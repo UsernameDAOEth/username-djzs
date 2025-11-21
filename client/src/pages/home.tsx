@@ -10,13 +10,14 @@ export default function Home() {
   const { toast } = useToast();
   const [isMinting, setIsMinting] = useState(false);
   const [wallet, setWallet] = useState("");
+  const [username, setUsername] = useState("");
 
   const handleMint = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wallet) {
+    if (!wallet || !username) {
       toast({
-        title: "ERROR: MISSING_WALLET",
-        description: "PLEASE PROVIDE A VALID ADDRESS TO PROCEED.",
+        title: "ERROR: MISSING_DATA",
+        description: "USERNAME AND WALLET REQUIRED.",
         variant: "destructive",
       });
       return;
@@ -26,8 +27,8 @@ export default function Home() {
     setTimeout(() => {
       setIsMinting(false);
       toast({
-        title: "TRANSACTION_BROADCASTED",
-        description: "HASH: 0x7f...92a1 // BLOCK: PENDING",
+        title: "IDENTITY_MINTED",
+        description: `AGENT @${username.toUpperCase()} ACTIVATED.`,
         className: "bg-primary text-primary-foreground font-mono border-2 border-black",
       });
     }, 2000);
@@ -46,19 +47,19 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 bg-primary animate-pulse" />
-            <span className="font-mono text-xl font-bold tracking-tighter">AZTEC_PROTO_V1</span>
+            <span className="font-mono text-xl font-bold tracking-tighter">USERNAME_DAO</span>
           </div>
           <nav className="hidden md:flex gap-8 font-mono text-sm">
-            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DOCS</a>
+            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
+            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">EXPLORER</a>
-            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">FAUCET</a>
             <a href="#" className="text-primary">CONNECT_WALLET [OFFLINE]</a>
           </nav>
         </div>
       </header>
 
       {/* Marquee */}
-      <Marquee text="/// PRIVACY IS NOT A CRIME /// TESTNET LIVE /// MINT GENESIS BLOCK /// " />
+      <Marquee text="/// YOUR NAME IS YOUR AGENT /// NO CLOUD /// LOCAL FIRST /// PAY PER INSIGHT /// " />
 
       <main className="container mx-auto px-4 py-12 md:py-24 space-y-32">
         {/* Hero Section */}
@@ -66,23 +67,24 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="inline-block border border-primary px-2 py-1 text-xs font-mono text-primary">
-                SYSTEM_STATUS: OPERATIONAL
+                SYSTEM_STATUS: MINTING LIVE
               </div>
               <h1 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter font-serif">
-                RAW<br />
-                <span className="text-outline text-transparent stroke-foreground stroke-2" style={{ WebkitTextStroke: "2px hsl(var(--foreground))" }}>INFRA</span><br />
-                STRUCTURE
+                YOUR<br />
+                <span className="text-outline text-transparent stroke-foreground stroke-2" style={{ WebkitTextStroke: "2px hsl(var(--foreground))" }}>NAME IS</span><br />
+                YOUR AGENT
               </h1>
               <p className="text-xl md:text-2xl font-mono text-muted-foreground max-w-md border-l-4 border-primary pl-6">
-                Build privacy-first decentralized applications on the Aztec Network. No compromises.
+                Claim your Username. Spawn your AI Agent. Own your Intelligence. 
+                <br/><span className="text-primary text-sm mt-2 block">POWERED BY AZTEC & DJZS</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <BrutalButton onClick={() => document.getElementById('mint')?.scrollIntoView({ behavior: 'smooth' })}>
-                  START_MINTING
+                  CLAIM_USERNAME
                 </BrutalButton>
                 <a href="https://docs.aztec.network/try_testnet" target="_blank" rel="noreferrer">
                   <BrutalButton variant="outline">
-                    VIEW_TESTNET_DOCS
+                    TESTNET_DOCS
                   </BrutalButton>
                 </a>
               </div>
@@ -98,44 +100,119 @@ export default function Home() {
                </div>
                <div className="absolute right-0 top-0 bottom-0 w-12 border-l-2 border-border flex flex-col items-center justify-center py-4 overflow-hidden bg-background z-20">
                   <div className="[writing-mode:vertical-rl] font-mono text-xs tracking-widest uppercase whitespace-nowrap animate-pulse text-primary">
-                    /// ENCRYPTED CONNECTION ESTABLISHED ///
+                    /// DJZS PROTOCOL ACTIVE ///
                   </div>
                </div>
                <div className="relative z-10 text-center space-y-4 p-8 bg-background border-2 border-foreground rotate-3 transition-transform group-hover:rotate-0">
-                 <GlitchText text="GENESIS" className="text-5xl md:text-7xl block" />
-                 <div className="font-mono text-sm">BATCH: #0001A</div>
+                 <GlitchText text="DJZS" className="text-7xl md:text-9xl block" />
+                 <div className="font-mono text-sm">AGENT_ID: UNASSIGNED</div>
                  <div className="w-full h-2 bg-primary mt-4 loading-bar" />
                </div>
             </div>
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="grid grid-cols-2 md:grid-cols-4 border-2 border-border divide-x-2 divide-y-2 md:divide-y-0 divide-border bg-card text-card-foreground">
-          {[
-            { label: "BLOCK_HEIGHT", value: "8,932,101" },
-            { label: "AVG_GAS", value: "12 GWEI" },
-            { label: "ACTIVE_NODES", value: "1,204" },
-            { label: "PRIVACY_POOL", value: "$42.5M" },
-          ].map((stat, i) => (
-            <div key={i} className="p-8 space-y-2 hover:bg-secondary/50 transition-colors group cursor-crosshair">
-              <div className="text-xs font-mono text-muted-foreground group-hover:text-primary">{stat.label}</div>
-              <div className="text-2xl md:text-4xl font-bold font-mono">{stat.value}</div>
-            </div>
-          ))}
+        {/* How It Works Grid */}
+        <section className="space-y-12">
+          <div className="flex items-end justify-between border-b-2 border-border pb-4">
+             <h2 className="text-4xl font-black uppercase">System Architecture</h2>
+             <span className="font-mono text-xs text-muted-foreground hidden md:inline-block">PROTOCOL_VER_1.0</span>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                step: "01",
+                title: "Choose Username",
+                desc: "Your handle becomes your identity layer. The root of everything your agent learns.",
+                icon: "🟣"
+              },
+              {
+                step: "02",
+                title: "Agent Activates",
+                desc: "Persistent. Linked to you. Trained in DJZS style. Doesn't run in the cloud.",
+                icon: "🔵"
+              },
+              {
+                step: "03",
+                title: "Local Space",
+                desc: "Your agent lives in your Anytype Vault. Encrypted. Private. Fully yours.",
+                icon: "🟢"
+              },
+              {
+                step: "04",
+                title: "Pay Per Insight",
+                desc: "No subscriptions. Micropayments per request (x402). Only pay for intelligence.",
+                icon: "🔴"
+              }
+            ].map((item, i) => (
+              <BrutalCard key={i} className="bg-card hover:-translate-y-2 transition-transform duration-200">
+                <div className="flex justify-between items-start mb-4">
+                  <span className="font-mono text-4xl font-bold text-primary opacity-50">{item.step}</span>
+                  <span className="text-2xl">{item.icon}</span>
+                </div>
+                <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                <p className="font-mono text-sm text-muted-foreground">{item.desc}</p>
+              </BrutalCard>
+            ))}
+          </div>
+        </section>
+
+        {/* Pricing Table */}
+        <section className="border-2 border-border bg-background p-8 md:p-12">
+          <h3 className="text-2xl font-bold uppercase mb-8 text-center">x402 Micropayment Structure</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full font-mono text-sm text-left">
+              <thead className="bg-secondary/20 text-primary border-b-2 border-border">
+                <tr>
+                  <th className="p-4 uppercase">Mode</th>
+                  <th className="p-4 uppercase">Output</th>
+                  <th className="p-4 uppercase">Cost</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {[
+                  { mode: "QUICK", output: "Simple Answers", cost: "$0.01" },
+                  { mode: "JOURNAL", output: "Problem → Solution → Use Cases", cost: "$0.03" },
+                  { mode: "RESEARCH", output: "Full Analysis", cost: "$0.05" },
+                  { mode: "ALPHA", output: "High-Value Insights", cost: "$0.10+" },
+                ].map((row, i) => (
+                  <tr key={i} className="hover:bg-secondary/10">
+                    <td className="p-4 font-bold">{row.mode}</td>
+                    <td className="p-4">{row.output}</td>
+                    <td className="p-4 text-primary">{row.cost}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* Mint Section */}
         <section id="mint" className="max-w-3xl mx-auto relative">
           <BrutalCard className="bg-background p-8 md:p-12 space-y-8">
             <div className="space-y-2">
-              <h2 className="text-4xl font-black uppercase">Mint Access Token</h2>
-              <p className="font-mono text-muted-foreground">Enter your Ethereum address to mint a testnet access token.</p>
+              <h2 className="text-4xl font-black uppercase">Claim Your Identity</h2>
+              <p className="font-mono text-muted-foreground">Mint your Username NFT to spawn your DJZS Agent.</p>
             </div>
 
             <form onSubmit={handleMint} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="wallet" className="font-mono text-xs uppercase">Wallet Address</Label>
+                <Label htmlFor="username" className="font-mono text-xs uppercase">Desired Username</Label>
+                <div className="flex">
+                  <span className="flex items-center px-4 border-2 border-r-0 border-border bg-secondary/20 font-mono text-muted-foreground">@</span>
+                  <Input 
+                    id="username"
+                    placeholder="djzs" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="font-mono text-lg p-6 border-2 border-border rounded-none focus-visible:ring-0 focus-visible:border-primary bg-secondary/10 flex-1"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="wallet" className="font-mono text-xs uppercase">Aztec Wallet Address</Label>
                 <Input 
                   id="wallet"
                   placeholder="0x..." 
@@ -147,12 +224,12 @@ export default function Home() {
               
               <div className="grid grid-cols-2 gap-4">
                  <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
-                    <div className="font-mono text-xs text-muted-foreground">PRICE</div>
+                    <div className="font-mono text-xs text-muted-foreground">MINT FEE</div>
                     <div className="text-xl font-bold">0.05 ETH</div>
                  </div>
                  <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
-                    <div className="font-mono text-xs text-muted-foreground">LIMIT</div>
-                    <div className="text-xl font-bold">1 PER WALLET</div>
+                    <div className="font-mono text-xs text-muted-foreground">STORAGE</div>
+                    <div className="text-xl font-bold">LOCAL/IPFS</div>
                  </div>
               </div>
 
@@ -161,11 +238,11 @@ export default function Home() {
                 className="w-full py-6 text-xl"
                 disabled={isMinting}
               >
-                {isMinting ? "PROCESSING_TRANSACTION..." : "MINT_TOKEN_NOW"}
+                {isMinting ? "INITIALIZING_AGENT..." : "MINT_IDENTITY_NFT"}
               </BrutalButton>
               
               <p className="text-xs font-mono text-center text-muted-foreground">
-                * By minting, you agree to the testnet terms of service. Gas fees apply.
+                * Requires Aztec Testnet connection. Your agent will be deployed to your local environment.
               </p>
             </form>
           </BrutalCard>
@@ -175,35 +252,37 @@ export default function Home() {
         <footer className="border-t-2 border-border pt-12 pb-8">
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="space-y-4">
-              <div className="h-8 w-8 bg-foreground" />
+              <div className="h-8 w-8 bg-primary animate-pulse" />
               <p className="font-mono text-sm text-muted-foreground max-w-xs">
-                Aztec is a privacy-first zero-knowledge rollup on Ethereum.
+                Username DAO x DJZS Protocol.
+                <br/>
+                Your name. Your agent. Your mind.
               </p>
             </div>
             <div className="col-span-2 grid grid-cols-2 md:grid-cols-3 gap-8 font-mono text-sm">
                <div className="space-y-4">
-                 <h4 className="font-bold uppercase text-primary">Protocol</h4>
+                 <h4 className="font-bold uppercase text-primary">Ecosystem</h4>
                  <ul className="space-y-2 text-muted-foreground">
-                   <li><a href="#" className="hover:text-foreground">Documentation</a></li>
-                   <li><a href="#" className="hover:text-foreground">GitHub</a></li>
-                   <li><a href="#" className="hover:text-foreground">Audits</a></li>
+                   <li><a href="#" className="hover:text-foreground">Username DAO</a></li>
+                   <li><a href="#" className="hover:text-foreground">DJZS Protocol</a></li>
+                   <li><a href="#" className="hover:text-foreground">Anytype</a></li>
                  </ul>
                </div>
                <div className="space-y-4">
                  <h4 className="font-bold uppercase text-primary">Community</h4>
                  <ul className="space-y-2 text-muted-foreground">
                    <li><a href="#" className="hover:text-foreground">Discord</a></li>
-                   <li><a href="#" className="hover:text-foreground">Twitter</a></li>
-                   <li><a href="#" className="hover:text-foreground">Forum</a></li>
+                   <li><a href="#" className="hover:text-foreground">Farcaster</a></li>
+                   <li><a href="#" className="hover:text-foreground">Governance</a></li>
                  </ul>
                </div>
             </div>
           </div>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-xs text-muted-foreground">
-            <div>© 2025 AZTEC NETWORK. ALL RIGHTS RESERVED.</div>
+            <div>© 2025 USERNAME DAO. DECENTRALIZED INTELLIGENCE.</div>
             <div className="flex gap-4">
-              <span>STATUS: ONLINE</span>
-              <span>BLOCK: 120491</span>
+              <span>AGENT_NET: ONLINE</span>
+              <span>ZONES: 10</span>
             </div>
           </div>
         </footer>
