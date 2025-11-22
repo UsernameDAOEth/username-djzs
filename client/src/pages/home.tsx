@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
+import { DjzsAgentConsole } from "@/components/djzs-agent-console";
 
 export default function Home() {
   const { toast } = useToast();
@@ -110,6 +111,15 @@ export default function Home() {
                </div>
             </div>
           </div>
+        </section>
+
+        {/* Agent Console Section */}
+        <section className="space-y-8">
+           <div className="text-center space-y-2">
+             <h2 className="text-3xl md:text-5xl font-black uppercase">Agent Console</h2>
+             <p className="font-mono text-muted-foreground">Interact with the DJZS Protocol Intelligence Layer</p>
+           </div>
+           <DjzsAgentConsole />
         </section>
 
         {/* How It Works Grid */}

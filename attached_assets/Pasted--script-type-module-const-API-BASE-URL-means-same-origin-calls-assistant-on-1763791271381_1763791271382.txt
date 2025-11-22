@@ -1,0 +1,114 @@
+<script type="module">
+  const API_BASE_URL = ""; 
+  // "" means "same origin" → calls /assistant on this same Replit app.
+  // If you ever split frontend/back, set this to the full origin:
+  // const API_BASE_URL = "https://ea5d0ede-c0b4-4e6e-8aab-622338eae763-00-1hla9paj6syzi.kirk.replit.dev";
+
+  // Keep one sessionId per browser so conversations persist
+  function getSessionId() {
+    const key = "djzs_session_id";
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = "user-" + crypto.randomUUID();
+      localStorage.setItem(key, id);
+    }
+    return id;
+  }
+
+  async function callDjzsAssistant({ query, zone, mode }) {
+    const sessionId = getSessionId();
+
+    const res = await fetch(`${API_BASE_URL}/assistant`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        query,
+        sessionId,
+        zone,
+        mode,
+        metadata: {
+          client: "djzs-web",
+          version: "1.0.0"
+        }
+      })
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Server error (${res.status}): ${text}`);
+    }
+
+    const data = await res.json();
+    return data;
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("assistant-form");
+    const queryInput = document.getElementById("query-input");
+    const zoneSelect = document.getElementById("zone-select");
+    const modeSelect = document.getElementById("mode-select");
+    const responseEl = document.getElementById("assistant-response");
+    const submitBtn = form?.querySelector("button[type='submit']");
+
+    if (!form || !queryInput || !zoneSelect || !modeSelect || !responseEl) {
+      console.error("DJZS wiring: one or more elements not found. Check IDs.");
+      return;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const query = queryInput.value.trim();
+      const zone = zoneSelect.value || "Zone 01 – DYOR";
+      const mode = modeSelect.value || "quick";
+
+      if (!query) {
+        responseEl.textContent = "Type a question or prompt first.";
+        return;
+      }
+
+      // UI state: show loading
+      const originalText = submitBtn ? submitBtn.textContent : "";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Thinking…";
+      }
+      responseEl.textContent = "Summoning your DJZS Agent…";
+
+      try {
+        const { response, sessionId, requestCount } = await callDjzsAssistant({
+          query,
+          zone,
+          mode
+        });
+
+        responseEl.innerHTML = `
+          <div class="djzs-response-block">
+            <div class="djzs-response-meta">
+              <span><strong>Zone:</strong> ${zone}</span>
+              <span><strong>Mode:</strong> ${mode}</span>
+              <span><strong>Session:</strong> ${sessionId}</span>
+              <span><strong>Request #</strong> ${requestCount ?? "—"}</span>
+            </div>
+            <div class="djzs-response-text">
+              ${response
+                .replace(/\n/g, "<br>")
+                .trim() || "No response from agent."}
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        console.error(err);
+        responseEl.textContent =
+          "Error talking to the DJZS Agent. Please try again.";
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText || "Ask";
+        }
+      }
+    });
+  });
+</script>
