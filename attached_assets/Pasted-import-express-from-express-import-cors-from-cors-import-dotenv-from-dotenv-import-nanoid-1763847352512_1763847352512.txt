@@ -1,0 +1,175 @@
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { nanoid } from "nanoid";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// In-memory store for demo.
+// In production, swap this to a DB (Supabase, PlanetScale, etc.)
+const entries = []; // { id, title, zone, mode, problem, solution, useCases, tags, summary, sessionId, externalLink, synced }
+
+app.use(cors());
+app.use(express.json());
+
+/**
+ * Health check
+ */
+app.get("/", (req, res) => {
+  res.send({
+    status: "ok",
+    message: "DJZS Paid Agent backend is running.",
+    routes: ["/assistant", "/sync/entries", "/sync/entries/:id/mark-synced"]
+  });
+});
+
+/**
+ * POST /assistant
+ *
+ * Main DJZS agent endpoint.
+ * For now this just echos back a structured response and enqueues
+ * a DJZS Journal entry to be synced into Anytype.
+ *
+ * Expected JSON body:
+ * {
+ *   "query": "string",
+ *   "zone": "Zone 07 – DeFi",
+ *   "mode": "quick" | "journal" | "research" | "alpha",
+ *   "sessionId": "optional string"
+ * }
+ */
+app.post("/assistant", (req, res) => {
+  const { query, zone, mode, sessionId } = req.body || {};
+
+  if (!query) {
+    return res.status(400).json({ error: "Missing 'query' in request body." });
+  }
+
+  const safeZone = zone || "Zone 01 – DYOR";
+  const safeMode = mode || "quick";
+  const safeSessionId = sessionId || `session-${nanoid(8)}`;
+
+  // For now, we fake a DJZS-style structured response.
+  // Later you can plug in Daydreams / OpenAI / Anthropic here.
+  const problem = `User is exploring: ${query}`;
+  const solution =
+    "Frame this topic through the DJZS lens, focusing on decentralized journaling, local-first storage, and agentic workflows.";
+  const useCases =
+    "Use this insight in a DJZS Journal entry, link it to the correct Zone, and sync it into the Anytype Member Vault as structured knowledge.";
+
+  const responseText = [
+    "Problem:",
+    problem,
+    "",
+    "Solution:",
+    solution,
+    "",
+    "Use Cases:",
+    useCases
+  ].join("\n");
+
+  // Create a DJZS Journal entry in our in-memory queue for Anytype sync
+  const id = nanoid(12);
+  const title = `DJZS – ${safeZone} – ${safeMode} – ${id}`;
+
+  const entry = {
+    id,
+    title,
+    zone: safeZone,
+    mode: safeMode,
+    problem,
+    solution,
+    useCases,
+    tags: [],
+    summary: solution,
+    sessionId: safeSessionId,
+    externalLink: null,
+    synced: false
+  };
+
+  entries.push(entry);
+
+  res.json({
+    response: responseText,
+    sessionId: safeSessionId,
+    zone: safeZone,
+    mode: safeMode,
+    journalEntryId: id
+  });
+});
+
+/**
+ * GET /sync/entries
+ *
+ * This is the endpoint your Anytype worker calls to fetch *unsynced* DJZS entries.
+ *
+ * It returns an array of entries shaped like:
+ * [
+ *   {
+ *     id,
+ *     title,
+ *     zone,
+ *     mode,
+ *     problem,
+ *     solution,
+ *     useCases,
+ *     tags,
+ *     summary,
+ *     sessionId,
+ *     externalLink
+ *   }
+ * ]
+ *
+ * Note: it does NOT include the "synced" flag.
+ */
+app.get("/sync/entries", (req, res) => {
+  const unsynced = entries.filter((e) => !e.synced);
+
+  const payload = unsynced.map((e) => ({
+    id: e.id,
+    title: e.title,
+    zone: e.zone,
+    mode: e.mode,
+    problem: e.problem,
+    solution: e.solution,
+    useCases: e.useCases,
+    tags: e.tags,
+    summary: e.summary,
+    sessionId: e.sessionId,
+    externalLink: e.externalLink
+  }));
+
+  res.json(payload);
+});
+
+/**
+ * POST /sync/entries/:id/mark-synced
+ *
+ * Called by the Anytype worker AFTER successfully writing a journal into Anytype.
+ * This prevents the same entry from being synced repeatedly.
+ */
+app.post("/sync/entries/:id/mark-synced", (req, res) => {
+  const { id } = req.params;
+
+  const idx = entries.findIndex((e) => e.id === id);
+  if (idx === -1) {
+    return res.status(404).json({ error: "Entry not found." });
+  }
+
+  entries[idx].synced = true;
+  res.json({ ok: true, id });
+});
+
+/**
+ * Optional: see current in-memory entries (debug only)
+ */
+app.get("/debug/entries", (req, res) => {
+  res.json(entries);
+});
+
+app.listen(PORT, () => {
+  console.log(`DJZS backend listening on port ${PORT}`);
+});

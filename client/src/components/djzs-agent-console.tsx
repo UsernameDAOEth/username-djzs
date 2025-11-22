@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { BrutalButton, BrutalCard, GlitchText } from "@/components/ui/brutalist";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal, Cpu, ShieldCheck, Zap } from "lucide-react";
 
 // Mock response generator since we are frontend-only
 const generateMockResponse = (query: string, zone: string, mode: string) => {
   const timestamp = new Date().toISOString();
   
-  const commonHeader = `/// DJZS_AGENT_V1 // ${zone.toUpperCase()} // ${mode.toUpperCase()} ///\n/// TIMESTAMP: ${timestamp} ///\n\n`;
+  const commonHeader = `/// DJZS_PAID_AGENT_V1.0.0 // ${zone.toUpperCase()} // ${mode.toUpperCase()} ///\n/// TIMESTAMP: ${timestamp} ///\n\n`;
 
   if (mode === "quick") {
     return `${commonHeader}QUERY: "${query}"\n\n> ANALYSIS: The query touches on fundamental concepts within ${zone}.\n\n> ANSWER: \nBased on current protocol parameters, this requires immediate attention to decentralized verification methods. The integration of ${zone} vectors suggests a bullish outlook on sovereignty but bears monitoring for regulatory friction points.\n\n> ACTION: Verify on-chain data.`;
@@ -34,6 +34,11 @@ export const DjzsAgentConsole = () => {
   const [mode, setMode] = useState("quick");
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [logs, setLogs] = useState<string[]>([]);
+
+  const addLog = (message: string) => {
+    setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0,8)}] ${message}`].slice(-5));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +46,24 @@ export const DjzsAgentConsole = () => {
 
     setLoading(true);
     setResponse(null);
+    setLogs([]);
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    addLog("INIT_SEQUENCE_START");
+    addLog(`CONNECTING TO DJZS_PAID_AGENT v1.0.0...`);
+    
+    // Simulate network delay and logs
+    await new Promise((resolve) => setTimeout(() => {
+        addLog("AUTHENTICATING USERNAME_DAO KEY...");
+    }, 500));
+    
+    await new Promise((resolve) => setTimeout(() => {
+        addLog(`LOADING CONTEXT: ${zone.replace(' ', '_').toUpperCase()}`);
+    }, 1000));
+    
+    await new Promise((resolve) => setTimeout(() => {
+        addLog("GENERATING_INSIGHTS...");
+        resolve(true);
+    }, 1500));
 
     const mockRes = generateMockResponse(query, zone, mode);
     setResponse(mockRes);
@@ -51,20 +71,24 @@ export const DjzsAgentConsole = () => {
   };
 
   return (
-    <BrutalCard className="w-full max-w-4xl mx-auto bg-background p-0 overflow-hidden border-2 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)]">
+    <BrutalCard className="w-full max-w-5xl mx-auto bg-background p-0 overflow-hidden border-2 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)]">
       {/* Terminal Header */}
       <div className="bg-primary text-primary-foreground p-2 border-b-2 border-primary flex justify-between items-center">
         <div className="font-mono text-xs font-bold uppercase flex items-center gap-2">
-          <div className="w-3 h-3 bg-black animate-pulse" />
-          DJZS_AGENT_CONSOLE // v1.0.0
+          <Terminal className="w-4 h-4" />
+          DJZS_PAID_AGENT // v1.0.0
         </div>
-        <div className="font-mono text-xs">CONNECTED: LOCAL_HOST</div>
+        <div className="font-mono text-[10px] flex items-center gap-4">
+            <span className="flex items-center gap-1"><Cpu className="w-3 h-3"/> NODE_ENV: PRODUCTION</span>
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3"/> ENCRYPTED</span>
+            <span className="flex items-center gap-1"><Zap className="w-3 h-3"/> x402 READY</span>
+        </div>
       </div>
 
-      <div className="p-6 md:p-8 grid md:grid-cols-2 gap-8">
+      <div className="p-4 md:p-6 grid lg:grid-cols-12 gap-6">
         {/* Input Section */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="lg:col-span-5 space-y-6 flex flex-col h-full">
+          <div className="space-y-2 flex-grow">
             <label htmlFor="query-input" className="font-mono text-xs uppercase text-muted-foreground block">
               Input Directive
             </label>
@@ -72,12 +96,12 @@ export const DjzsAgentConsole = () => {
               id="query-input"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-32 bg-secondary/10 border-2 border-border p-4 font-mono text-sm focus:border-primary focus:outline-none resize-none rounded-none text-foreground placeholder:text-muted-foreground/50"
+              className="w-full h-full min-h-[160px] bg-secondary/10 border-2 border-border p-4 font-mono text-sm focus:border-primary focus:outline-none resize-none rounded-none text-foreground placeholder:text-muted-foreground/50"
               placeholder="Ask the DJZS Agent..."
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <label htmlFor="zone-select" className="font-mono text-xs uppercase text-muted-foreground block">
                 Target Zone
@@ -111,10 +135,10 @@ export const DjzsAgentConsole = () => {
                 onChange={(e) => setMode(e.target.value)}
                 className="w-full bg-secondary/10 border-2 border-border p-3 font-mono text-xs focus:border-primary focus:outline-none rounded-none appearance-none cursor-pointer hover:bg-secondary/20 transition-colors"
               >
-                <option value="quick">Quick (Q&A)</option>
-                <option value="journal">Journal</option>
-                <option value="research">Research</option>
-                <option value="alpha">Alpha</option>
+                <option value="quick">Quick (Q&A) - $0.01</option>
+                <option value="journal">Journal - $0.03</option>
+                <option value="research">Research - $0.05</option>
+                <option value="alpha">Alpha - $0.10+</option>
               </select>
             </div>
           </div>
@@ -122,7 +146,7 @@ export const DjzsAgentConsole = () => {
           <BrutalButton
             type="submit"
             disabled={loading || !query.trim()}
-            className="w-full flex justify-center items-center gap-2"
+            className="w-full flex justify-center items-center gap-2 py-6"
           >
             {loading ? (
               <>
@@ -136,31 +160,46 @@ export const DjzsAgentConsole = () => {
         </form>
 
         {/* Output Section */}
-        <div className="relative border-2 border-border bg-black p-4 font-mono text-sm overflow-hidden min-h-[300px] flex flex-col">
+        <div className="lg:col-span-7 relative border-2 border-border bg-black font-mono text-sm overflow-hidden min-h-[400px] flex flex-col">
           <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
           
-          {!response && !loading && (
-            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground/50 text-center space-y-4">
-              <div className="text-4xl opacity-20">⌘</div>
-              <p className="text-xs uppercase tracking-widest">Terminal Ready<br/>Waiting for Input...</p>
-            </div>
-          )}
+          {/* Status Bar */}
+          <div className="border-b border-white/10 p-2 flex gap-4 text-[10px] text-muted-foreground uppercase tracking-wider">
+            <span>STATUS: {loading ? <span className="text-primary animate-pulse">PROCESSING</span> : <span className="text-green-500">IDLE</span>}</span>
+            <span>MEM: 128MB</span>
+            <span>UPTIME: 99.9%</span>
+          </div>
 
-          {loading && (
-            <div className="flex-1 flex flex-col justify-center space-y-1 text-primary">
-              <div className="animate-pulse">&gt; CONNECTING TO AGENT SWARM...</div>
-              <div className="animate-pulse delay-75">&gt; VERIFYING USERNAME_DAO CREDENTIALS...</div>
-              <div className="animate-pulse delay-150">&gt; LOADING CONTEXT FROM {zone.toUpperCase()}...</div>
-              <div className="animate-pulse delay-300">&gt; GENERATING INSIGHTS...</div>
-            </div>
-          )}
+          <div className="p-4 flex-1 overflow-y-auto space-y-4 font-mono">
+            {!response && !loading && (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 space-y-4 select-none">
+                <Terminal className="w-16 h-16 opacity-20" />
+                <p className="text-xs uppercase tracking-widest text-center">
+                    System Ready<br/>
+                    Initiate Query Sequence
+                </p>
+                </div>
+            )}
 
-          {response && !loading && (
-            <div className="text-primary whitespace-pre-wrap leading-relaxed animate-in fade-in duration-300">
-              {response}
-              <span className="inline-block w-2 h-4 bg-primary ml-1 animate-pulse align-middle" />
-            </div>
-          )}
+            {/* Live Logs */}
+            {loading && (
+                <div className="space-y-1 text-xs font-mono text-primary/70">
+                    {logs.map((log, i) => (
+                        <div key={i} className="animate-in fade-in slide-in-from-left-2 duration-200">
+                            {log}
+                        </div>
+                    ))}
+                    <div className="animate-pulse">_</div>
+                </div>
+            )}
+
+            {response && !loading && (
+                <div className="text-primary whitespace-pre-wrap leading-relaxed animate-in fade-in duration-300 selection:bg-primary/30 selection:text-white">
+                {response}
+                <span className="inline-block w-2 h-4 bg-primary ml-1 animate-pulse align-middle" />
+                </div>
+            )}
+          </div>
         </div>
       </div>
     </BrutalCard>

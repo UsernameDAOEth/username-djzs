@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { BrutalButton, BrutalCard, Marquee, GlitchText } from "@/components/ui/brutalist";
+import { DjzsAgentConsole } from "@/components/djzs-agent-console";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
-import { DjzsAgentConsole } from "@/components/djzs-agent-console";
 
 export default function Home() {
   const { toast } = useToast();
@@ -113,13 +113,13 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Agent Console Section */}
+        {/* Agent Console Integration */}
         <section className="space-y-8">
-           <div className="text-center space-y-2">
-             <h2 className="text-3xl md:text-5xl font-black uppercase">Agent Console</h2>
-             <p className="font-mono text-muted-foreground">Interact with the DJZS Protocol Intelligence Layer</p>
-           </div>
-           <DjzsAgentConsole />
+            <div className="text-center space-y-2">
+                <h2 className="text-2xl font-black uppercase">Live Agent Preview</h2>
+                <p className="font-mono text-sm text-muted-foreground">Interact with the djzs-paid-agent v1.0.0 kernel</p>
+            </div>
+            <DjzsAgentConsole />
         </section>
 
         {/* How It Works Grid */}
@@ -158,25 +158,25 @@ export default function Home() {
               {
                 step: "05",
                 title: "Agent Writes",
-                desc: "Every insight gets written directly into your encrypted Anytype Vault. No platform owns your data.",
+                desc: "Direct-to-vault encrypted storage. No platform owns your data.",
                 icon: "🟣"
               },
               {
                 step: "06",
                 title: "Knowledge Evolves",
-                desc: "Your agent learns your style. Your Zone graph expands. Your personal space becomes richer.",
+                desc: "Graph expansion and style learning. Your personal space becomes richer.",
                 icon: "🔵"
               },
               {
                 step: "07",
                 title: "Mint or Export",
-                desc: "Create NFTs, build a portfolio, or keep everything entirely private. You're in control.",
+                desc: "Create NFTs, build a portfolio, or share your research. Optional.",
                 icon: "🟢"
               },
               {
                 step: "08",
                 title: "Full Ownership",
-                desc: "No cloud lock-in. No big tech data mining. Just your name, your agent, your mind.",
+                desc: "Zero lock-in. Total sovereignty. Just your name, your agent, your mind.",
                 icon: "🧭"
               }
             ].map((item, i) => (
@@ -314,9 +314,9 @@ export default function Home() {
           </div>
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 font-mono text-xs text-muted-foreground">
             <div>© 2025 USERNAME DAO. DECENTRALIZED INTELLIGENCE.</div>
-            <div className="flex gap-4">
-              <span>AGENT_NET: ONLINE</span>
-              <span>ZONES: 10</span>
+            <div className="flex flex-col md:flex-row gap-4 text-right">
+              <span>AGENT_CORE: v1.0.0 (Node/Express)</span>
+              <span>STATUS: ONLINE</span>
             </div>
           </div>
         </footer>
