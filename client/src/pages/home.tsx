@@ -154,6 +154,30 @@ export default function Home() {
                 title: "Pay Per Insight",
                 desc: "No subscriptions. Micropayments per request (x402). Only pay for intelligence.",
                 icon: "🔴"
+              },
+              {
+                step: "05",
+                title: "Agent Writes",
+                desc: "Every insight gets written directly into your encrypted Anytype Vault. No platform owns your data.",
+                icon: "🟣"
+              },
+              {
+                step: "06",
+                title: "Knowledge Evolves",
+                desc: "Your agent learns your style. Your Zone graph expands. Your personal space becomes richer.",
+                icon: "🔵"
+              },
+              {
+                step: "07",
+                title: "Mint or Export",
+                desc: "Create NFTs, build a portfolio, or keep everything entirely private. You're in control.",
+                icon: "🟢"
+              },
+              {
+                step: "08",
+                title: "Full Ownership",
+                desc: "No cloud lock-in. No big tech data mining. Just your name, your agent, your mind.",
+                icon: "🧭"
               }
             ].map((item, i) => (
               <BrutalCard key={i} className="bg-card hover:-translate-y-2 transition-transform duration-200">
