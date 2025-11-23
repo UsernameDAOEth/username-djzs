@@ -112,5 +112,41 @@ export const djzsApi = {
   
   async clearEntries() {
     localStorage.removeItem(STORAGE_KEY);
+  },
+
+  // --- Authentication Simulation ---
+  
+  async requestChallenge(appName: string) {
+    await new Promise(r => setTimeout(r, 800));
+    // In a real app, this calls POST /v1/auth/challenges
+    return {
+      challenge_id: nanoid(24),
+      status: "pending_user_code"
+    };
+  },
+
+  async verifyChallenge(challenge_id: string, code: string) {
+    await new Promise(r => setTimeout(r, 1000));
+    
+    // Mock verification - accept any 4 digit code for prototype
+    if (code.length === 4 && /^\d+$/.test(code)) {
+      const apiKey = `sk_${nanoid(32)}`;
+      // Store in local storage for persistence
+      localStorage.setItem("djzs_anytype_key", apiKey);
+      return {
+        api_key: apiKey,
+        success: true
+      };
+    }
+    
+    throw new Error("Invalid code. Please check Anytype app.");
+  },
+
+  isAuthenticated() {
+    return !!localStorage.getItem("djzs_anytype_key");
+  },
+
+  disconnect() {
+    localStorage.removeItem("djzs_anytype_key");
   }
 };

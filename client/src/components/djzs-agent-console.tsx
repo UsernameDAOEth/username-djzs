@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
 import { cn } from "@/lib/utils";
-import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2 } from "lucide-react";
+import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2, Link2, Lock, AlertCircle, LogOut } from "lucide-react";
 import { djzsApi, type DjzsEntry } from "@/lib/djzs-api";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export const DjzsAgentConsole = () => {
+  const { toast } = useToast();
   const [query, setQuery] = useState("");
   const [zone, setZone] = useState("Zone 01 – DYOR");
   const [mode, setMode] = useState("quick");
@@ -15,6 +19,13 @@ export const DjzsAgentConsole = () => {
   // Sync State
   const [syncQueue, setSyncQueue] = useState<DjzsEntry[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
+  
+  // Auth State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authStep, setAuthStep] = useState<"idle" | "challenge" | "verify">("idle");
+  const [challengeId, setChallengeId] = useState("");
+  const [authCode, setAuthCode] = useState("");
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const addLog = (message: string) => {
     setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0,8)}] ${message}`].slice(-5));
@@ -28,6 +39,7 @@ export const DjzsAgentConsole = () => {
   // Initial load
   useEffect(() => {
     refreshSyncQueue();
+    setIsAuthenticated(djzsApi.isAuthenticated());
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -74,6 +86,50 @@ export const DjzsAgentConsole = () => {
     
     await refreshSyncQueue();
     setIsSyncing(false);
+  };
+
+  const handleRequestChallenge = async () => {
+    setIsAuthenticating(true);
+    try {
+        const res = await djzsApi.requestChallenge("DJZS Agent");
+        setChallengeId(res.challenge_id);
+        setAuthStep("verify");
+        addLog("AUTH_CHALLENGE_INITIATED");
+    } catch (e) {
+        addLog("AUTH_ERROR: CHALLENGE_FAILED");
+    } finally {
+        setIsAuthenticating(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    setIsAuthenticating(true);
+    try {
+        await djzsApi.verifyChallenge(challengeId, authCode);
+        setIsAuthenticated(true);
+        setAuthStep("idle");
+        addLog("ANYTYPE_CONNECTION_ESTABLISHED");
+        toast({
+            title: "VAULT_CONNECTED",
+            description: "SECURE TUNNEL ESTABLISHED WITH ANYTYPE.",
+            className: "bg-primary text-primary-foreground font-mono border-2 border-black",
+        });
+    } catch (e) {
+        addLog("AUTH_ERROR: INVALID_CODE");
+        toast({
+            title: "CONNECTION_FAILED",
+            description: "INVALID CODE. TRY AGAIN.",
+            variant: "destructive",
+        });
+    } finally {
+        setIsAuthenticating(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    djzsApi.disconnect();
+    setIsAuthenticated(false);
+    addLog("ANYTYPE_DISCONNECTED");
   };
 
   return (
@@ -217,44 +273,90 @@ export const DjzsAgentConsole = () => {
                         <Database className="w-3 h-3" />
                         ANYTYPE_SYNC
                     </h4>
-                    <div className="text-[10px] font-mono text-muted-foreground">
-                        PENDING: {syncQueue.length}
-                    </div>
+                    {isAuthenticated && (
+                      <div className="text-[10px] font-mono text-primary flex items-center gap-1">
+                         <Lock className="w-3 h-3" /> CONNECTED
+                      </div>
+                    )}
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[200px]">
-                    {syncQueue.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 text-center">
-                            <CheckCircle2 className="w-8 h-8 mb-2 opacity-50" />
-                            <span className="text-[10px] uppercase">All Entries Synced</span>
-                        </div>
-                    ) : (
-                        syncQueue.map((entry) => (
-                            <div key={entry.id} className="bg-background border border-border p-2 text-[10px] font-mono group">
-                                <div className="flex justify-between text-muted-foreground mb-1">
-                                    <span>{entry.mode.toUpperCase()}</span>
-                                    <span>{entry.zone.split('–')[0].trim()}</span>
-                                </div>
-                                <div className="truncate font-bold mb-1">{entry.title}</div>
-                                <div className="text-primary/50 truncate">{entry.id}</div>
+                {!isAuthenticated ? (
+                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 mb-4 border-2 border-border border-dashed bg-background/50 p-4">
+                      <Link2 className="w-8 h-8 text-muted-foreground opacity-50" />
+                      
+                      {authStep === "idle" && (
+                          <div className="text-center space-y-4">
+                             <p className="text-[10px] font-mono text-muted-foreground">CONNECT VAULT TO ENABLE SYNC</p>
+                             <BrutalButton variant="outline" className="w-full text-xs" onClick={handleRequestChallenge} disabled={isAuthenticating}>
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "CONNECT ANYTYPE"}
+                             </BrutalButton>
+                          </div>
+                      )}
+
+                      {authStep === "verify" && (
+                          <div className="space-y-3 w-full">
+                             <p className="text-[10px] font-mono text-primary text-center">ENTER CODE FROM ANYTYPE APP</p>
+                             <Input 
+                                value={authCode}
+                                onChange={(e) => setAuthCode(e.target.value)}
+                                placeholder="1234"
+                                className="text-center font-mono tracking-widest text-lg"
+                                maxLength={4}
+                             />
+                             <BrutalButton className="w-full text-xs" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4}>
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "VERIFY CODE"}
+                             </BrutalButton>
+                             <button onClick={() => setAuthStep("idle")} className="text-[10px] underline text-muted-foreground w-full text-center">CANCEL</button>
+                          </div>
+                      )}
+                   </div>
+                ) : (
+                   <>
+                    <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[200px]">
+                        {syncQueue.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 text-center">
+                                <CheckCircle2 className="w-8 h-8 mb-2 opacity-50" />
+                                <span className="text-[10px] uppercase">All Entries Synced</span>
                             </div>
-                        ))
-                    )}
-                </div>
+                        ) : (
+                            syncQueue.map((entry) => (
+                                <div key={entry.id} className="bg-background border border-border p-2 text-[10px] font-mono group animate-in fade-in slide-in-from-bottom-2">
+                                    <div className="flex justify-between text-muted-foreground mb-1">
+                                        <span>{entry.mode.toUpperCase()}</span>
+                                        <span>{entry.zone.split('–')[0].trim()}</span>
+                                    </div>
+                                    <div className="truncate font-bold mb-1">{entry.title}</div>
+                                    <div className="text-primary/50 truncate">{entry.id}</div>
+                                </div>
+                            ))
+                        )}
+                    </div>
 
-                <BrutalButton 
-                    variant="outline" 
-                    className="w-full text-xs py-2 h-auto"
-                    onClick={handleSimulateSync}
-                    disabled={isSyncing || syncQueue.length === 0}
-                >
-                    {isSyncing ? (
-                        <RefreshCw className="w-3 h-3 animate-spin mr-2" />
-                    ) : (
-                        <RefreshCw className="w-3 h-3 mr-2" />
-                    )}
-                    {isSyncing ? "SYNCING..." : "TRIGGER_SYNC_WORKER"}
-                </BrutalButton>
+                    <div className="space-y-2">
+                        <BrutalButton 
+                            variant="outline" 
+                            className="w-full text-xs py-2 h-auto"
+                            onClick={handleSimulateSync}
+                            disabled={isSyncing || syncQueue.length === 0}
+                        >
+                            {isSyncing ? (
+                                <RefreshCw className="w-3 h-3 animate-spin mr-2" />
+                            ) : (
+                                <RefreshCw className="w-3 h-3 mr-2" />
+                            )}
+                            {isSyncing ? "SYNCING..." : "TRIGGER_SYNC_WORKER"}
+                        </BrutalButton>
+                        <BrutalButton 
+                            variant="ghost" 
+                            className="w-full text-xs py-1 h-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            onClick={handleDisconnect}
+                        >
+                            <LogOut className="w-3 h-3 mr-2" />
+                            DISCONNECT
+                        </BrutalButton>
+                    </div>
+                   </>
+                )}
                 
                 <div className="mt-4 text-[10px] text-muted-foreground font-mono border-t border-border pt-2">
                     <p>SIMULATES WORKER POLLING:</p>
