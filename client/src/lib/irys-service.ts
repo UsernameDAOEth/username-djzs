@@ -8,13 +8,14 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export interface IrysJournalPayload {
   title: string;
   content: string;
-  zoneId: string;
+  zoneId: number; // Changed to number to match guide
   zoneSlug: string;
-  timeCode: number;
+  timeCode: string; // Changed to string to match guide
   createdAt: string;
-  version: string;
+  version: number; // Changed to number to match guide
   previousIrysId?: string;
   authorAlias?: string;
+  tags?: string[]; // Added optional tags array
 }
 
 export const irysService = {

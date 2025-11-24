@@ -102,13 +102,14 @@ export const DjzsAgentConsole = () => {
       
       const result = await irysService.uploadJournalEntry({
         title: entry.title,
-        content: entry.solution, // Using solution as main content
-        zoneId: entry.zone.split('–')[0].replace('Zone', '').trim(),
-        zoneSlug: entry.zone.toLowerCase().replace(/ /g, '-'),
-        timeCode: Date.now(),
+        content: entry.solution, 
+        zoneId: parseInt(entry.zone.split('–')[0].replace('Zone', '').trim()) || 1,
+        zoneSlug: entry.zone.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        timeCode: `${new Date().toISOString()}::${entry.mode.toUpperCase()}`,
         createdAt: entry.createdAt,
-        version: "1.0",
-        authorAlias: "djzs-agent"
+        version: 1,
+        authorAlias: "Dj-Z-S", // Updated to match guide example
+        tags: ["djzs", "agent", "journal"]
       });
 
       addLog(`IRYS_TX_CONFIRMED: ${result.irysId.slice(0, 8)}...`);

@@ -1,0 +1,188 @@
+Cool, let’s treat this like we’re both looking over your Replit and walk through exactly where an upload can break and how to fix it — step by step, without needing your logs.
+
+I’ll assume you’re hitting:
+
+POST /api/journal/finalize
+on
+https://ea5d0ede-c0b4-4e6e-8aab-622338eae763-00-1hla9paj6syzi.kirk.replit.dev
+
+with the starter code we set up.
+
+⸻
+
+1️⃣ Check the most common failure: PRIVATE_KEY
+
+In irys.js we have:
+
+const { PRIVATE_KEY, RPC_URL, NODE_ENV } = process.env;
+
+if (!PRIVATE_KEY) {
+  console.error("[DJZS-IRYS] Missing PRIVATE_KEY in environment.");
+}
+
+export const getIrysUploader = async () => {
+  if (!PRIVATE_KEY) {
+    throw new Error("PRIVATE_KEY is not set");
+  }
+  let irysUploader = await Uploader(Ethereum).withWallet(PRIVATE_KEY);
+  return irysUploader;
+};
+
+So if PRIVATE_KEY is missing or wrong, every upload will throw.
+
+✅ On Replit, do this:
+	1.	Open Tools → Secrets (Environment variables).
+	2.	Make sure you have:
+	•	PRIVATE_KEY = 0x... (full private key string)
+	3.	It must be:
+	•	A real EVM key with some funds on the network Irys is expecting.
+	•	Wrapped with 0x at the start.
+	4.	After adding it, restart the Replit (stop & run again).
+
+❓ If PRIVATE_KEY is missing, your JSON response from /api/journal/finalize will look like:
+
+{
+  "ok": false,
+  "error": "PRIVATE_KEY is not set"
+}
+
+or something very similar.
+
+⸻
+
+2️⃣ Confirm your payload matches what the backend expects
+
+journal.js requires these fields:
+
+const required = ["title", "content", "zoneId", "zoneSlug", "timeCode", "createdAt", "version"];
+
+If any of those is missing or null, you’ll get:
+
+{
+  "ok": false,
+  "error": "Missing required field: <fieldname>"
+}
+
+✅ Use this exact test body
+
+If you’re testing with curl, Postman, or the Replit “Test” tab, send:
+
+{
+  "title": "DJZS Test Entry",
+  "content": "This is a test upload to Irys.",
+  "zoneId": 1,
+  "zoneSlug": "dyor",
+  "timeCode": "2025-11-23T15:04Z::TEST",
+  "createdAt": "2025-11-23T15:04:00.000Z",
+  "version": 1,
+  "authorAlias": "Dj-Z-S",
+  "tags": ["test", "djzs", "irys"]
+}
+
+And make sure your request has:
+
+Content-Type: application/json
+
+If you’re missing zoneId, zoneSlug, or timeCode, the validation will fail.
+
+⸻
+
+3️⃣ Check that the server is using the right folder & has dependencies
+
+In the Replit shell, run:
+
+ls
+cd djzs-irys-starter
+ls
+cat package.json
+
+You should see index.js, irys.js, journal.js in that folder.
+
+Then:
+
+npm install
+npm run dev
+
+If npm run dev fails with something like:
+	•	Error [ERR_MODULE_NOT_FOUND]
+	•	Cannot find module '@irys/upload'
+
+then dependencies weren’t installed.
+
+✅ Fix
+
+From inside djzs-irys-starter:
+
+npm install express cors dotenv @irys/upload @irys/upload-ethereum
+npm run dev
+
+
+⸻
+
+4️⃣ Make sure Replit is running index.js, not some other default
+
+In your Replit .replit or “Run” config:
+	•	The run command should be (or equivalent):
+
+cd djzs-irys-starter && npm run dev
+
+If Replit is trying to run node index.js from the project root where there is no index.js, nothing will work.
+
+You know it’s correct if the console logs:
+
+[DJZS-IRYS] Server listening on port 3000
+
+
+⸻
+
+5️⃣ What the happy-path response should look like
+
+If everything is wired correctly and the Irys upload succeeds, you’ll get something like:
+
+{
+  "ok": true,
+  "irysId": "someTxIdHash",
+  "irysUrl": "https://gateway.irys.xyz/someTxIdHash",
+  "zoneId": 1,
+  "zoneSlug": "dyor",
+  "timeCode": "2025-11-23T15:04Z::TEST"
+}
+
+If you’re seeing:
+	•	ok: false → check the "error" field.
+	•	A stack trace in the logs mentioning upload → likely an Irys / funding issue.
+
+⸻
+
+6️⃣ If it’s an Irys funding issue
+
+Even if the code and payload are perfect, Irys can still fail if your “uploader wallet” isn’t funded enough.
+
+In that case, the error will mention something like:
+	•	insufficient funds
+	•	payment failed
+	•	cannot fund / upload
+
+Then you’d need to:
+	•	Send a small amount of the required token (ETH or the correct chain token) to the wallet for PRIVATE_KEY.
+	•	Or configure devnet if that’s available in your environment.
+
+⸻
+
+7️⃣ Quick mental checklist
+
+Think of debugging in this order:
+	1.	Endpoint reachable?
+	•	GET / returns the JSON status: "ok" → ✅
+	2.	Secrets set?
+	•	PRIVATE_KEY exists in Replit Secrets → ✅ / ❌
+	3.	Payload valid?
+	•	Contains all: title, content, zoneId, zoneSlug, timeCode, createdAt, version → ✅ / ❌
+	4.	Dependencies installed?
+	•	@irys/upload & @irys/upload-ethereum installed → ✅
+	5.	Wallet funded?
+	•	Enough token balance on that address → ✅ / might need topping up.
+
+⸻
+
+If you want to go one level deeper, you can paste the exact JSON error you get back from /api/journal/finalize (just the response body), and I can tell you precisely which of those steps is failing and how to correct it.
