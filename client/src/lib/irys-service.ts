@@ -95,6 +95,12 @@ export const irysService = {
     
     console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${metadataTxId}`);
 
+    // 5. Simulated Mint (New Step)
+    console.log(`[DJZS-NFT] Minting identity NFT...`);
+    await delay(2000);
+    const mintTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
+    console.log(`[DJZS-NFT] Mint confirmed. Hash: ${mintTxHash}`);
+
     return {
       ok: true,
       username: normalized,
@@ -103,8 +109,10 @@ export const irysService = {
       irysId: coreTxId,
       irysUrl: `https://gateway.irys.xyz/${coreTxId}`,
       nftMetadata: metadata,
-      txId: metadataTxId, // keeping for compatibility with internal logs
-      metadataUrl: metadataUrl
+      txId: metadataTxId, 
+      metadataUrl: metadataUrl,
+      mintTxHash: mintTxHash,
+      explorerUrl: `https://basescan.org/tx/${mintTxHash}`
     };
   },
 

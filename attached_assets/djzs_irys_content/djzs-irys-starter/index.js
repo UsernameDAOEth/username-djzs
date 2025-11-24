@@ -101,6 +101,46 @@ app.post("/api/agent/activate", async (req, res) => {
   }
 });
 
+/**
+ * Mint the DJZS Identity NFT.
+ * Body: { toAddress: string, tokenURI: string }
+ * Note: In a real production app, you might have the user sign the mint tx on client-side,
+ * or use a relayer. Here we simulate a server-side mint for the starter.
+ */
+app.post("/api/nft/mint", async (req, res) => {
+  try {
+    const { toAddress, tokenURI } = req.body;
+    if (!toAddress || !tokenURI) {
+      return res.status(400).json({ ok: false, error: "Missing toAddress or tokenURI" });
+    }
+
+    console.log(`[DJZS-NFT] Minting to ${toAddress} with URI: ${tokenURI}`);
+
+    // --- REAL IMPLEMENTATION STUB ---
+    // import { ethers } from "ethers";
+    // const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+    // const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
+    // const tx = await contract.mint(toAddress, tokenURI);
+    // await tx.wait();
+    // --------------------------------
+
+    // SIMULATION RESPONSE
+    const mockTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
+    
+    res.json({
+      ok: true,
+      txHash: mockTxHash,
+      explorerUrl: `https://basescan.org/tx/${mockTxHash}`,
+      message: "Mint transaction broadcasted"
+    });
+
+  } catch (err) {
+    console.error("[DJZS-NFT] Mint error:", err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`[DJZS-IRYS] Server listening on port ${PORT}`);
 });

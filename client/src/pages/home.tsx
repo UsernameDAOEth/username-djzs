@@ -35,11 +35,19 @@ export default function Home() {
       setActiveAgent(username);
       toast({
         title: "CORE_ACTIVATED",
-        description: `AGENT @${username.toUpperCase()} ACTIVATED ON BASE.`,
+        description: (
+          <div className="font-mono text-xs space-y-1">
+            <div>AGENT @{username.toUpperCase()} ACTIVATED</div>
+            <div>IRYS_ID: {result.irysId.substring(0, 8)}...</div>
+            <div>MINT_TX: {result.mintTxHash.substring(0, 8)}...</div>
+          </div>
+        ),
         className: "bg-primary text-primary-foreground font-mono border-2 border-black",
+        duration: 8000,
       });
       
       console.log("Agent Metadata URL:", result.metadataUrl);
+      console.log("Mint Explorer URL:", result.explorerUrl);
       
     } catch (error) {
       toast({
