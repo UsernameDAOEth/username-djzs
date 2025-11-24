@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "NODE_ENV=development node index.js"
+    "dev": "NODE_ENV=development node index.js",
+    "bootstrap": "node agent_bootstrap.js"
   },
   "dependencies": {
     "@irys/upload": "^1.0.0",
