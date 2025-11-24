@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
 
 import { saveJournalToIrys } from "./journal.js";
 import { buildAgentCore, saveAgentCoreToIrys, buildUsernameNftMetadata } from "./agent.js";
+import { getNftContract } from "./nft.js";
 
 dotenv.config();
 
@@ -103,36 +104,56 @@ app.post("/api/agent/activate", async (req, res) => {
 
 /**
  * Mint the DJZS Identity NFT.
- * Body: { toAddress: string, tokenURI: string }
- * Note: In a real production app, you might have the user sign the mint tx on client-side,
- * or use a relayer. Here we simulate a server-side mint for the starter.
+ * Body: { toAddress: string, username: string, tokenURI: string }
+ * Contract Sig: function mintUsername(address to, string calldata username, string calldata tokenURI) external returns (uint256);
  */
 app.post("/api/nft/mint", async (req, res) => {
   try {
-    const { toAddress, tokenURI } = req.body;
-    if (!toAddress || !tokenURI) {
-      return res.status(400).json({ ok: false, error: "Missing toAddress or tokenURI" });
+    const { toAddress, username, tokenURI } = req.body;
+    if (!toAddress || !username || !tokenURI) {
+      return res.status(400).json({ ok: false, error: "Missing toAddress, username, or tokenURI" });
     }
 
-    console.log(`[DJZS-NFT] Minting to ${toAddress} with URI: ${tokenURI}`);
+    console.log(`[DJZS-NFT] Calling mintUsername(${toAddress}, "${username}", ${tokenURI})`);
 
-    // --- REAL IMPLEMENTATION STUB ---
-    // import { ethers } from "ethers";
-    // const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
-    // const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-    // const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, wallet);
-    // const tx = await contract.mint(toAddress, tokenURI);
-    // await tx.wait();
-    // --------------------------------
+    // Try to get real contract
+    const contract = getNftContract();
+    
+    if (contract) {
+      try {
+        // Real Mint
+        const tx = await contract.mintUsername(toAddress, username, tokenURI);
+        console.log(`[DJZS-NFT] Transaction sent: ${tx.hash}`);
+        
+        // We return immediately, frontend can poll or wait. 
+        // Ideally we might wait for 1 confirmation if speed allows, but usually better to return hash.
+        
+        return res.json({
+          ok: true,
+          txHash: tx.hash,
+          explorerUrl: `https://basescan.org/tx/${tx.hash}`,
+          message: "Mint transaction broadcasted (Real)"
+        });
+      } catch (realError) {
+        console.error("[DJZS-NFT] Real mint failed:", realError);
+        // Fallthrough to mock if real fails (optional, or just return error)
+        // For this starter, let's return error so user knows configuration is wrong
+        return res.status(500).json({ 
+          ok: false, 
+          error: `Real mint failed: ${realError.message}. Check env vars & balance.` 
+        });
+      }
+    }
 
-    // SIMULATION RESPONSE
+    // SIMULATION RESPONSE (if no contract configured)
+    console.log("[DJZS-NFT] No contract configured, using simulation.");
     const mockTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
     
     res.json({
       ok: true,
       txHash: mockTxHash,
       explorerUrl: `https://basescan.org/tx/${mockTxHash}`,
-      message: "Mint transaction broadcasted"
+      message: "Mint transaction broadcasted (Simulated)"
     });
 
   } catch (err) {

@@ -96,7 +96,7 @@ export const irysService = {
     console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${metadataTxId}`);
 
     // 5. Simulated Mint (New Step)
-    console.log(`[DJZS-NFT] Minting identity NFT...`);
+    console.log(`[DJZS-NFT] Calling mintUsername(0xSimulatedWallet, "${normalized}", ${metadataUrl})...`);
     await delay(2000);
     const mintTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
     console.log(`[DJZS-NFT] Mint confirmed. Hash: ${mintTxHash}`);
