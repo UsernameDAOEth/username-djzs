@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
 import { cn } from "@/lib/utils";
-import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2, Link2, Lock, AlertCircle, LogOut } from "lucide-react";
+import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2, Link2, Lock, AlertCircle, LogOut, UploadCloud } from "lucide-react";
 import { djzsApi, type DjzsEntry } from "@/lib/djzs-api";
+import { irysService } from "@/lib/irys-service";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -16,9 +17,10 @@ export const DjzsAgentConsole = () => {
   const [loading, setLoading] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
   
-  // Sync State
+  // Sync & Archive State
   const [syncQueue, setSyncQueue] = useState<DjzsEntry[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isArchiving, setIsArchiving] = useState<string | null>(null); // ID of entry being archived
   
   // Auth State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -86,6 +88,48 @@ export const DjzsAgentConsole = () => {
     
     await refreshSyncQueue();
     setIsSyncing(false);
+    toast({
+      title: "SYNC_COMPLETE",
+      description: "ENTRIES SYNCED TO ANYTYPE VAULT.",
+      className: "bg-primary text-primary-foreground font-mono border-2 border-black",
+    });
+  };
+
+  const handleArchiveToIrys = async (entry: DjzsEntry) => {
+    setIsArchiving(entry.id);
+    try {
+      addLog(`INITIATING_IRYS_UPLOAD: ${entry.id}`);
+      
+      const result = await irysService.uploadJournalEntry({
+        title: entry.title,
+        content: entry.solution, // Using solution as main content
+        zoneId: entry.zone.split('–')[0].replace('Zone', '').trim(),
+        zoneSlug: entry.zone.toLowerCase().replace(/ /g, '-'),
+        timeCode: Date.now(),
+        createdAt: entry.createdAt,
+        version: "1.0",
+        authorAlias: "djzs-agent"
+      });
+
+      addLog(`IRYS_TX_CONFIRMED: ${result.irysId.slice(0, 8)}...`);
+      toast({
+        title: "PERMANENCE_ACHIEVED",
+        description: "ENTRY ARCHIVED TO IRYS NETWORK.",
+        className: "bg-primary text-primary-foreground font-mono border-2 border-black",
+      });
+
+      // Mark as synced locally too if we want, or keep separate. 
+      // For now let's just update UI state via logs
+    } catch (e) {
+      addLog("ERROR: IRYS_UPLOAD_FAILED");
+      toast({
+        title: "ARCHIVE_FAILED",
+        description: "COULD NOT CONNECT TO IRYS NODE.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsArchiving(null);
+    }
   };
 
   const handleRequestChallenge = async () => {
@@ -271,11 +315,11 @@ export const DjzsAgentConsole = () => {
                 <div className="flex items-center justify-between mb-4">
                     <h4 className="font-mono text-xs font-bold uppercase flex items-center gap-2">
                         <Database className="w-3 h-3" />
-                        ANYTYPE_SYNC
+                        DATA_PERSISTENCE
                     </h4>
                     {isAuthenticated && (
                       <div className="text-[10px] font-mono text-primary flex items-center gap-1">
-                         <Lock className="w-3 h-3" /> CONNECTED
+                         <Lock className="w-3 h-3" /> VAULT_ACTIVE
                       </div>
                     )}
                 </div>
@@ -312,7 +356,7 @@ export const DjzsAgentConsole = () => {
                    </div>
                 ) : (
                    <>
-                    <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[200px]">
+                    <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[200px] pr-1">
                         {syncQueue.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 text-center">
                                 <CheckCircle2 className="w-8 h-8 mb-2 opacity-50" />
@@ -320,13 +364,24 @@ export const DjzsAgentConsole = () => {
                             </div>
                         ) : (
                             syncQueue.map((entry) => (
-                                <div key={entry.id} className="bg-background border border-border p-2 text-[10px] font-mono group animate-in fade-in slide-in-from-bottom-2">
-                                    <div className="flex justify-between text-muted-foreground mb-1">
+                                <div key={entry.id} className="bg-background border border-border p-2 text-[10px] font-mono group flex flex-col gap-2">
+                                    <div className="flex justify-between text-muted-foreground">
                                         <span>{entry.mode.toUpperCase()}</span>
                                         <span>{entry.zone.split('–')[0].trim()}</span>
                                     </div>
-                                    <div className="truncate font-bold mb-1">{entry.title}</div>
-                                    <div className="text-primary/50 truncate">{entry.id}</div>
+                                    <div className="truncate font-bold">{entry.title}</div>
+                                    
+                                    <div className="flex gap-2 pt-1">
+                                      {/* Archive to Irys Button */}
+                                      <button 
+                                        onClick={() => handleArchiveToIrys(entry)}
+                                        disabled={!!isArchiving}
+                                        className="flex-1 bg-secondary/20 hover:bg-primary hover:text-primary-foreground text-[9px] uppercase py-1 flex items-center justify-center gap-1 transition-colors disabled:opacity-50"
+                                      >
+                                        {isArchiving === entry.id ? <Loader2 className="w-2 h-2 animate-spin"/> : <UploadCloud className="w-2 h-2" />}
+                                        ARCHIVE_IRYS
+                                      </button>
+                                    </div>
                                 </div>
                             ))
                         )}
@@ -344,7 +399,7 @@ export const DjzsAgentConsole = () => {
                             ) : (
                                 <RefreshCw className="w-3 h-3 mr-2" />
                             )}
-                            {isSyncing ? "SYNCING..." : "TRIGGER_SYNC_WORKER"}
+                            {isSyncing ? "SYNCING..." : "SYNC_ALL_TO_VAULT"}
                         </BrutalButton>
                         <BrutalButton 
                             variant="ghost" 
@@ -359,8 +414,11 @@ export const DjzsAgentConsole = () => {
                 )}
                 
                 <div className="mt-4 text-[10px] text-muted-foreground font-mono border-t border-border pt-2">
-                    <p>SIMULATES WORKER POLLING:</p>
-                    <code className="block bg-black p-1 mt-1 text-primary/70">GET /sync/entries</code>
+                    <p>DATA LAYERS:</p>
+                    <div className="flex justify-between mt-1 text-primary/70">
+                      <span>LOCAL: SYNC</span>
+                      <span>IRYS: ARCHIVE</span>
+                    </div>
                 </div>
             </div>
         </div>

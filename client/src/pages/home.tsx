@@ -27,7 +27,7 @@ export default function Home() {
     setTimeout(() => {
       setIsMinting(false);
       toast({
-        title: "IDENTITY_MINTED",
+        title: "CORE_ACTIVATED",
         description: `AGENT @${username.toUpperCase()} ACTIVATED.`,
         className: "bg-primary text-primary-foreground font-mono border-2 border-black",
       });
@@ -67,7 +67,7 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="inline-block border border-primary px-2 py-1 text-xs font-mono text-primary">
-                SYSTEM_STATUS: MINTING LIVE
+                SYSTEM_STATUS: SPAWNING LIVE
               </div>
               <h1 className="text-6xl md:text-8xl font-black leading-[0.85] tracking-tighter font-serif">
                 YOUR<br />
@@ -246,7 +246,7 @@ export default function Home() {
                  </div>
                  <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
                     <div className="font-mono text-xs text-muted-foreground">STORAGE</div>
-                    <div className="text-xl font-bold">LOCAL/IPFS</div>
+                    <div className="text-xl font-bold">LOCAL/IRYS</div>
                  </div>
               </div>
 
@@ -255,7 +255,7 @@ export default function Home() {
                 className="w-full py-6 text-xl"
                 disabled={isMinting}
               >
-                {isMinting ? "INITIALIZING_AGENT..." : "MINT_IDENTITY_NFT"}
+                {isMinting ? "INITIALIZING_AGENT..." : "ACTIVATE_AGENT_CORE"}
               </BrutalButton>
               
               <p className="text-xs font-mono text-center text-muted-foreground">
