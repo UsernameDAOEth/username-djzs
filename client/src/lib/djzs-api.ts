@@ -56,6 +56,8 @@ export const djzsApi = {
         responseText = `${header}QUERY: "${query}"\n\n> ANALYSIS: ${safeZone} vector detected.\n\n> ANSWER: \nBased on protocol parameters, this requires immediate verification. The integration of ${safeZone} suggests a bullish outlook on sovereignty.\n\n> ACTION: Verify on-chain data.`;
     } else if (safeMode === "alpha") {
         responseText = `${header}/// ALPHA LEAK /// CONFIDENTIAL ///\n\nNARRATIVE: ${query}\n\nSIGNAL: 88/100\n\nOPPORTUNITY:\nEarly accumulation of identity-layer protocols is underpriced.\n\nSTRATEGY:\nPosition into modular identity stacks.`;
+    } else if (safeMode === "research") {
+        responseText = `${header}DEEP DIVE ANALYSIS: ${query}\n\n1. THESIS\nThe intersection of ${safeZone} and autonomous agents represents the next major repricing event.\n\n2. TECHNICAL VECTORS\n- Interoperability: High\n- Privacy Preservation: Critical (Zero-Knowledge Stack)\n- Latency: <50ms optimized\n\n3. MARKET IMPACT\nShift from rent-seeking Web2 platforms to protocol-owned liquidity and user-owned data lakes. Expect 10x growth in "Headless Brands" managed by AI agents.\n\n4. RISKS\n- Smart contract contagion\n- Agent hallucinations in financial execution`;
     } else {
         responseText = `${header}Problem:\n${problem}\n\nSolution:\n${solution}\n\nUse Cases:\n${useCases}`;
     }

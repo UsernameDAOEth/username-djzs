@@ -10,15 +10,14 @@ import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_over
 export default function Home() {
   const { toast } = useToast();
   const [isMinting, setIsMinting] = useState(false);
-  const [wallet, setWallet] = useState("");
   const [username, setUsername] = useState("");
 
   const handleMint = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wallet || !username) {
+    if (!username) {
       toast({
         title: "ERROR: MISSING_DATA",
-        description: "USERNAME AND WALLET REQUIRED.",
+        description: "USERNAME REQUIRED.",
         variant: "destructive",
       });
       return;
@@ -77,17 +76,12 @@ export default function Home() {
               </h1>
               <p className="text-xl md:text-2xl font-mono text-muted-foreground max-w-md border-l-4 border-primary pl-6">
                 Claim your Username. Spawn your AI Agent. Own your Intelligence. 
-                <br/><span className="text-primary text-sm mt-2 block">POWERED BY AZTEC & DJZS</span>
+                <br/><span className="text-primary text-sm mt-2 block">POWERED BY DJZS</span>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <BrutalButton onClick={() => document.getElementById('mint')?.scrollIntoView({ behavior: 'smooth' })}>
                   CLAIM_USERNAME
                 </BrutalButton>
-                <a href="https://docs.aztec.network/try_testnet" target="_blank" rel="noreferrer">
-                  <BrutalButton variant="outline">
-                    TESTNET_DOCS
-                  </BrutalButton>
-                </a>
               </div>
             </div>
             
@@ -244,22 +238,11 @@ export default function Home() {
                   />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="wallet" className="font-mono text-xs uppercase">Aztec Wallet Address</Label>
-                <Input 
-                  id="wallet"
-                  placeholder="0x..." 
-                  value={wallet}
-                  onChange={(e) => setWallet(e.target.value)}
-                  className="font-mono text-lg p-6 border-2 border-border rounded-none focus-visible:ring-0 focus-visible:border-primary bg-secondary/10"
-                />
-              </div>
               
               <div className="grid grid-cols-2 gap-4">
                  <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
                     <div className="font-mono text-xs text-muted-foreground">MINT FEE</div>
-                    <div className="text-xl font-bold">0.05 ETH</div>
+                    <div className="text-xl font-bold">FREE</div>
                  </div>
                  <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
                     <div className="font-mono text-xs text-muted-foreground">STORAGE</div>
@@ -276,7 +259,7 @@ export default function Home() {
               </BrutalButton>
               
               <p className="text-xs font-mono text-center text-muted-foreground">
-                * Requires Aztec Testnet connection. Your agent will be deployed to your local environment.
+                * Your agent will be deployed to your local environment.
               </p>
             </form>
           </BrutalCard>
