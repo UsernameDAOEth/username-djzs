@@ -42,7 +42,7 @@ export const irysService = {
    * 3. Building NFT Metadata
    * 4. Uploading Metadata to Irys
    */
-  async activateAgent(username: string): Promise<{ txId: string; metadataUrl: string }> {
+  async activateAgent(username: string): Promise<any> {
     console.log(`[DJZS-IRYS] Activating agent for @${username}...`);
     
     const normalized = normalizeUsername(username);
@@ -96,7 +96,14 @@ export const irysService = {
     console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${metadataTxId}`);
 
     return {
-      txId: metadataTxId,
+      ok: true,
+      username: normalized,
+      agentId: agentCore.agentId,
+      agentCore,
+      irysId: coreTxId,
+      irysUrl: `https://gateway.irys.xyz/${coreTxId}`,
+      nftMetadata: metadata,
+      txId: metadataTxId, // keeping for compatibility with internal logs
       metadataUrl: metadataUrl
     };
   },

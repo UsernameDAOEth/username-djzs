@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DJZS Agent Activation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #050505;
+      --card: #101010;
+      --outline: #2a2a2a;
+      --text-main: #fafafa;
+      --text-muted: #a0a0a0;
+      --accent: #adff2f; /* neon-ish green */
+      --accent-text: #050505;
+      --danger: #ff4b4b;
+      --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #171717 0, #050505 45%);
+      color: var(--text-main);
+      font-family: var(--sans);
+    }
+
+    .frame {
+      width: min(960px, 100%);
+      border: 1px solid var(--outline);
+      background: radial-gradient(circle at top left, #161616 0, #050505 55%);
+      padding: 40px 32px 32px;
+      box-shadow: 0 0 0 1px #000, 0 32px 80px rgba(0, 0, 0, 0.75);
+    }
+
+    .headline {
+      font-size: 28px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .username-row {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--outline);
+      background: #0b0b0b;
+      margin-bottom: 32px;
+    }
+
+    .username-prefix {
+      padding: 12px 16px;
+      font-family: var(--mono);
+      font-size: 16px;
+      border-right: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      color: var(--text-muted);
+    }
+
+    .username-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-main);
+      padding: 12px 16px;
+      font-size: 16px;
+      font-family: var(--mono);
+      outline: none;
+    }
+
+    .username-input::placeholder {
+      color: #555;
+    }
+
+    .bottom-row {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .info-card {
+      flex: 1;
+      min-width: 200px;
+      border: 1px solid var(--outline);
+      padding: 16px 20px;
+      background: #0a0a0a;
+    }
+
+    .info-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-family: var(--mono);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .button-row {
+      margin-bottom: 16px;
+    }
+
+    .activate-btn {
+      width: 100%;
+      border: none;
+      padding: 18px 24px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 16px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      background: var(--accent);
+      color: var(--accent-text);
+      cursor: pointer;
+      transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, filter 0.12s;
+      box-shadow: 0 0 0 1px #000;
+    }
+
+    .activate-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(173, 255, 47, 0.2);
+      filter: brightness(1.02);
+    }
+
+    .activate-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      filter: brightness(0.98);
+    }
+
+    .footnote {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .status {
+      font-size: 12px;
+      margin-top: 8px;
+      min-height: 18px;
+      font-family: var(--mono);
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .status.ok {
+      color: #7bff8b;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .small-input-row {
+      margin-bottom: 16px;
+    }
+
+    .small-input-label {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .small-input {
+      width: 100%;
+      border: 1px solid var(--outline);
+      background: #0a0a0a;
+      color: var(--text-main);
+      padding: 8px 10px;
+      font-size: 12px;
+      font-family: var(--mono);
+      outline: none;
+    }
+
+    .small-input::placeholder {
+      color: #555;
+    }
+
+    @media (max-width: 720px) {
+      .frame {
+        padding: 24px 16px 20px;
+      }
+
+      .headline {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <h1 class="headline">CLAIM YOUR IDENTITY</h1>
+    <p class="subtitle">
+      Mint your Username NFT to spawn your DJZS Agent. Your Agent Core will be stored locally and on Irys (Base).
+    </p>
+
+    <div class="label">Desired Username</div>
+    <div class="username-row">
+      <div class="username-prefix">@</div>
+      <input
+        id="usernameInput"
+        class="username-input"
+        type="text"
+        placeholder="djzs"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="small-input-row">
+      <div class="small-input-label">Owner Wallet (optional)</div>
+      <input
+        id="walletInput"
+        class="small-input"
+        type="text"
+        placeholder="0xYourWalletOnBase (optional)"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="bottom-row">
+      <div class="info-card">
+        <div class="info-label">Mint Fee</div>
+        <div class="info-value">FREE*</div>
+      </div>
+      <div class="info-card">
+        <div class="info-label">Storage</div>
+        <div class="info-value">LOCAL / IRYS (Base)</div>
+      </div>
+    </div>
+
+    <div class="button-row">
+      <button id="activateBtn" class="activate-btn">
+        ACTIVATE_AGENT_CORE
+      </button>
+      <div id="status" class="status"></div>
+    </div>
+
+    <p class="footnote">
+      * Gas fees may apply on Base. Your agent will be deployed to your local environment (config pulled from Irys).
+    </p>
+  </div>
+
+  <script>
+    const activateBtn = document.getElementById("activateBtn");
+    const usernameInput = document.getElementById("usernameInput");
+    const walletInput = document.getElementById("walletInput");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(message, type) {
+      statusEl.textContent = message || "";
+      statusEl.classList.remove("ok", "error");
+      if (type) statusEl.classList.add(type);
+    }
+
+    activateBtn.addEventListener("click", async () => {
+      const rawUsername = usernameInput.value.trim();
+      const wallet = walletInput.value.trim();
+
+      if (!rawUsername) {
+        setStatus("↳ Please enter a username.", "error");
+        return;
+      }
+
+      setStatus("↳ Activating agent core...", null);
+      activateBtn.disabled = true;
+
+      try {
+        const res = await fetch("/api/agent/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: rawUsername,
+            ownerWallet: wallet || undefined,
+            storageMode: "LOCAL_IRYS"
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.ok) {
+          throw new Error(data.error || "Activation failed");
+        }
+
+        const { username, irysId, irysUrl, agentId } = data;
+
+        setStatus(
+          [
+            `↳ Agent Core activated for @${username}`,
+            `   Agent ID: ${agentId}`,
+            `   Irys ID: ${irysId}`,
+            `   Irys URL: ${irysUrl}`
+          ].join("\n"),
+          "ok"
+        );
+      } catch (err) {
+        console.error(err);
+        setStatus(`↳ Error: ${err.message}`, "error");
+      } finally {
+        activateBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
