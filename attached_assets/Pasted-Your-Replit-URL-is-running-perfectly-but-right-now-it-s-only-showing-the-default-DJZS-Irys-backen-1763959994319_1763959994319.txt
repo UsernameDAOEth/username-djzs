@@ -1,0 +1,101 @@
+Your Replit URL is running perfectly, but right now it’s only showing the default DJZS + Irys backend homepage because you have not yet created the public/ folder with index.html.
+
+That’s why the page looks empty or unchanged.
+
+Here’s exactly what you need to do so the Claim Your Identity UI + Agent Activation backend actually appear at:
+
+👉 https://ea5d0ede-c0b4-4e6e-8aab-622338eae763-00-1hla9paj6syzi.kirk.replit.dev/
+
+⸻
+
+✅ 1. Create the folder structure in Replit
+
+Inside your djzs-irys-starter folder, create:
+
+djzs-irys-starter/
+  public/
+    index.html   ← UI goes here
+
+If you don’t create this folder, Replit will only serve GET / as JSON and not load any frontend.
+
+⸻
+
+✅ 2. Paste the frontend UI into public/index.html
+
+Create this file:
+
+djzs-irys-starter/public/index.html
+
+Paste the full DJZS Identity / Agent Activation UI I gave you above.
+
+Make sure it contains:
+	•	HTML
+	•	The neon green “ACTIVATE_AGENT_CORE” button
+	•	Username input
+	•	Calls /api/agent/activate
+	•	Shows irysUrl, agentId, etc.
+
+If you want, I can repost the full UI block here — just say:
+“send the full UI again”.
+
+⸻
+
+✅ 3. Confirm your index.js points to public/index.html
+
+Your index.js should contain:
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const publicDir = path.join(__dirname, "public");
+
+app.use(express.static(publicDir));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(publicDir, "index.html"));
+});
+
+If that’s in place → the UI will show.
+
+⸻
+
+✅ 4. Restart the Replit server
+
+In the shell:
+
+npm run dev
+
+Or press the “Run” button.
+
+After it boots, open:
+
+👉 https://ea5d0ede-c0b4-4e6e-8aab-622338eae763-00-1hla9paj6syzi.kirk.replit.dev/
+
+You will now see:
+	•	DJZS neon UI
+	•	Username field
+	•	@ prefix
+	•	Owner wallet input
+	•	“Mint Fee: Free”
+	•	“Storage: Local / Irys (Base)”
+	•	ACTIVATE_AGENT_CORE button
+
+⸻
+
+⚠️ What you’re seeing now
+
+You’re still seeing the old JSON because:
+	•	Replit cannot find /public/index.html
+	•	So it falls back to JSON for /
+
+Once you add the UI file & folder → it works instantly.
+
+⸻
+
+If you want:
+
+✔ I can generate the exact folder structure for Replit
+✔ I can bundle all files as a ZIP again
+✔ I can re-send the full styled HTML UI
+✔ I can check your Replit file tree if you paste a screenshot
+
+Just tell me what you want next.
