@@ -20,6 +20,40 @@ export interface IrysJournalPayload {
 
 export const irysService = {
   /**
+   * Simulates activating an agent by uploading metadata to Irys
+   */
+  async activateAgent(username: string): Promise<{ txId: string; metadataUrl: string }> {
+    console.log(`[DJZS-IRYS] Activating agent for @${username}...`);
+    
+    // 1. Generate Metadata
+    const metadata = {
+      name: `DJZS Agent @${username}`,
+      description: `Autonomous AI Agent spawned by @${username} on DJZS Protocol.`,
+      image: "https://arweave.net/placeholder_agent_image", // Placeholder
+      external_url: `https://djzs.xyz/agent/${username}`,
+      attributes: [
+        { trait_type: "Type", value: "Autonomous Agent" },
+        { trait_type: "Version", value: "1.0.0" },
+        { trait_type: "Status", value: "Active" },
+        { trait_type: "Protocol", value: "DJZS" }
+      ]
+    };
+
+    // 2. Upload Metadata (Simulated)
+    // In real app: await this.getWebUploader().upload(JSON.stringify(metadata))
+    await delay(2500); // Simulate upload time
+
+    const mockTxId = `Arweave_Agent_Mint_${Math.random().toString(36).substring(7)}`;
+    
+    console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${mockTxId}`);
+
+    return {
+      txId: mockTxId,
+      metadataUrl: `https://gateway.irys.xyz/${mockTxId}`
+    };
+  },
+
+  /**
    * Simulates getting an Irys uploader. 
    * In a real app, this would use the user's injected wallet (Metamask/Phantom) on Base Mainnet.
    */

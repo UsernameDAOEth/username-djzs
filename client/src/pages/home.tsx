@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
 
+import { irysService } from "@/lib/irys-service";
+
 export default function Home() {
   const { toast } = useToast();
   const [isMinting, setIsMinting] = useState(false);
   const [username, setUsername] = useState("");
   const [activeAgent, setActiveAgent] = useState<string | null>(null);
 
-  const handleMint = (e: React.FormEvent) => {
+  const handleMint = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username) {
       toast({
@@ -24,16 +26,30 @@ export default function Home() {
       return;
     }
     setIsMinting(true);
-    // Simulate minting
-    setTimeout(() => {
-      setIsMinting(false);
+    
+    try {
+      // Call the simulated Irys activation
+      // In a real app, this would hit POST /api/agent/activate
+      const result = await irysService.activateAgent(username);
+      
       setActiveAgent(username);
       toast({
         title: "CORE_ACTIVATED",
-        description: `AGENT @${username.toUpperCase()} ACTIVATED.`,
+        description: `AGENT @${username.toUpperCase()} ACTIVATED ON BASE.`,
         className: "bg-primary text-primary-foreground font-mono border-2 border-black",
       });
-    }, 2000);
+      
+      console.log("Agent Metadata URL:", result.metadataUrl);
+      
+    } catch (error) {
+      toast({
+        title: "ACTIVATION_FAILED",
+        description: "COULD NOT UPLOAD METADATA TO IRYS.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsMinting(false);
+    }
   };
 
   return (
