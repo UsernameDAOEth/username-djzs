@@ -18,38 +18,86 @@ export interface IrysJournalPayload {
   tags?: string[]; 
 }
 
+export interface AgentMetadata {
+  name: string;
+  description: string;
+  image: string;
+  attributes: Array<{ trait_type: string; value: string }>;
+  external_url: string;
+}
+
+// Helper function to normalize username
+function normalizeUsername(username: string) {
+  return String(username || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_\-\.]/g, ""); // only safe chars
+}
+
 export const irysService = {
   /**
-   * Simulates activating an agent by uploading metadata to Irys
+   * Simulates activating an agent by:
+   * 1. Building Agent Core
+   * 2. Uploading Core to Irys
+   * 3. Building NFT Metadata
+   * 4. Uploading Metadata to Irys
    */
   async activateAgent(username: string): Promise<{ txId: string; metadataUrl: string }> {
     console.log(`[DJZS-IRYS] Activating agent for @${username}...`);
     
-    // 1. Generate Metadata
-    const metadata = {
-      name: `DJZS Agent @${username}`,
-      description: `Autonomous AI Agent spawned by @${username} on DJZS Protocol.`,
-      image: "https://arweave.net/placeholder_agent_image", // Placeholder
-      external_url: `https://djzs.xyz/agent/${username}`,
-      attributes: [
-        { trait_type: "Type", value: "Autonomous Agent" },
-        { trait_type: "Version", value: "1.0.0" },
-        { trait_type: "Status", value: "Active" },
-        { trait_type: "Protocol", value: "DJZS" }
-      ]
+    const normalized = normalizeUsername(username);
+    
+    // 1. Build Agent Core (Simulated from agent.js logic)
+    const agentCore = {
+      username: normalized,
+      agentId: `agent_${normalized}_${Date.now()}`,
+      ownerWallet: "0xSimulatedWalletAddress", // In real app this comes from wallet
+      createdAt: new Date().toISOString(),
+      protocolVersion: "DJZS-0.1",
+      storage: {
+        mode: "LOCAL_IRYS", 
+        irysEnabled: true
+      },
+      zones: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      config: {
+        journalingStyle: "problem-solution-usecases",
+        description: "DJZS Agent – learns from journals, trades, and Timekit logs."
+      }
     };
 
-    // 2. Upload Metadata (Simulated)
-    // In real app: await this.getWebUploader().upload(JSON.stringify(metadata))
-    await delay(2500); // Simulate upload time
+    console.log("[DJZS-IRYS] Built Agent Core:", agentCore);
 
-    const mockTxId = `Arweave_Agent_Mint_${Math.random().toString(36).substring(7)}`;
+    // 2. Upload Agent Core (Simulated)
+    await delay(1500); // Simulate core upload
+    const coreTxId = `Arweave_Core_${Math.random().toString(36).substring(7)}`;
+    console.log(`[DJZS-IRYS] Agent Core uploaded. TX: ${coreTxId}`);
+
+    // 3. Build NFT Metadata (Simulated from agent.js logic)
+    const metadata = {
+      name: `@${normalized}`,
+      description: `DJZS Identity NFT for @${normalized}. Minting this spawns your local-first DJZS Agent.`,
+      image: "https://arweave.net/placeholder_agent_image", 
+      external_url: `https://djzs.xyz/agent/${normalized}`,
+      attributes: [
+        { trait_type: "Protocol", value: "DJZS" },
+        { trait_type: "Agent Core Storage", value: "LOCAL/IRYS" },
+        { trait_type: "Username", value: `@${normalized}` }
+      ],
+      agent_core_irys_id: coreTxId
+    };
+
+    console.log("[DJZS-IRYS] Built NFT Metadata:", metadata);
+
+    // 4. Upload Metadata (Simulated)
+    await delay(1500); // Simulate metadata upload
+    const metadataTxId = `Arweave_Meta_${Math.random().toString(36).substring(7)}`;
+    const metadataUrl = `https://gateway.irys.xyz/${metadataTxId}`;
     
-    console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${mockTxId}`);
+    console.log(`[DJZS-IRYS] Agent Activated. Metadata TX: ${metadataTxId}`);
 
     return {
-      txId: mockTxId,
-      metadataUrl: `https://gateway.irys.xyz/${mockTxId}`
+      txId: metadataTxId,
+      metadataUrl: metadataUrl
     };
   },
 
