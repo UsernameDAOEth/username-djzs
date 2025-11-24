@@ -11,6 +11,7 @@ export default function Home() {
   const { toast } = useToast();
   const [isMinting, setIsMinting] = useState(false);
   const [username, setUsername] = useState("");
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
 
   const handleMint = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +27,7 @@ export default function Home() {
     // Simulate minting
     setTimeout(() => {
       setIsMinting(false);
+      setActiveAgent(username);
       toast({
         title: "CORE_ACTIVATED",
         description: `AGENT @${username.toUpperCase()} ACTIVATED.`,
@@ -100,8 +102,8 @@ export default function Home() {
                </div>
                <div className="relative z-10 text-center space-y-4 p-8 bg-background border-2 border-foreground rotate-3 transition-transform group-hover:rotate-0">
                  <GlitchText text="DJZS" className="text-7xl md:text-9xl block" />
-                 <div className="font-mono text-sm">AGENT_ID: UNASSIGNED</div>
-                 <div className="w-full h-2 bg-primary mt-4 loading-bar" />
+                 <div className="font-mono text-sm">AGENT_ID: {activeAgent ? `@${activeAgent.toUpperCase()}` : "UNASSIGNED"}</div>
+                 <div className={`w-full h-2 mt-4 loading-bar ${activeAgent ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)]" : "bg-primary"}`} />
                </div>
             </div>
           </div>
