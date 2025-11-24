@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
+import { CyberGrid } from "@/components/cyber-grid";
+import { WireframeCore } from "@/components/wireframe-core";
 
 import { irysService } from "@/lib/irys-service";
 
@@ -62,9 +64,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground overflow-x-hidden relative">
+      {/* Animated Cyber Grid Background */}
+      <CyberGrid />
+      
       {/* Noise Overlay */}
       <div 
-        className="fixed inset-0 pointer-events-none z-50 opacity-[0.15] mix-blend-overlay"
+        className="fixed inset-0 pointer-events-none z-30 opacity-[0.15] mix-blend-overlay"
         style={{ backgroundImage: `url(${noiseTexture})`, backgroundSize: '200px' }}
       />
 
@@ -87,9 +92,14 @@ export default function Home() {
       {/* Marquee */}
       <Marquee text="/// YOUR NAME IS YOUR AGENT /// NO CLOUD /// LOCAL FIRST /// PAY PER INSIGHT /// " />
 
-      <main className="container mx-auto px-4 py-12 md:py-24 space-y-32">
+      <main className="container mx-auto px-4 py-12 md:py-24 space-y-32 relative z-20">
         {/* Hero Section */}
-        <section className="relative">
+        <motion.section 
+          className="relative"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="inline-block border border-primary px-2 py-1 text-xs font-mono text-primary">
@@ -113,37 +123,46 @@ export default function Home() {
             
             {/* Hero Visual */}
             <div className="relative aspect-square md:aspect-auto md:h-[600px] border-2 border-border bg-secondary/20 flex items-center justify-center overflow-hidden group">
-               {/* Abstract Grid Animation */}
-               <div className="absolute inset-0 grid grid-cols-6 grid-rows-6 gap-px bg-border opacity-20 pointer-events-none">
-                  {Array.from({ length: 36 }).map((_, i) => (
-                    <div key={i} className="bg-background hover:bg-primary transition-colors duration-0" />
-                  ))}
-               </div>
+               {/* 3D Wireframe Core */}
+               <WireframeCore />
+
                <div className="absolute right-0 top-0 bottom-0 w-12 border-l-2 border-border flex flex-col items-center justify-center py-4 overflow-hidden bg-background z-20">
                   <div className="[writing-mode:vertical-rl] font-mono text-xs tracking-widest uppercase whitespace-nowrap animate-pulse text-primary">
                     /// DJZS PROTOCOL ACTIVE ///
                   </div>
                </div>
-               <div className="relative z-10 text-center space-y-4 p-8 bg-background border-2 border-foreground rotate-3 transition-transform group-hover:rotate-0">
+               <div className="relative z-10 text-center space-y-4 p-8 bg-background/80 backdrop-blur-sm border-2 border-foreground rotate-3 transition-transform group-hover:rotate-0">
                  <GlitchText text="DJZS" className="text-7xl md:text-9xl block" />
                  <div className="font-mono text-sm">AGENT_ID: {activeAgent ? `@${activeAgent.toUpperCase()}` : "UNASSIGNED"}</div>
                  <div className={`w-full h-2 mt-4 loading-bar ${activeAgent ? "bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)]" : "bg-primary"}`} />
                </div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Agent Console Integration */}
-        <section className="space-y-8">
+        <motion.section 
+          className="space-y-8"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
             <div className="text-center space-y-2">
                 <h2 className="text-2xl font-black uppercase">Live Agent Preview</h2>
                 <p className="font-mono text-sm text-muted-foreground">Interact with the djzs-paid-agent v1.0.0 kernel</p>
             </div>
             <DjzsAgentConsole />
-        </section>
+        </motion.section>
 
         {/* How It Works Grid */}
-        <section className="space-y-12">
+        <motion.section 
+          className="space-y-12"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ staggerChildren: 0.1 }}
+        >
           <div className="flex items-end justify-between border-b-2 border-border pb-4">
              <h2 className="text-4xl font-black uppercase">System Architecture</h2>
              <span className="font-mono text-xs text-muted-foreground hidden md:inline-block">PROTOCOL_VER_1.0</span>
@@ -200,20 +219,34 @@ export default function Home() {
                 icon: "🧭"
               }
             ].map((item, i) => (
-              <BrutalCard key={i} className="bg-card hover:-translate-y-2 transition-transform duration-200">
-                <div className="flex justify-between items-start mb-4">
-                  <span className="font-mono text-4xl font-bold text-primary opacity-50">{item.step}</span>
-                  <span className="text-2xl">{item.icon}</span>
-                </div>
-                <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
-                <p className="font-mono text-sm text-muted-foreground">{item.desc}</p>
-              </BrutalCard>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05, duration: 0.5 }}
+              >
+                <BrutalCard className="bg-card hover:-translate-y-2 transition-transform duration-200 h-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="font-mono text-4xl font-bold text-primary opacity-50">{item.step}</span>
+                    <span className="text-2xl">{item.icon}</span>
+                  </div>
+                  <h3 className="text-xl font-bold uppercase mb-2">{item.title}</h3>
+                  <p className="font-mono text-sm text-muted-foreground">{item.desc}</p>
+                </BrutalCard>
+              </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
         {/* Pricing Table */}
-        <section className="border-2 border-border bg-background p-8 md:p-12">
+        <motion.section 
+          className="border-2 border-border bg-background p-8 md:p-12"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h3 className="text-2xl font-bold uppercase mb-8 text-center">x402 Micropayment Structure</h3>
           <div className="overflow-x-auto">
             <table className="w-full font-mono text-sm text-left">
@@ -240,17 +273,27 @@ export default function Home() {
               </tbody>
             </table>
           </div>
-        </section>
+        </motion.section>
 
         {/* Mint Section */}
-        <section id="mint" className="max-w-3xl mx-auto relative">
-          <BrutalCard className="bg-background p-8 md:p-12 space-y-8">
-            <div className="space-y-2">
+        <motion.section 
+          id="mint" 
+          className="max-w-3xl mx-auto relative"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <BrutalCard className="bg-background p-8 md:p-12 space-y-8 relative overflow-hidden">
+            {/* Decorative background element */}
+            <div className="absolute -right-12 -top-12 w-40 h-40 border-4 border-primary/20 rounded-full animate-[spin_10s_linear_infinite]" />
+            
+            <div className="space-y-2 relative z-10">
               <h2 className="text-4xl font-black uppercase">Claim Your Identity</h2>
               <p className="font-mono text-muted-foreground">Mint your Username NFT to spawn your DJZS Agent.</p>
             </div>
 
-            <form onSubmit={handleMint} className="space-y-6">
+            <form onSubmit={handleMint} className="space-y-6 relative z-10">
               <div className="space-y-2">
                 <Label htmlFor="username" className="font-mono text-xs uppercase">Desired Username</Label>
                 <div className="flex">
@@ -266,21 +309,22 @@ export default function Home() {
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                 <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
-                    <div className="font-mono text-xs text-muted-foreground">MINT FEE</div>
+                 <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors group">
+                    <div className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">MINT FEE</div>
                     <div className="text-xl font-bold">FREE</div>
                  </div>
-                 <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors">
-                    <div className="font-mono text-xs text-muted-foreground">STORAGE</div>
+                 <div className="p-4 border-2 border-border bg-secondary/5 text-center cursor-pointer hover:border-primary hover:bg-primary/10 transition-colors group">
+                    <div className="font-mono text-xs text-muted-foreground group-hover:text-primary transition-colors">STORAGE</div>
                     <div className="text-xl font-bold">LOCAL/IRYS</div>
                  </div>
               </div>
 
               <BrutalButton 
                 type="submit" 
-                className="w-full py-6 text-xl"
+                className="w-full py-6 text-xl relative overflow-hidden group"
                 disabled={isMinting}
               >
+                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12" />
                 {isMinting ? "INITIALIZING_AGENT..." : "ACTIVATE_AGENT_CORE"}
               </BrutalButton>
               
@@ -289,7 +333,7 @@ export default function Home() {
               </p>
             </form>
           </BrutalCard>
-        </section>
+        </motion.section>
 
         {/* Footer */}
         <footer className="border-t-2 border-border pt-12 pb-8">
