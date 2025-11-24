@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { saveJournalToIrys } from "./journal.js";
 import { buildAgentCore, saveAgentCoreToIrys, buildUsernameNftMetadata } from "./agent.js";
 import { getNftContract } from "./nft.js";
+import { getIrysUploader } from "./irys.js";
 
 dotenv.config();
 
@@ -98,6 +99,85 @@ app.post("/api/agent/activate", async (req, res) => {
     res.status(400).json({
       ok: false,
       error: err.message || "Failed to activate agent"
+    });
+  }
+});
+
+/**
+ * Mint a Username NFT using nftMetadata as tokenURI.
+ * Body: { username, ownerWallet, agentCoreIrysId, nftMetadataIrysId? }
+ *
+ * Flow:
+ *  - If nftMetadataIrysId is not provided, uploads nftMetadata JSON to Irys and uses that URL.
+ *  - Calls NFT contract mintUsername(to, username, tokenURI).
+ */
+app.post("/api/agent/mint-username", async (req, res) => {
+  try {
+    const { username, ownerWallet, agentCoreIrysId, nftMetadata } = req.body || {};
+    if (!username) {
+      return res.status(400).json({ ok: false, error: "username is required" });
+    }
+    if (!ownerWallet) {
+      return res.status(400).json({ ok: false, error: "ownerWallet is required" });
+    }
+    if (!agentCoreIrysId) {
+      return res.status(400).json({ ok: false, error: "agentCoreIrysId is required" });
+    }
+
+    // 1) If nftMetadata not provided, rebuild a minimal one
+    const metadata = nftMetadata || buildUsernameNftMetadata({
+      username,
+      agentCoreIrysId,
+      imageUrl: "",
+      externalUrl: ""
+    });
+
+    // 2) Upload nftMetadata JSON to Irys to get tokenURI
+    const metadataUploader = await getIrysUploader();
+    const metadataJson = JSON.stringify(metadata, null, 2);
+    const metadataTags = [
+      { name: "protocol", value: "DJZS" },
+      { name: "type", value: "username-nft-metadata" },
+      { name: "username", value: String(username) }
+    ];
+    const metadataReceipt = await metadataUploader.upload(metadataJson, { tags: metadataTags });
+    const metadataId = metadataReceipt.id;
+    const tokenURI = `https://gateway.irys.xyz/${metadataId}`;
+
+    // 3) Call NFT contract
+    const contract = getNftContract();
+    if (contract) {
+      const tx = await contract.mintUsername(ownerWallet, username, tokenURI);
+      const receipt = await tx.wait();
+
+      res.status(200).json({
+        ok: true,
+        username,
+        ownerWallet,
+        agentCoreIrysId,
+        tokenURI,
+        txHash: receipt.hash,
+        nftMetadataIrysId: metadataId
+      });
+    } else {
+       // Simulation fallback if contract not ready
+       const mockTxHash = "0x" + Array(64).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join("");
+       res.status(200).json({
+        ok: true,
+        username,
+        ownerWallet,
+        agentCoreIrysId,
+        tokenURI,
+        txHash: mockTxHash,
+        nftMetadataIrysId: metadataId,
+        note: "Simulated mint (no contract configured)"
+      });
+    }
+  } catch (err) {
+    console.error("[DJZS-IRYS] /api/agent/mint-username error:", err);
+    res.status(400).json({
+      ok: false,
+      error: err.message || "Failed to mint username NFT"
     });
   }
 });
