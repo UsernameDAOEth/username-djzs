@@ -1,5 +1,5 @@
 import { WebUploader } from "@irys/upload";
-import { Ethereum } from "@irys/upload-ethereum";
+import { BaseETH } from "@irys/upload-ethereum";
 import { ethers } from "ethers";
 
 // Mock delay helper
@@ -8,28 +8,28 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export interface IrysJournalPayload {
   title: string;
   content: string;
-  zoneId: number; // Changed to number to match guide
+  zoneId: number; 
   zoneSlug: string;
-  timeCode: string; // Changed to string to match guide
+  timeCode: string; 
   createdAt: string;
-  version: number; // Changed to number to match guide
+  version: number; 
   previousIrysId?: string;
   authorAlias?: string;
-  tags?: string[]; // Added optional tags array
+  tags?: string[]; 
 }
 
 export const irysService = {
   /**
    * Simulates getting an Irys uploader. 
-   * In a real app, this would use the user's injected wallet (Metamask/Phantom).
+   * In a real app, this would use the user's injected wallet (Metamask/Phantom) on Base Mainnet.
    */
   async getWebUploader() {
     // For prototype: Check if window.ethereum exists
     if (typeof window !== 'undefined' && (window as any).ethereum) {
         try {
-            // Ideally we would do this:
+            // Ideally we would do this for Base Mainnet:
             // const provider = new ethers.BrowserProvider((window as any).ethereum);
-            // const irys = await WebUploader(Ethereum).withProvider(provider);
+            // const irys = await WebUploader(BaseETH).withProvider(provider);
             // return irys;
             
             // But for the mockup stability, we'll return a mock object if real wallet fails or isn't desired yet
