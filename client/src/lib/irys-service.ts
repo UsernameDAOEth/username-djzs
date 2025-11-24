@@ -1,5 +1,5 @@
-import { WebUploader } from "@irys/upload";
-import { BaseETH } from "@irys/upload-ethereum";
+import { Uploader } from "@irys/upload";
+import { BaseEth } from "@irys/upload-ethereum";
 import { ethers } from "ethers";
 
 // Mock delay helper

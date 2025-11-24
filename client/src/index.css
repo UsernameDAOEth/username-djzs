@@ -14,35 +14,35 @@
   --color-card-foreground: hsl(0 0% 95%);
   --color-popover: hsl(0 0% 8%);
   --color-popover-foreground: hsl(0 0% 95%);
-  --color-primary: hsl(120 100% 50%);
+  --color-primary: hsl(88 100% 67%);
   --color-primary-foreground: hsl(0 0% 0%);
   --color-secondary: hsl(0 0% 20%);
   --color-secondary-foreground: hsl(0 0% 95%);
   --color-muted: hsl(0 0% 15%);
   --color-muted-foreground: hsl(0 0% 65%);
-  --color-accent: hsl(120 100% 50%);
+  --color-accent: hsl(88 100% 67%);
   --color-accent-foreground: hsl(0 0% 0%);
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(0 0% 98%);
   --color-border: hsl(0 0% 30%);
-  --color-primary-border: hsl(120 100% 50%);
-  --color-accent-border: hsl(120 100% 50%);
+  --color-primary-border: hsl(88 100% 67%);
+  --color-accent-border: hsl(88 100% 67%);
   --color-card-border: hsl(0 0% 30%);
   --color-input: hsl(0 0% 30%);
-  --color-ring: hsl(120 100% 50%);
-  --color-chart-1: hsl(120 100% 50%);
+  --color-ring: hsl(88 100% 67%);
+  --color-chart-1: hsl(88 100% 67%);
   --color-chart-2: hsl(0 0% 100%);
   --color-chart-3: hsl(0 0% 50%);
   --color-chart-4: hsl(0 0% 30%);
   --color-chart-5: hsl(0 0% 20%);
   --color-sidebar: hsl(0 0% 8%);
   --color-sidebar-foreground: hsl(0 0% 95%);
-  --color-sidebar-primary: hsl(120 100% 50%);
+  --color-sidebar-primary: hsl(88 100% 67%);
   --color-sidebar-primary-foreground: hsl(0 0% 0%);
   --color-sidebar-accent: hsl(0 0% 20%);
   --color-sidebar-accent-foreground: hsl(0 0% 95%);
   --color-sidebar-border: hsl(0 0% 30%);
-  --color-sidebar-ring: hsl(120 100% 50%);
+  --color-sidebar-ring: hsl(88 100% 67%);
 
   /* Automatically computed borders: They're already hsl() wrapped. That's okay.
    * The only reason you don't want to wrap them in hsl() in theme tokens is so that
@@ -85,27 +85,27 @@
   --sidebar: 0 0% 8%;
   --sidebar-foreground: 0 0% 95%;
   --sidebar-border: 0 0% 30%;
-  --sidebar-primary: 120 100% 50%;
+  --sidebar-primary: 88 100% 67%;
   --sidebar-primary-foreground: 0 0% 0%;
   --sidebar-accent: 0 0% 20%;
   --sidebar-accent-foreground: 0 0% 95%;
-  --sidebar-ring: 120 100% 50%;
+  --sidebar-ring: 88 100% 67%;
   --popover: 0 0% 8%;
   --popover-foreground: 0 0% 95%;
   --popover-border: 0 0% 30%;
-  --primary: 120 100% 50%; /* Acid Green */
+  --primary: 88 100% 67%; /* Acid Green */
   --primary-foreground: 0 0% 0%;
   --secondary: 0 0% 20%;
   --secondary-foreground: 0 0% 95%;
   --muted: 0 0% 15%;
   --muted-foreground: 0 0% 65%;
-  --accent: 120 100% 50%;
+  --accent: 88 100% 67%;
   --accent-foreground: 0 0% 0%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
   --input: 0 0% 30%;
-  --ring: 120 100% 50%;
-  --chart-1: 120 100% 50%;
+  --ring: 88 100% 67%;
+  --chart-1: 88 100% 67%;
   --chart-2: 0 0% 100%;
   --chart-3: 0 0% 50%;
   --chart-4: 0 0% 30%;
