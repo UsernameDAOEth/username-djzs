@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
+import { BrutalButton, BrutalCard, GlitchText } from "@/components/ui/brutalist";
 import { cn } from "@/lib/utils";
-import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2, Link2, Lock, AlertCircle, LogOut, UploadCloud } from "lucide-react";
+import { Loader2, Terminal, Cpu, ShieldCheck, Zap, Database, RefreshCw, CheckCircle2, Link2, Lock, AlertCircle, LogOut, UploadCloud, Activity, Radio } from "lucide-react";
 import { djzsApi, type DjzsEntry } from "@/lib/djzs-api";
 import { irysService } from "@/lib/irys-service";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { MatrixRain } from "@/components/matrix-rain";
+import { motion } from "framer-motion";
 
 export const DjzsAgentConsole = () => {
   const { toast } = useToast();
@@ -30,7 +31,7 @@ export const DjzsAgentConsole = () => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const addLog = (message: string) => {
-    setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0,8)}] ${message}`].slice(-5));
+    setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0,12)}] ${message}`].slice(-8));
   };
 
   const refreshSyncQueue = async () => {
@@ -178,209 +179,247 @@ export const DjzsAgentConsole = () => {
   };
 
   return (
-    <BrutalCard className="w-full max-w-6xl mx-auto bg-background p-0 overflow-hidden border-2 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)]">
+    <BrutalCard className="w-full max-w-6xl mx-auto bg-black/90 backdrop-blur-xl p-0 overflow-hidden border-2 border-primary shadow-[0px_0px_40px_rgba(178,255,89,0.2)]">
       {/* Terminal Header */}
-      <div className="bg-primary text-primary-foreground p-2 border-b-2 border-primary flex justify-between items-center">
-        <div className="font-mono text-xs font-bold uppercase flex items-center gap-2">
+      <div className="bg-primary/10 text-primary p-2 border-b-2 border-primary flex justify-between items-center relative overflow-hidden">
+        {/* Header Glitch Scanline */}
+        <div className="absolute top-0 left-0 h-full w-1 bg-primary/50 animate-[scan_2s_ease-in-out_infinite]" />
+        
+        <div className="font-mono text-xs font-bold uppercase flex items-center gap-2 z-10">
           <Terminal className="w-4 h-4" />
-          DJZS_PAID_AGENT // v1.0.0
+          <GlitchText text="DJZS_PAID_AGENT // v1.0.0" className="text-sm font-black tracking-wider" />
         </div>
-        <div className="font-mono text-[10px] flex items-center gap-4">
-            <span className="flex items-center gap-1"><Cpu className="w-3 h-3"/> NODE_ENV: PRODUCTION</span>
-            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3"/> ENCRYPTED</span>
-            <span className="flex items-center gap-1"><Zap className="w-3 h-3"/> x402 READY</span>
+        <div className="font-mono text-[10px] flex items-center gap-4 z-10">
+            <span className="flex items-center gap-1 text-primary/70"><Cpu className="w-3 h-3"/> NODE_ENV: PRODUCTION</span>
+            <span className="flex items-center gap-1 text-primary/70"><ShieldCheck className="w-3 h-3"/> ENCRYPTED</span>
+            <span className="flex items-center gap-1 text-primary/70"><Zap className="w-3 h-3"/> x402 READY</span>
         </div>
       </div>
 
-      <div className="p-4 md:p-6 grid lg:grid-cols-12 gap-6">
+      <div className="grid lg:grid-cols-12 h-[600px]">
         {/* Input Section */}
-        <form onSubmit={handleSubmit} className="lg:col-span-4 space-y-6 flex flex-col h-full border-r-0 lg:border-r-2 border-border pr-0 lg:pr-6 border-dashed">
-          <div className="space-y-2 flex-grow">
-            <label htmlFor="query-input" className="font-mono text-xs uppercase text-muted-foreground block">
-              Input Directive
-            </label>
-            <textarea
-              id="query-input"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-full min-h-[160px] bg-secondary/10 border-2 border-border p-4 font-mono text-sm focus:border-primary focus:outline-none resize-none rounded-none text-foreground placeholder:text-muted-foreground/50"
-              placeholder="Ask the DJZS Agent..."
-            />
-          </div>
-
-          <div className="grid grid-cols-1 gap-4">
+        <form onSubmit={handleSubmit} className="lg:col-span-3 bg-black flex flex-col h-full border-r-2 border-primary/30">
+          <div className="p-4 space-y-6 flex-grow">
             <div className="space-y-2">
-              <label htmlFor="zone-select" className="font-mono text-xs uppercase text-muted-foreground block">
-                Target Zone
+              <label htmlFor="query-input" className="font-mono text-[10px] uppercase text-primary/50 block tracking-widest">
+                /// INPUT DIRECTIVE
               </label>
-              <select
-                id="zone-select"
-                value={zone}
-                onChange={(e) => setZone(e.target.value)}
-                className="w-full bg-secondary/10 border-2 border-border p-3 font-mono text-xs focus:border-primary focus:outline-none rounded-none appearance-none cursor-pointer hover:bg-secondary/20 transition-colors"
-              >
-                <option>Zone 01 – DYOR</option>
-                <option>Zone 02 – Decentralized iD</option>
-                <option>Zone 03 – Blockchain Testnet</option>
-                <option>Zone 04 – Decentralized Social</option>
-                <option>Zone 05 – RWA</option>
-                <option>Zone 06 – DePIN</option>
-                <option>Zone 07 – DeFi</option>
-                <option>Zone 08 – DeAI</option>
-                <option>Zone 09 – DeSci</option>
-                <option>Zone 10 – Time</option>
-              </select>
+              <textarea
+                id="query-input"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full h-48 bg-secondary/10 border border-primary/30 p-3 font-mono text-xs focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none resize-none rounded-none text-primary placeholder:text-primary/20"
+                placeholder="ENTER QUERY..."
+              />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="mode-select" className="font-mono text-xs uppercase text-muted-foreground block">
-                Processing Mode
-              </label>
-              <select
-                id="mode-select"
-                value={mode}
-                onChange={(e) => setMode(e.target.value)}
-                className="w-full bg-secondary/10 border-2 border-border p-3 font-mono text-xs focus:border-primary focus:outline-none rounded-none appearance-none cursor-pointer hover:bg-secondary/20 transition-colors"
-              >
-                <option value="quick">Quick (Q&A) - $0.01</option>
-                <option value="journal">Journal - $0.03</option>
-                <option value="research">Research - $0.05</option>
-                <option value="alpha">Alpha - $0.10+</option>
-              </select>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label htmlFor="zone-select" className="font-mono text-[10px] uppercase text-primary/50 block tracking-widest">
+                  /// TARGET ZONE
+                </label>
+                <div className="relative">
+                    <select
+                        id="zone-select"
+                        value={zone}
+                        onChange={(e) => setZone(e.target.value)}
+                        className="w-full bg-black border border-primary/30 p-2 font-mono text-[10px] text-primary focus:border-primary focus:outline-none rounded-none appearance-none cursor-pointer hover:bg-primary/10 transition-colors uppercase"
+                    >
+                        <option>Zone 01 – DYOR</option>
+                        <option>Zone 02 – Decentralized iD</option>
+                        <option>Zone 03 – Blockchain Testnet</option>
+                        <option>Zone 04 – Decentralized Social</option>
+                        <option>Zone 05 – RWA</option>
+                        <option>Zone 06 – DePIN</option>
+                        <option>Zone 07 – DeFi</option>
+                        <option>Zone 08 – DeAI</option>
+                        <option>Zone 09 – DeSci</option>
+                        <option>Zone 10 – Time</option>
+                    </select>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-primary/50 text-[8px]">▼</div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="mode-select" className="font-mono text-[10px] uppercase text-primary/50 block tracking-widest">
+                  /// PROCESSING MODE
+                </label>
+                <div className="relative">
+                    <select
+                        id="mode-select"
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value)}
+                        className="w-full bg-black border border-primary/30 p-2 font-mono text-[10px] text-primary focus:border-primary focus:outline-none rounded-none appearance-none cursor-pointer hover:bg-primary/10 transition-colors uppercase"
+                    >
+                        <option value="quick">Quick (Q&A) - $0.01</option>
+                        <option value="journal">Journal - $0.03</option>
+                        <option value="research">Research - $0.05</option>
+                        <option value="alpha">Alpha - $0.10+</option>
+                    </select>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-primary/50 text-[8px]">▼</div>
+                </div>
+              </div>
             </div>
           </div>
 
           <BrutalButton
             type="submit"
             disabled={loading || !query.trim()}
-            className="w-full flex justify-center items-center gap-2 py-6"
+            className="w-full flex justify-center items-center gap-2 py-6 border-t-2 border-primary/30 bg-primary/10 hover:bg-primary hover:text-black transition-all"
           >
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                PROCESSING...
+                PROCESSING
               </>
             ) : (
-              "EXECUTE_QUERY"
+              <>
+                EXECUTE_QUERY <span className="animate-pulse">_</span>
+              </>
             )}
           </BrutalButton>
         </form>
 
         {/* Output Section */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="relative border-2 border-border bg-black font-mono text-sm overflow-hidden min-h-[400px] flex flex-col flex-grow">
-            <div className="absolute top-0 left-0 w-full h-1 bg-primary/20" />
+        <div className="lg:col-span-6 flex flex-col relative bg-black overflow-hidden">
+            {/* Matrix Background */}
+            <MatrixRain />
             
             {/* Status Bar */}
-            <div className="border-b border-white/10 p-2 flex gap-4 text-[10px] text-muted-foreground uppercase tracking-wider">
-                <span>STATUS: {loading ? <span className="text-primary animate-pulse">PROCESSING</span> : <span className="text-green-500">IDLE</span>}</span>
-                <span>MEM: 128MB</span>
+            <div className="border-b border-primary/30 p-2 flex justify-between text-[10px] font-mono text-primary/50 uppercase tracking-wider bg-black/80 backdrop-blur-sm z-10">
+                <div className="flex gap-4">
+                    <span>STATUS: {loading ? <span className="text-primary animate-pulse">PROCESSING...</span> : <span className="text-green-500">IDLE</span>}</span>
+                    <span>MEM: 128MB</span>
+                </div>
+                <div className="flex gap-2">
+                    <Activity className="w-3 h-3 animate-pulse" />
+                    LIVE FEED
+                </div>
             </div>
 
-            <div className="p-4 flex-1 overflow-y-auto space-y-4 font-mono">
+            <div className="p-6 flex-1 overflow-y-auto font-mono relative z-10 scrollbar-hide">
                 {!response && !loading && (
-                    <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 space-y-4 select-none">
-                    <Terminal className="w-16 h-16 opacity-20" />
-                    <p className="text-xs uppercase tracking-widest text-center">
-                        System Ready<br/>
-                        Initiate Query Sequence
-                    </p>
+                    <div className="h-full flex flex-col items-center justify-center text-primary/20 space-y-4 select-none">
+                        <div className="border border-primary/20 p-8 rotate-45">
+                            <div className="-rotate-45">
+                                <Terminal className="w-12 h-12" />
+                            </div>
+                        </div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-center animate-pulse">
+                            System Ready<br/>
+                            Awaiting Input
+                        </p>
                     </div>
                 )}
 
-                {/* Live Logs */}
+                {/* Live Logs Overlay */}
                 {loading && (
-                    <div className="space-y-1 text-xs font-mono text-primary/70">
-                        {logs.map((log, i) => (
-                            <div key={i} className="animate-in fade-in slide-in-from-left-2 duration-200">
-                                {log}
-                            </div>
-                        ))}
-                        <div className="animate-pulse">_</div>
+                    <div className="absolute bottom-4 left-4 right-4 p-4 bg-black/90 border border-primary/30 text-[10px] font-mono text-primary shadow-[0_0_20px_rgba(178,255,89,0.1)]">
+                        <div className="flex flex-col-reverse gap-1 h-32 overflow-hidden">
+                            {logs.map((log, i) => (
+                                <div key={i} className="animate-in fade-in slide-in-from-left-4 duration-100 flex gap-2">
+                                    <span className="opacity-50">{'>'}</span>
+                                    {log}
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
                 {response && !loading && (
-                    <div className="text-primary whitespace-pre-wrap leading-relaxed animate-in fade-in duration-300 selection:bg-primary/30 selection:text-white">
-                    {response}
-                    <span className="inline-block w-2 h-4 bg-primary ml-1 animate-pulse align-middle" />
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        className="text-primary whitespace-pre-wrap leading-relaxed selection:bg-primary/30 selection:text-white text-sm"
+                    >
+                        <div className="mb-4 text-[10px] text-primary/50 border-b border-primary/20 pb-2">
+                            /// OUTPUT GENERATED: {new Date().toLocaleTimeString()}
+                        </div>
+                        {response}
+                        <span className="inline-block w-2 h-4 bg-primary ml-1 animate-[blink_1s_infinite]" />
+                    </motion.div>
                 )}
-            </div>
             </div>
         </div>
 
         {/* Sync Status Section (Simulated Anytype Worker) */}
-        <div className="lg:col-span-3 border-l-0 lg:border-l-2 border-border pl-0 lg:pl-6 border-dashed flex flex-col">
-            <div className="bg-secondary/5 border-2 border-border h-full p-4 flex flex-col">
-                <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-mono text-xs font-bold uppercase flex items-center gap-2">
-                        <Database className="w-3 h-3" />
-                        DATA_PERSISTENCE
-                    </h4>
-                    {isAuthenticated && (
-                      <div className="text-[10px] font-mono text-primary flex items-center gap-1">
-                         <Lock className="w-3 h-3" /> VAULT_ACTIVE
-                      </div>
-                    )}
-                </div>
+        <div className="lg:col-span-3 border-l-2 border-primary/30 flex flex-col bg-black/95 backdrop-blur-sm">
+            <div className="p-3 border-b border-primary/30 flex justify-between items-center bg-primary/5">
+                <h4 className="font-mono text-[10px] font-bold uppercase flex items-center gap-2 text-primary">
+                    <Database className="w-3 h-3" />
+                    DATA_PERSISTENCE
+                </h4>
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            </div>
 
+            <div className="flex-1 p-4 flex flex-col gap-4 overflow-hidden">
                 {!isAuthenticated ? (
-                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 mb-4 border-2 border-border border-dashed bg-background/50 p-4">
-                      <Link2 className="w-8 h-8 text-muted-foreground opacity-50" />
+                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 border border-primary/20 border-dashed bg-primary/5 p-4 text-center">
+                      <Lock className="w-8 h-8 text-primary/30" />
                       
                       {authStep === "idle" && (
-                          <div className="text-center space-y-4">
-                             <p className="text-[10px] font-mono text-muted-foreground">CONNECT VAULT TO ENABLE SYNC</p>
-                             <BrutalButton variant="outline" className="w-full text-xs" onClick={handleRequestChallenge} disabled={isAuthenticating}>
-                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "CONNECT ANYTYPE"}
+                          <div className="space-y-4 w-full">
+                             <p className="text-[10px] font-mono text-primary/70">VAULT LOCKED</p>
+                             <BrutalButton variant="outline" className="w-full text-[10px] py-2 h-auto border-primary/50 text-primary hover:bg-primary hover:text-black" onClick={handleRequestChallenge} disabled={isAuthenticating}>
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "INITIATE HANDSHAKE"}
                              </BrutalButton>
                           </div>
                       )}
 
                       {authStep === "verify" && (
                           <div className="space-y-3 w-full">
-                             <p className="text-[10px] font-mono text-primary text-center">ENTER CODE FROM ANYTYPE APP</p>
+                             <p className="text-[10px] font-mono text-primary text-center animate-pulse">AWAITING 2FA CODE</p>
                              <Input 
                                 value={authCode}
                                 onChange={(e) => setAuthCode(e.target.value)}
-                                placeholder="1234"
-                                className="text-center font-mono tracking-widest text-lg"
+                                placeholder="0000"
+                                className="text-center font-mono tracking-[0.5em] text-lg bg-black border-primary text-primary focus:ring-primary rounded-none"
                                 maxLength={4}
                              />
-                             <BrutalButton className="w-full text-xs" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4}>
-                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "VERIFY CODE"}
+                             <BrutalButton className="w-full text-[10px] h-8" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4}>
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "VERIFY"}
                              </BrutalButton>
-                             <button onClick={() => setAuthStep("idle")} className="text-[10px] underline text-muted-foreground w-full text-center">CANCEL</button>
+                             <button onClick={() => setAuthStep("idle")} className="text-[8px] underline text-primary/50 w-full text-center hover:text-primary">ABORT</button>
                           </div>
                       )}
                    </div>
                 ) : (
                    <>
-                    <div className="flex-1 overflow-y-auto space-y-2 mb-4 min-h-[200px] pr-1">
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-2">
+                        <div className="bg-primary/10 p-2 border border-primary/20">
+                            <div className="text-[8px] text-primary/50 uppercase">PENDING</div>
+                            <div className="text-xl font-mono font-bold text-primary leading-none">{syncQueue.length}</div>
+                        </div>
+                        <div className="bg-primary/10 p-2 border border-primary/20">
+                            <div className="text-[8px] text-primary/50 uppercase">ARCHIVED</div>
+                            <div className="text-xl font-mono font-bold text-primary leading-none">0</div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-primary/30 scrollbar-track-transparent">
                         {syncQueue.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground/30 text-center">
-                                <CheckCircle2 className="w-8 h-8 mb-2 opacity-50" />
-                                <span className="text-[10px] uppercase">All Entries Synced</span>
+                            <div className="h-full flex flex-col items-center justify-center text-primary/30 text-center space-y-2">
+                                <CheckCircle2 className="w-6 h-6" />
+                                <span className="text-[10px] uppercase tracking-wider">All Data Synced</span>
                             </div>
                         ) : (
                             syncQueue.map((entry) => (
-                                <div key={entry.id} className="bg-background border border-border p-2 text-[10px] font-mono group flex flex-col gap-2">
-                                    <div className="flex justify-between text-muted-foreground">
-                                        <span>{entry.mode.toUpperCase()}</span>
-                                        <span>{entry.zone.split('–')[0].trim()}</span>
+                                <div key={entry.id} className="bg-black border border-primary/30 p-2 text-[10px] font-mono group flex flex-col gap-2 hover:bg-primary/5 transition-colors">
+                                    <div className="flex justify-between text-primary/50">
+                                        <span>{entry.mode.slice(0,3).toUpperCase()}</span>
+                                        <span>{entry.zone.split('–')[0].replace('Zone', 'ZN').trim()}</span>
                                     </div>
-                                    <div className="truncate font-bold">{entry.title}</div>
+                                    <div className="truncate font-bold text-primary">{entry.title}</div>
                                     
                                     <div className="flex gap-2 pt-1">
-                                      {/* Archive to Irys Button */}
                                       <button 
                                         onClick={() => handleArchiveToIrys(entry)}
                                         disabled={!!isArchiving}
-                                        className="flex-1 bg-secondary/20 hover:bg-primary hover:text-primary-foreground text-[9px] uppercase py-1 flex items-center justify-center gap-1 transition-colors disabled:opacity-50"
+                                        className="flex-1 bg-primary/10 hover:bg-primary hover:text-black text-[9px] uppercase py-1 flex items-center justify-center gap-1 transition-colors disabled:opacity-50 border border-primary/30"
                                       >
                                         {isArchiving === entry.id ? <Loader2 className="w-2 h-2 animate-spin"/> : <UploadCloud className="w-2 h-2" />}
-                                        ARCHIVE_IRYS
+                                        ARCHIVE
                                       </button>
                                     </div>
                                 </div>
@@ -388,10 +427,10 @@ export const DjzsAgentConsole = () => {
                         )}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 mt-auto pt-4 border-t border-primary/30">
                         <BrutalButton 
                             variant="outline" 
-                            className="w-full text-xs py-2 h-auto"
+                            className="w-full text-[10px] py-2 h-auto border-primary text-primary hover:bg-primary hover:text-black"
                             onClick={handleSimulateSync}
                             disabled={isSyncing || syncQueue.length === 0}
                         >
@@ -400,27 +439,19 @@ export const DjzsAgentConsole = () => {
                             ) : (
                                 <RefreshCw className="w-3 h-3 mr-2" />
                             )}
-                            {isSyncing ? "SYNCING..." : "SYNC_ALL_TO_VAULT"}
+                            {isSyncing ? "SYNCING..." : "FORCE_SYNC_VAULT"}
                         </BrutalButton>
                         <BrutalButton 
                             variant="ghost" 
-                            className="w-full text-xs py-1 h-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                            className="w-full text-[10px] py-1 h-auto text-primary/50 hover:text-red-500 hover:bg-red-500/10"
                             onClick={handleDisconnect}
                         >
                             <LogOut className="w-3 h-3 mr-2" />
-                            DISCONNECT
+                            TERMINATE_SESSION
                         </BrutalButton>
                     </div>
                    </>
                 )}
-                
-                <div className="mt-4 text-[10px] text-muted-foreground font-mono border-t border-border pt-2">
-                    <p>DATA LAYERS:</p>
-                    <div className="flex justify-between mt-1 text-primary/70">
-                      <span>LOCAL: SYNC</span>
-                      <span>IRYS: ARCHIVE</span>
-                    </div>
-                </div>
             </div>
         </div>
       </div>
