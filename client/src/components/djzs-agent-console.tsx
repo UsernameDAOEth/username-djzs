@@ -54,14 +54,26 @@ export const DjzsAgentConsole = () => {
     setLogs([]);
 
     addLog("INIT_SEQUENCE_START");
-    addLog(`CONNECTING TO DJZS_PAID_AGENT v1.0.0...`);
+    
+    // Simulate MCP Bridge Interaction if authenticated
+    if (isAuthenticated) {
+       addLog(`> [MCP] SERVER: @anyproto/anytype-mcp`);
+       addLog(`> [MCP] TOOL_CALL: anytype_search_objects("${query}")`);
+       await djzsApi.mcpExecuteTool("anytype_search_objects", { query });
+       addLog(`> [MCP] RESULT: { hits: 0, latency: 45ms }`);
+    } else {
+       addLog(`> [MCP] STATUS: DISCONNECTED (USING LOCAL KNOWLEDGE BASE)`); 
+    }
     
     try {
         // Simulate authenticating
-        await new Promise((resolve) => setTimeout(() => {
-            addLog("AUTHENTICATING USERNAME_DAO KEY...");
-            resolve(true);
-        }, 500));
+        if (!isAuthenticated) {
+            addLog(`CONNECTING TO DJZS_PAID_AGENT v1.0.0...`);
+            await new Promise((resolve) => setTimeout(() => {
+                addLog("AUTHENTICATING USERNAME_DAO KEY...");
+                resolve(true);
+            }, 500));
+        }
 
         // Call Simulated API
         const result = await djzsApi.assistant(query, zone, mode);

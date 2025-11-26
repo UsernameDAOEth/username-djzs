@@ -35,6 +35,40 @@ const saveEntries = (entries: DjzsEntry[]) => {
 };
 
 export const djzsApi = {
+  // --- MCP Protocol Simulation ---
+  
+  async mcpExecuteTool(toolName: string, args: any) {
+    await new Promise(r => setTimeout(r, 600));
+    
+    // Simulate MCP Tool Execution
+    console.log(`[MCP] Executing tool: ${toolName}`, args);
+    
+    if (toolName === "anytype_create_object") {
+        return {
+            content: [{
+                type: "text",
+                text: `Created object: ${args.title} (ID: ${nanoid(16)})`
+            }]
+        };
+    }
+    
+    if (toolName === "anytype_search_objects") {
+        return {
+            content: [{
+                type: "text",
+                text: `Found 3 objects matching "${args.query}":\n- Project Alpha (Space)\n- Q3 Roadmap (Note)\n- Meeting Notes (Page)`
+            }]
+        };
+    }
+    
+    return {
+        content: [{
+            type: "text",
+            text: "Tool execution successful"
+        }]
+    };
+  },
+
   async assistant(query: string, zone: string, mode: string, sessionId?: string) {
     // Simulate network delay
     await new Promise(r => setTimeout(r, 1200));
@@ -53,7 +87,7 @@ export const djzsApi = {
     const header = `/// DJZS_AGENT // ${safeZone.toUpperCase()} // ${safeMode.toUpperCase()} ///\n/// TIMESTAMP: ${timestamp} ///\n\n`;
 
     if (safeMode === "quick") {
-        responseText = `${header}QUERY: "${query}"\n\n> ANALYSIS: ${safeZone} vector detected.\n\n> ANSWER: \nBased on protocol parameters, this requires immediate verification. The integration of ${safeZone} suggests a bullish outlook on sovereignty.\n\n> ACTION: Verify on-chain data.`;
+        responseText = `${header}QUERY: "${query}"\n\n> ANALYSIS: ${safeZone} vector detected.\n\n> MCP TOOL CALL: anytype_search_objects("${query}")\n> RESULT: No direct matches in local vault.\n\n> ANSWER: \nBased on protocol parameters, this requires immediate verification. The integration of ${safeZone} suggests a bullish outlook on sovereignty.\n\n> ACTION: Verify on-chain data.`;
     } else if (safeMode === "alpha") {
         responseText = `${header}/// ALPHA LEAK /// CONFIDENTIAL ///\n\nNARRATIVE: ${query}\n\nSIGNAL: 88/100\n\nOPPORTUNITY:\nEarly accumulation of identity-layer protocols is underpriced.\n\nSTRATEGY:\nPosition into modular identity stacks.`;
     } else if (safeMode === "research") {
