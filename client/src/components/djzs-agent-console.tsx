@@ -137,12 +137,22 @@ export const DjzsAgentConsole = () => {
   const handleRequestChallenge = async () => {
     setIsAuthenticating(true);
     try {
+        addLog(`> CONNECTING TO LOCAL ANYTYPE DAEMON...`);
+        await new Promise(r => setTimeout(r, 400));
+        
+        addLog(`> POST http://localhost:31009/v1/auth/challenges`);
+        addLog(`> PAYLOAD: { "app_name": "DJZS Agent" }`);
+        
         const res = await djzsApi.requestChallenge("DJZS Agent");
         setChallengeId(res.challenge_id);
         setAuthStep("verify");
-        addLog("AUTH_CHALLENGE_INITIATED");
+        
+        addLog(`> RESPONSE: 200 OK`);
+        addLog(`> CHALLENGE_ID: ${res.challenge_id.substring(0, 12)}...`);
+        addLog(`> ACTION REQUIRED: CHECK ANYTYPE APP FOR 4-DIGIT CODE`);
+        
     } catch (e) {
-        addLog("AUTH_ERROR: CHALLENGE_FAILED");
+        addLog("AUTH_ERROR: CHALLENGE_FAILED - IS ANYTYPE RUNNING?");
     } finally {
         setIsAuthenticating(false);
     }
@@ -151,13 +161,20 @@ export const DjzsAgentConsole = () => {
   const handleVerifyCode = async () => {
     setIsAuthenticating(true);
     try {
+        addLog(`> POST http://localhost:31009/v1/auth/api_keys`);
+        addLog(`> PAYLOAD: { "challenge_id": "...", "code": "****" }`);
+        
         await djzsApi.verifyChallenge(challengeId, authCode);
         setIsAuthenticated(true);
         setAuthStep("idle");
-        addLog("ANYTYPE_CONNECTION_ESTABLISHED");
+        
+        addLog(`> RESPONSE: 200 OK`);
+        addLog(`> API_KEY ACQUIRED: sk_********************`);
+        addLog("ANYTYPE_MCP_BRIDGE_ESTABLISHED");
+        
         toast({
-            title: "VAULT_CONNECTED",
-            description: "SECURE TUNNEL ESTABLISHED WITH ANYTYPE.",
+            title: "MCP_BRIDGE_ACTIVE",
+            description: "CONNECTED TO LOCAL ANYTYPE VAULT API.",
             className: "bg-primary text-primary-foreground font-mono border-2 border-black",
         });
     } catch (e) {
@@ -359,16 +376,22 @@ export const DjzsAgentConsole = () => {
                       
                       {authStep === "idle" && (
                           <div className="space-y-4 w-full">
-                             <p className="text-[10px] font-mono text-primary/70">VAULT LOCKED</p>
+                             <div className="space-y-1">
+                               <p className="text-[10px] font-mono text-primary/70">LOCAL API DISCONNECTED</p>
+                               <p className="text-[8px] font-mono text-primary/40">REQUIREMENT: Anytype v0.46.6+</p>
+                             </div>
                              <BrutalButton variant="outline" className="w-full text-[10px] py-2 h-auto border-primary/50 text-primary hover:bg-primary hover:text-black" onClick={handleRequestChallenge} disabled={isAuthenticating}>
-                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "INITIATE HANDSHAKE"}
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "INITIATE MCP BRIDGE"}
                              </BrutalButton>
                           </div>
                       )}
 
                       {authStep === "verify" && (
                           <div className="space-y-3 w-full">
-                             <p className="text-[10px] font-mono text-primary text-center animate-pulse">AWAITING 2FA CODE</p>
+                             <div className="space-y-1">
+                                <p className="text-[10px] font-mono text-primary text-center animate-pulse">CHECK ANYTYPE APP</p>
+                                <p className="text-[8px] font-mono text-primary/50 text-center">ENTER 4-DIGIT PAIRING CODE</p>
+                             </div>
                              <Input 
                                 value={authCode}
                                 onChange={(e) => setAuthCode(e.target.value)}
@@ -377,9 +400,9 @@ export const DjzsAgentConsole = () => {
                                 maxLength={4}
                              />
                              <BrutalButton className="w-full text-[10px] h-8" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4}>
-                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "VERIFY"}
+                                {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "AUTHORIZE KEY GENERATION"}
                              </BrutalButton>
-                             <button onClick={() => setAuthStep("idle")} className="text-[8px] underline text-primary/50 w-full text-center hover:text-primary">ABORT</button>
+                             <button onClick={() => setAuthStep("idle")} className="text-[8px] underline text-primary/50 w-full text-center hover:text-primary">CANCEL REQUEST</button>
                           </div>
                       )}
                    </div>
