@@ -9,6 +9,7 @@ import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_over
 import { CyberGrid } from "@/components/cyber-grid";
 import { WireframeCore } from "@/components/wireframe-core";
 
+import { ThreeDCard } from "@/components/3d-card";
 import { irysService } from "@/lib/irys-service";
 
 export default function Home() {
@@ -121,11 +122,6 @@ export default function Home() {
               </div>
             </div>
             
-import { ThreeDCard } from "@/components/3d-card";
-
-// ... (existing imports)
-
-// In the Hero Section:
             {/* Hero Visual */}
             <ThreeDCard className="relative aspect-square md:aspect-auto md:h-[600px] border-2 border-border bg-secondary/20 flex items-center justify-center group cursor-crosshair bg-black/40 backdrop-blur-sm">
                {/* 3D Wireframe Core - Moved to background of card */}
