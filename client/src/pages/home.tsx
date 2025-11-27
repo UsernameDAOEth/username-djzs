@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Wallet } from "lucide-react";
 import { BrutalButton, BrutalCard, Marquee, GlitchText } from "@/components/ui/brutalist";
 import { DjzsAgentConsole } from "@/components/djzs-agent-console";
+import { MobileMenu } from "@/components/mobile-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
@@ -94,6 +95,7 @@ export default function Home() {
               </BrutalButton>
             </Link>
           </nav>
+          <MobileMenu />
         </div>
       </header>
 

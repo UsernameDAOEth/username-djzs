@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-export const WireframeCore = () => {
+export const WireframeCore = ({ className }: { className?: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export const WireframeCore = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="w-full h-full absolute inset-0"
+      className={`w-full h-full absolute inset-0 ${className || ""}`}
     />
   );
 };

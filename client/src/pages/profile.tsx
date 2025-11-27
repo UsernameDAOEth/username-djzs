@@ -20,20 +20,45 @@ import { BrutalButton, BrutalCard, GlitchText } from "@/components/ui/brutalist"
 import { ThreeDCard } from "@/components/3d-card";
 import { WireframeCore } from "@/components/wireframe-core";
 import { CyberGrid } from "@/components/cyber-grid";
-import { MatrixRain } from "@/components/matrix-rain";
+import { UserProfile } from "@/types/user-profile";
+import { MobileMenu } from "@/components/mobile-menu";
 
 export default function Profile() {
-  // Mock User Data
-  const user = {
-    username: "djzs.eth",
-    tokenId: "8842",
-    zone: "Zone 01 – DYOR",
-    balance: "402.00",
-    reputation: "98/100",
-    contract: "0x7a2...3b91",
-    joined: "2024-11-27",
-    status: "ACTIVE"
+  // Mock User Data matching the schema
+  const user: UserProfile = {
+    id: "user-123",
+    username: "djzs",
+    displayName: "DJZS Protocol",
+    bio: "Decentralized Intelligence",
+    ens: "djzs.eth",
+    ethAddress: "0x7a2...3b91",
+    createdAt: "2024-11-27T14:20:01Z",
+    agent: {
+      name: "DJZS_AGENT",
+      level: 1,
+      xp: 402,
+      mood: "FOCUSED",
+      lastTrainedAt: new Date().toISOString(),
+    },
+    nfts: [
+      {
+        tokenId: "8842",
+        contract: "0x7a2...3b91",
+        chain: "Base Mainnet",
+        mintedAt: "2024-11-27T14:20:01Z"
+      }
+    ],
+    zones: [
+      { zoneId: "1", title: "Zone 01 – DYOR", entryCount: 3, publicCount: 0, lastUpdatedAt: new Date().toISOString() },
+      { zoneId: "2", title: "Zone 02 – Decentralized iD", entryCount: 1, publicCount: 0, lastUpdatedAt: new Date().toISOString() },
+      { zoneId: "3", title: "Zone 03 – Blockchain Testnet", entryCount: 0, publicCount: 0 }
+    ],
+    achievements: [
+      { id: "1", title: "EARLY ADOPTER", description: "Joined before 2026", awardedAt: "2024-11-27" }
+    ]
   };
+  
+  const mainNft = user.nfts?.[0];
 
   return (
     <div className="min-h-screen bg-black text-primary font-mono selection:bg-primary selection:text-black relative overflow-hidden">
@@ -58,14 +83,15 @@ export default function Profile() {
 
         <div className="flex items-center gap-4">
            <div className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-widest text-primary/70">
-              <span className="flex items-center gap-1"><div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/> BASE MAINNET</span>
+              <span className="flex items-center gap-1"><div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/> {mainNft?.chain || "BASE MAINNET"}</span>
               <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3"/> CONNECTED</span>
            </div>
            <BrutalButton className="h-8 text-xs px-4">
               <Wallet className="w-3 h-3 mr-2" />
-              {user.contract.slice(0,6)}...
+              {user.ethAddress?.slice(0,8)}...
            </BrutalButton>
         </div>
+        <MobileMenu />
       </nav>
 
       <main className="relative z-10 pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
@@ -83,7 +109,7 @@ export default function Profile() {
                                 <Cpu className="w-6 h-6 animate-pulse" />
                             </div>
                             <div className="text-xs font-mono border border-primary px-2 py-1 bg-black/50 backdrop-blur-sm">
-                                #{user.tokenId}
+                                #{mainNft?.tokenId}
                             </div>
                         </div>
                         
@@ -93,12 +119,12 @@ export default function Profile() {
 
                         <div className="space-y-2 bg-black/60 backdrop-blur-md p-4 border-t border-primary/30 -mx-6 -mb-6">
                             <h1 className="text-2xl font-black tracking-tighter glitch-text">
-                                {user.username}
+                                {user.ens || user.username}
                             </h1>
                             <div className="flex items-center gap-2 text-[10px] uppercase text-primary/70">
-                                <span className="bg-primary/20 px-1">GEN 1</span>
+                                <span className="bg-primary/20 px-1">GEN {user.agent?.level}</span>
                                 <span>•</span>
-                                <span>{user.zone}</span>
+                                <span>{user.zones?.[0]?.title}</span>
                             </div>
                         </div>
                     </div>
@@ -128,18 +154,18 @@ export default function Profile() {
                         <div>
                             <h2 className="text-3xl font-black uppercase tracking-widest flex items-center gap-3">
                                 AGENT STATUS
-                                <span className="text-xs bg-primary text-black px-2 py-1 font-bold align-middle">ACTIVE</span>
+                                <span className="text-xs bg-primary text-black px-2 py-1 font-bold align-middle">{user.agent?.mood || "ACTIVE"}</span>
                             </h2>
-                            <p className="text-xs text-primary/50 font-mono mt-1">LAST SYNC: {new Date().toLocaleTimeString()}</p>
+                            <p className="text-xs text-primary/50 font-mono mt-1">LAST TRAINED: {new Date(user.agent?.lastTrainedAt || "").toLocaleTimeString()}</p>
                         </div>
                         <div className="flex gap-4 text-right">
                             <div>
-                                <div className="text-[10px] uppercase text-primary/50">REP SCORE</div>
-                                <div className="text-xl font-bold">{user.reputation}</div>
+                                <div className="text-[10px] uppercase text-primary/50">XP</div>
+                                <div className="text-xl font-bold">{user.agent?.xp}</div>
                             </div>
                             <div>
                                 <div className="text-[10px] uppercase text-primary/50">BALANCE</div>
-                                <div className="text-xl font-bold">{user.balance} <span className="text-xs">x402</span></div>
+                                <div className="text-xl font-bold">402.00 <span className="text-xs">x402</span></div>
                             </div>
                         </div>
                     </div>
@@ -162,8 +188,8 @@ export default function Profile() {
                                 <Activity className="w-5 h-5 text-primary/70 group-hover:text-primary" />
                                 <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"/>
                             </div>
-                            <div className="text-[10px] uppercase text-primary/50">QUERIES</div>
-                            <div className="text-lg font-bold">842</div>
+                            <div className="text-[10px] uppercase text-primary/50">TOTAL ENTRIES</div>
+                            <div className="text-lg font-bold">{user.zones?.reduce((acc, z) => acc + (z.entryCount || 0), 0)}</div>
                             <div className="text-[10px] text-primary/40">+12 this week</div>
                          </div>
 
@@ -172,8 +198,8 @@ export default function Profile() {
                                 <Grid className="w-5 h-5 text-primary/70 group-hover:text-primary" />
                                 <ExternalLink className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity"/>
                             </div>
-                            <div className="text-[10px] uppercase text-primary/50">ZONES UNLOCKED</div>
-                            <div className="text-lg font-bold">3/10</div>
+                            <div className="text-[10px] uppercase text-primary/50">ZONES ACTIVE</div>
+                            <div className="text-lg font-bold">{user.zones?.filter(z => (z.entryCount || 0) > 0).length}/10</div>
                             <div className="flex gap-1 mt-2">
                                 {[1,2,3].map(i => <div key={i} className="w-2 h-2 bg-primary" />)}
                                 {[1,2,3,4,5,6,7].map(i => <div key={i} className="w-2 h-2 bg-primary/20" />)}
@@ -199,27 +225,27 @@ export default function Profile() {
                     <div className="p-4 font-mono text-xs space-y-2 overflow-y-auto flex-1 custom-scrollbar">
                         <div className="text-primary/50">--- BEGIN LOG STREAM ---</div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[14:20:01]</span>
-                            <span>Minted "djzs.eth" on Base Mainnet</span>
+                            <span className="text-primary/50">[{new Date(user.createdAt).toLocaleTimeString()}]</span>
+                            <span>Minted "{user.ens}" on {mainNft?.chain}</span>
                         </div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[14:21:45]</span>
+                            <span className="text-primary/50">[{new Date().toLocaleTimeString()}]</span>
                             <span>Activated MCP Bridge v1.0.2</span>
                         </div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[14:25:12]</span>
-                            <span>Synced 12 objects to Anytype Vault</span>
+                            <span className="text-primary/50">[{new Date().toLocaleTimeString()}]</span>
+                            <span>Synced {user.zones?.reduce((acc, z) => acc + (z.entryCount || 0), 0)} objects to Anytype Vault</span>
                         </div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[15:02:33]</span>
+                            <span className="text-primary/50">[{new Date().toLocaleTimeString()}]</span>
                             <span>Query executed: "DeFi yield strategies"</span>
                         </div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[15:02:35]</span>
+                            <span className="text-primary/50">[{new Date().toLocaleTimeString()}]</span>
                             <span>Gas spent: 0.0004 ETH</span>
                         </div>
                         <div className="flex gap-2">
-                            <span className="text-primary/50">[16:10:00]</span>
+                            <span className="text-primary/50">[{new Date().toLocaleTimeString()}]</span>
                             <span>Zone 02 Unlocked: Decentralized Identity</span>
                         </div>
                         <div className="text-primary animate-pulse">_</div>
@@ -233,24 +259,24 @@ export default function Profile() {
             <div className="flex items-center justify-between border-b border-primary/30 pb-2">
                 <h3 className="text-xl font-black uppercase flex items-center gap-2">
                     <Layers className="w-5 h-5" />
-                    INVENTORY
+                    ACHIEVEMENTS
                 </h3>
                 <div className="text-xs font-mono text-primary/50">SHOWING ALL ITEMS</div>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {[1, 2, 3, 4].map((item) => (
-                    <div key={item} className="aspect-square border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all cursor-pointer group relative overflow-hidden p-4 flex flex-col items-center justify-center gap-2">
+                {user.achievements?.map((item) => (
+                    <div key={item.id} className="aspect-square border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary transition-all cursor-pointer group relative overflow-hidden p-4 flex flex-col items-center justify-center gap-2">
                         <Hash className="w-8 h-8 text-primary/40 group-hover:text-primary transition-colors" />
                         <div className="text-[10px] uppercase font-bold text-center opacity-50 group-hover:opacity-100">
-                            DATA FRAGMENT #{item}
+                            {item.title}
                         </div>
                         <div className="absolute top-2 right-2 w-2 h-2 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                 ))}
                 
                  {/* Empty Slots */}
-                 {[1, 2].map((item) => (
+                 {[1, 2, 3, 4].map((item) => (
                     <div key={`empty-${item}`} className="aspect-square border border-primary/10 bg-transparent flex items-center justify-center">
                         <div className="w-2 h-2 bg-primary/10" />
                     </div>
