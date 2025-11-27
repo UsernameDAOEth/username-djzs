@@ -1,5 +1,7 @@
 import React, { useState } from "react";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { Wallet } from "lucide-react";
 import { BrutalButton, BrutalCard, Marquee, GlitchText } from "@/components/ui/brutalist";
 import { DjzsAgentConsole } from "@/components/djzs-agent-console";
 import { Input } from "@/components/ui/input";
@@ -81,11 +83,16 @@ export default function Home() {
             <div className="h-6 w-6 bg-primary animate-pulse" />
             <span className="font-mono text-xl font-bold tracking-tighter">USERNAME_DAO</span>
           </div>
-          <nav className="hidden md:flex gap-8 font-mono text-sm">
+          <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">EXPLORER</a>
-            <a href="#" className="text-primary">CONNECT_WALLET [OFFLINE]</a>
+            <Link href="/profile">
+              <BrutalButton className="h-8 text-xs px-4">
+                 <Wallet className="w-3 h-3 mr-2" />
+                 PROFILE
+              </BrutalButton>
+            </Link>
           </nav>
         </div>
       </header>
