@@ -14,6 +14,7 @@
   "notes": "removed framer motion dependency",
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
+    "@irys/sdk": "^0.2.11",
     "@irys/upload": "^0.0.15",
     "@irys/upload-ethereum": "^0.0.16",
     "@jridgewell/trace-mapping": "^0.3.25",
