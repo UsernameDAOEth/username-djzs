@@ -14,8 +14,8 @@ export const MobileMenu = () => {
   const menuItems = [
     { href: "/", label: "HOME", icon: Home },
     { href: "/profile", label: "PROFILE", icon: User },
+    { href: "/api-test", label: "API_TEST", icon: Terminal },
     { href: "#", label: "DJZS_PROTOCOL", icon: ShieldCheck },
-    { href: "#", label: "ANYTYPE_VAULT", icon: Terminal },
   ];
 
   return (
