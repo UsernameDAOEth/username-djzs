@@ -47,6 +47,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Diagnostic endpoint - check if MCP port is open
+  app.get("/api/mcp-diagnostic", async (req, res) => {
+    try {
+      const net = require("net");
+      
+      const checkPort = (port: number): Promise<boolean> => {
+        return new Promise((resolve) => {
+          const socket = new net.Socket();
+          socket.setTimeout(2000);
+          socket.on("connect", () => {
+            socket.destroy();
+            resolve(true);
+          });
+          socket.on("error", () => resolve(false));
+          socket.on("timeout", () => {
+            socket.destroy();
+            resolve(false);
+          });
+          socket.connect(port, "127.0.0.1");
+        });
+      };
+
+      const port31009Open = await checkPort(31009);
+
+      // Try to connect to different potential endpoints
+      const endpoints = [
+        "http://localhost:31009/status",
+        "http://localhost:31009/v1/status",
+        "http://localhost:31009/v1/objects",
+        "http://127.0.0.1:31009/status",
+      ];
+
+      const endpointTests = await Promise.all(
+        endpoints.map(async (endpoint) => {
+          try {
+            const response = await fetch(endpoint, {
+              method: "GET",
+              signal: AbortSignal.timeout(2000),
+            }).catch(() => null);
+            return {
+              endpoint,
+              reachable: response?.ok || false,
+              status: response?.status,
+            };
+          } catch {
+            return { endpoint, reachable: false };
+          }
+        })
+      );
+
+      res.json({
+        diagnostics: {
+          port31009Open,
+          apiKey: process.env.ANYTYPE_API_KEY ? "configured" : "missing",
+          endpointTests,
+        },
+        hint: port31009Open
+          ? "Port 31009 is open. Try different endpoints above."
+          : "Port 31009 is not responding. Check if Anytype MCP is running.",
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Test endpoint for Anytype MCP API
   app.post("/api/test-mcp", async (req, res) => {
     try {
@@ -59,34 +124,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Test connection to Anytype MCP API
-      const testResponse = await fetch("http://localhost:31009/v1/objects", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${anytypeApiKey}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // Try multiple endpoints
+      const endpoints = [
+        "http://localhost:31009/v1/objects",
+        "http://localhost:31009/objects",
+        "http://localhost:31009/v1/status",
+      ];
 
-      if (!testResponse.ok) {
-        const errorText = await testResponse.text();
-        throw new Error(`MCP API error: ${testResponse.status} ${errorText}`);
+      let lastError: any = null;
+      let successResponse = null;
+
+      for (const endpoint of endpoints) {
+        try {
+          const testResponse = await fetch(endpoint, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${anytypeApiKey}`,
+              "Content-Type": "application/json",
+            },
+            signal: AbortSignal.timeout(3000),
+          });
+
+          if (testResponse.ok) {
+            const data = await testResponse.json();
+            successResponse = {
+              success: true,
+              message: "Successfully connected to Anytype MCP API",
+              endpoint,
+              data,
+              objectCount: data?.objects?.length || 0,
+            };
+            break;
+          }
+        } catch (e) {
+          lastError = e;
+          continue;
+        }
       }
 
-      const data = await testResponse.json();
+      if (successResponse) {
+        return res.json(successResponse);
+      }
 
-      res.json({
-        success: true,
-        message: "Successfully connected to Anytype MCP API",
-        objectCount: data?.objects?.length || 0,
-        endpoint: "http://localhost:31009",
-      });
+      throw lastError || new Error("All endpoints failed");
     } catch (error: any) {
       console.error("Anytype MCP error:", error);
+      
+      const errorMessage = error.message || String(error);
+      let hint = "";
+      
+      if (errorMessage.includes("ECONNREFUSED")) {
+        hint = "Connection refused. Anytype MCP server may not be running on port 31009.";
+      } else if (errorMessage.includes("401") || errorMessage.includes("403")) {
+        hint = "Authentication failed. Check ANYTYPE_API_KEY in secrets.";
+      } else if (errorMessage.includes("404")) {
+        hint = "Endpoint not found. Anytype MCP API structure may be different.";
+      } else {
+        hint = "Check that Anytype desktop app is running with MCP enabled on port 31009. Use /api/mcp-diagnostic for more info.";
+      }
+
       res.status(500).json({
         success: false,
-        error: error.message,
-        hint: "Make sure Anytype desktop app is running and MCP server is enabled on port 31009",
+        error: errorMessage,
+        hint,
+        diagnostic: "Visit /api/mcp-diagnostic for connection details",
       });
     }
   });
