@@ -105,11 +105,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Try multiple endpoints
+      // Try multiple endpoints with correct headers
       const endpoints = [
         "http://localhost:31009/v1/objects",
         "http://localhost:31009/objects",
         "http://localhost:31009/v1/status",
+        "http://127.0.0.1:31009/v1/objects",
       ];
 
       let lastError: any = null;
@@ -122,6 +123,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             headers: {
               "Authorization": `Bearer ${anytypeApiKey}`,
               "Content-Type": "application/json",
+              "Anytype-Version": "2025-05-20",
             },
             signal: AbortSignal.timeout(3000),
           });
@@ -155,13 +157,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let hint = "";
       
       if (errorMessage.includes("ECONNREFUSED")) {
-        hint = "Connection refused. Anytype MCP server may not be running on port 31009.";
+        hint = "Connection refused. Make sure Anytype MCP server is running: npx -y @anyproto/anytype-mcp";
       } else if (errorMessage.includes("401") || errorMessage.includes("403")) {
-        hint = "Authentication failed. Check ANYTYPE_API_KEY in secrets.";
+        hint = "Authentication failed. Verify ANYTYPE_API_KEY is correct in secrets.";
       } else if (errorMessage.includes("404")) {
-        hint = "Endpoint not found. Anytype MCP API structure may be different.";
+        hint = "Endpoint not found. Check MCP server endpoints.";
       } else {
-        hint = "Check that Anytype desktop app is running with MCP enabled on port 31009. Use /api/mcp-diagnostic for more info.";
+        hint = "Make sure Anytype MCP server is running on port 31009. Use /api/mcp-diagnostic for details.";
       }
 
       res.status(500).json({
@@ -199,6 +201,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers: {
           "Authorization": `Bearer ${anytypeApiKey}`,
           "Content-Type": "application/json",
+          "Anytype-Version": "2025-05-20",
         },
       });
 
