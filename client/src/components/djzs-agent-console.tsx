@@ -295,6 +295,7 @@ export const DjzsAgentConsole = () => {
             type="submit"
             disabled={loading || !query.trim()}
             className="w-full flex justify-center items-center gap-2 py-6 border-t-2 border-primary/30 bg-primary/10 hover:bg-primary hover:text-black transition-all"
+            data-testid="button-execute-query"
           >
             {loading ? (
               <>
@@ -372,9 +373,9 @@ export const DjzsAgentConsole = () => {
         </div>
 
         {/* Sync Status Section (Simulated Anytype Worker) */}
-        <div className="lg:col-span-3 border-l-2 border-primary/30 flex flex-col bg-black/95 backdrop-blur-sm">
+        <div className="lg:col-span-3 border-l-2 border-primary/30 flex flex-col bg-black/95 backdrop-blur-sm" data-testid="section-data-persistence">
             <div className="p-3 border-b border-primary/30 flex justify-between items-center bg-primary/5">
-                <h4 className="font-mono text-[10px] font-bold uppercase flex items-center gap-2 text-primary">
+                <h4 className="font-mono text-[10px] font-bold uppercase flex items-center gap-2 text-primary" data-testid="text-data-persistence">
                     <Database className="w-3 h-3" />
                     DATA_PERSISTENCE
                 </h4>
@@ -383,8 +384,8 @@ export const DjzsAgentConsole = () => {
 
             <div className="flex-1 p-4 flex flex-col gap-4 overflow-hidden">
                 {!isAuthenticated ? (
-                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 border border-primary/20 border-dashed bg-primary/5 p-4 text-center">
-                      <Lock className="w-8 h-8 text-primary/30" />
+                   <div className="flex-1 flex flex-col items-center justify-center space-y-4 border border-primary/20 border-dashed bg-primary/5 p-4 text-center" data-testid="lock-container">
+                      <Lock className="w-8 h-8 text-primary/30" data-testid="icon-lock" />
                       
                       {authStep === "idle" && (
                           <div className="space-y-4 w-full">
@@ -392,7 +393,7 @@ export const DjzsAgentConsole = () => {
                                <p className="text-[10px] font-mono text-primary/70">LOCAL API DISCONNECTED</p>
                                <p className="text-[8px] font-mono text-primary/40">REQUIREMENT: Anytype v0.46.6+</p>
                              </div>
-                             <BrutalButton variant="outline" className="w-full text-[10px] py-2 h-auto border-primary/50 text-primary hover:bg-primary hover:text-black" onClick={handleRequestChallenge} disabled={isAuthenticating}>
+                             <BrutalButton variant="outline" className="w-full text-[10px] py-2 h-auto border-primary/50 text-primary hover:bg-primary hover:text-black" onClick={handleRequestChallenge} disabled={isAuthenticating} data-testid="button-initiate-mcp">
                                 {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "INITIATE MCP BRIDGE"}
                              </BrutalButton>
                           </div>
@@ -410,11 +411,12 @@ export const DjzsAgentConsole = () => {
                                 placeholder="0000"
                                 className="text-center font-mono tracking-[0.5em] text-lg bg-black border-primary text-primary focus:ring-primary rounded-none"
                                 maxLength={4}
+                                data-testid="input-auth-code"
                              />
-                             <BrutalButton className="w-full text-[10px] h-8" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4}>
+                             <BrutalButton className="w-full text-[10px] h-8" onClick={handleVerifyCode} disabled={isAuthenticating || authCode.length !== 4} data-testid="button-authorize-key">
                                 {isAuthenticating ? <Loader2 className="w-3 h-3 animate-spin" /> : "AUTHORIZE KEY GENERATION"}
                              </BrutalButton>
-                             <button onClick={() => setAuthStep("idle")} className="text-[8px] underline text-primary/50 w-full text-center hover:text-primary">CANCEL REQUEST</button>
+                             <button onClick={() => setAuthStep("idle")} className="text-[8px] underline text-primary/50 w-full text-center hover:text-primary" data-testid="button-cancel-auth">CANCEL REQUEST</button>
                           </div>
                       )}
                    </div>
@@ -452,6 +454,7 @@ export const DjzsAgentConsole = () => {
                                         onClick={() => handleArchiveToIrys(entry)}
                                         disabled={!!isArchiving}
                                         className="flex-1 bg-primary/10 hover:bg-primary hover:text-black text-[9px] uppercase py-1 flex items-center justify-center gap-1 transition-colors disabled:opacity-50 border border-primary/30"
+                                        data-testid={`button-archive-${entry.id}`}
                                       >
                                         {isArchiving === entry.id ? <Loader2 className="w-2 h-2 animate-spin"/> : <UploadCloud className="w-2 h-2" />}
                                         ARCHIVE
@@ -468,6 +471,7 @@ export const DjzsAgentConsole = () => {
                             className="w-full text-[10px] py-2 h-auto border-primary text-primary hover:bg-primary hover:text-black"
                             onClick={handleSimulateSync}
                             disabled={isSyncing || syncQueue.length === 0}
+                            data-testid="button-force-sync"
                         >
                             {isSyncing ? (
                                 <RefreshCw className="w-3 h-3 animate-spin mr-2" />
@@ -480,6 +484,7 @@ export const DjzsAgentConsole = () => {
                             variant="ghost" 
                             className="w-full text-[10px] py-1 h-auto text-primary/50 hover:text-red-500 hover:bg-red-500/10"
                             onClick={handleDisconnect}
+                            data-testid="button-terminate-session"
                         >
                             <LogOut className="w-3 h-3 mr-2" />
                             TERMINATE_SESSION
