@@ -50,27 +50,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Diagnostic endpoint - check if MCP port is open
   app.get("/api/mcp-diagnostic", async (req, res) => {
     try {
-      const net = require("net");
-      
-      const checkPort = (port: number): Promise<boolean> => {
-        return new Promise((resolve) => {
-          const socket = new net.Socket();
-          socket.setTimeout(2000);
-          socket.on("connect", () => {
-            socket.destroy();
-            resolve(true);
-          });
-          socket.on("error", () => resolve(false));
-          socket.on("timeout", () => {
-            socket.destroy();
-            resolve(false);
-          });
-          socket.connect(port, "127.0.0.1");
-        });
-      };
-
-      const port31009Open = await checkPort(31009);
-
       // Try to connect to different potential endpoints
       const endpoints = [
         "http://localhost:31009/status",
@@ -97,15 +76,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
       );
 
+      const portOpen = endpointTests.some((t) => t.reachable);
+
       res.json({
         diagnostics: {
-          port31009Open,
+          portResponding: portOpen,
           apiKey: process.env.ANYTYPE_API_KEY ? "configured" : "missing",
           endpointTests,
         },
-        hint: port31009Open
-          ? "Port 31009 is open. Try different endpoints above."
-          : "Port 31009 is not responding. Check if Anytype MCP is running.",
+        hint: portOpen
+          ? "Port 31009 is responding. Check which endpoint returned success above."
+          : "Port 31009 is not responding. Make sure Anytype MCP server is running.",
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
