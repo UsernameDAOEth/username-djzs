@@ -40,18 +40,18 @@ export const MobileMenu = () => {
             <div className="absolute inset-0 z-[-1] bg-[linear-gradient(rgba(178,255,89,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(178,255,89,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
             <div className="space-y-2">
-                <div className="text-xs font-mono text-primary/50 uppercase tracking-widest mb-4 border-b border-primary/30 pb-2">Navigation</div>
+                <div className="text-xs font-mono text-primary/50 uppercase tracking-widest mb-4 border-b border-primary/30 pb-2">/// NAVIGATION</div>
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
                   return (
                     <Link key={item.label} href={item.href} onClick={() => setIsOpen(false)}>
                       <div className={cn(
-                        "flex items-center gap-4 p-4 border border-primary/20 hover:bg-primary hover:text-black transition-all cursor-pointer group mb-2",
-                        isActive ? "bg-primary/10 border-primary text-primary" : "text-primary/70"
+                        "flex items-center gap-4 p-3 border-2 hover:bg-primary hover:text-black transition-all cursor-pointer group",
+                        isActive ? "bg-primary/10 border-primary text-primary" : "text-primary/70 border-primary/30"
                       )}>
-                        <Icon className="w-6 h-6" />
-                        <span className="text-xl font-black tracking-tighter">{item.label}</span>
+                        <Icon className="w-5 h-5" />
+                        <span className="text-lg font-black tracking-tighter">{item.label}</span>
                         {isActive && <div className="ml-auto w-2 h-2 bg-primary rounded-full animate-pulse" />}
                       </div>
                     </Link>
@@ -59,28 +59,43 @@ export const MobileMenu = () => {
                 })}
             </div>
 
-            <div className="mt-auto space-y-6">
-                <div className="p-4 border-2 border-dashed border-primary/30 bg-primary/5">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] uppercase text-primary/50">NETWORK STATUS</span>
-                        <div className="flex items-center gap-1 text-[10px] text-primary">
+            <div className="space-y-3">
+                <div className="text-xs font-mono text-primary/50 uppercase tracking-widest border-b border-primary/30 pb-2">/// STATUS</div>
+                <div className="bg-black/50 border-2 border-primary/30 p-3 space-y-2">
+                    <div className="flex justify-between text-[11px] font-mono">
+                        <span className="text-primary/60">AGENT_STATUS</span>
+                        <span className="bg-primary text-black px-2 py-1 font-bold">FOCUSED</span>
+                    </div>
+                    <div className="flex justify-between text-[11px] font-mono text-primary/60">
+                        <span>LAST_TRAINED</span>
+                        <span className="text-primary">11:11:30 AM</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-auto space-y-3">
+                <div className="text-xs font-mono text-primary/50 uppercase tracking-widest border-b border-primary/30 pb-2">/// SYSTEM</div>
+                <div className="p-3 border-2 border-dashed border-primary/30 bg-primary/5 space-y-2">
+                    <div className="flex justify-between text-[10px] font-mono">
+                        <span className="text-primary/50">NETWORK</span>
+                        <div className="flex items-center gap-1 text-primary">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/>
                             BASE MAINNET
                         </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase text-primary/50">WALLET</span>
-                        <span className="font-mono text-xs text-primary">0x7a...3b91</span>
+                    <div className="flex justify-between text-[10px] font-mono">
+                        <span className="text-primary/50">WALLET</span>
+                        <span className="text-primary">0x7a...3b91</span>
                     </div>
                 </div>
 
-                <BrutalButton className="w-full py-6 text-lg" onClick={() => setIsOpen(false)}>
-                    <Wallet className="w-5 h-5 mr-2" />
-                    CONNECT WALLET
+                <BrutalButton className="w-full py-4 border-2 border-primary font-mono text-sm font-bold" onClick={() => setIsOpen(false)}>
+                    <Wallet className="w-4 h-4 mr-2" />
+                    CONNECT_WALLET
                 </BrutalButton>
 
-                <div className="text-center">
-                    <p className="font-mono text-[10px] text-primary/30">
+                <div className="text-center pt-2 border-t border-primary/30">
+                    <p className="font-mono text-[9px] text-primary/30 uppercase tracking-widest">
                         DJZS PROTOCOL v1.0.0<br/>
                         MOBILE INTERFACE
                     </p>
