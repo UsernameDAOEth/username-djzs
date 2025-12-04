@@ -149,22 +149,24 @@ export const DjzsAgentConsole = () => {
   const handleRequestChallenge = async () => {
     setIsAuthenticating(true);
     try {
-        addLog(`> CONNECTING TO LOCAL ANYTYPE DAEMON...`);
+        addLog(`> INITIALIZING SIMULATION MODE`);
+        addLog(`> NOTE: Anytype MCP is an AI protocol, not a REST API`);
         await new Promise(r => setTimeout(r, 400));
         
-        addLog(`> POST http://localhost:31009/v1/auth/challenges`);
-        addLog(`> PAYLOAD: { "app_name": "DJZS Agent" }`);
+        addLog(`> SIMULATED CHALLENGE INITIATED`);
+        addLog(`> For real Anytype integration:`);
+        addLog(`>   1. Export profile from Anytype UI`);
+        addLog(`>   2. Upload via /api/profile/publish endpoint`);
         
         const res = await djzsApi.requestChallenge("DJZS Agent");
         setChallengeId(res.challenge_id);
         setAuthStep("verify");
         
-        addLog(`> RESPONSE: 200 OK`);
-        addLog(`> CHALLENGE_ID: ${res.challenge_id.substring(0, 12)}...`);
-        addLog(`> ACTION REQUIRED: CHECK ANYTYPE APP FOR 4-DIGIT CODE`);
+        addLog(`> SIMULATION: Challenge generated (ID: ${res.challenge_id.substring(0, 12)}...)`);
+        addLog(`> DEMO MODE: Enter any 4-digit code to continue`);
         
     } catch (e) {
-        addLog("AUTH_ERROR: CHALLENGE_FAILED - IS ANYTYPE RUNNING?");
+        addLog("ERROR: CHALLENGE_SIMULATION_FAILED");
     } finally {
         setIsAuthenticating(false);
     }
@@ -173,27 +175,32 @@ export const DjzsAgentConsole = () => {
   const handleVerifyCode = async () => {
     setIsAuthenticating(true);
     try {
-        addLog(`> POST http://localhost:31009/v1/auth/api_keys`);
-        addLog(`> PAYLOAD: { "challenge_id": "...", "code": "****" }`);
+        addLog(`> SIMULATING KEY GENERATION...`);
         
         await djzsApi.verifyChallenge(challengeId, authCode);
         setIsAuthenticated(true);
         setAuthStep("idle");
         
-        addLog(`> RESPONSE: 200 OK`);
-        addLog(`> API_KEY ACQUIRED: sk_********************`);
-        addLog("ANYTYPE_MCP_BRIDGE_ESTABLISHED");
+        addLog(`> SIMULATION SUCCESSFUL`);
+        addLog(`> DEMO_API_KEY: sk_********************`);
+        addLog("SIMULATION_MODE_ACTIVE - NOT CONNECTED TO ANYTYPE");
+        addLog("");
+        addLog("> REAL WORKFLOW:");
+        addLog(">   1. Go to /api-test page");
+        addLog(">   2. Click 'TEST' on IRYS UPLOAD TEST (working ✓)");
+        addLog(">   3. Export profile from Anytype desktop");
+        addLog(">   4. Use /api/profile/publish to archive to Irys");
         
         toast({
-            title: "MCP_BRIDGE_ACTIVE",
-            description: "CONNECTED TO LOCAL ANYTYPE VAULT API.",
+            title: "SIMULATION_ACTIVE",
+            description: "DEMO MODE - Not connected to Anytype. See logs for real workflow.",
             className: "bg-primary text-primary-foreground font-mono border-2 border-black",
         });
     } catch (e) {
-        addLog("AUTH_ERROR: INVALID_CODE");
+        addLog("SIMULATION_ERROR: INVALID_CODE");
         toast({
-            title: "CONNECTION_FAILED",
-            description: "INVALID CODE. TRY AGAIN.",
+            title: "SIMULATION_FAILED",
+            description: "INVALID CODE (must be 4 digits). TRY AGAIN.",
             variant: "destructive",
         });
     } finally {
