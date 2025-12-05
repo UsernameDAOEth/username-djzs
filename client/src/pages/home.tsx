@@ -85,7 +85,7 @@ export default function Home() {
             <span className="font-mono text-xl font-bold tracking-tighter">USERNAME_DAO</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
-            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
+            <a href="#agent" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
             <a href="https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">EXPLORER</a>
             <Link href="/profile">
@@ -154,6 +154,7 @@ export default function Home() {
 
         {/* Agent Console Integration */}
         <motion.section 
+          id="agent"
           className="space-y-8"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
