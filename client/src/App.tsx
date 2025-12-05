@@ -7,6 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import ApiTest from "@/pages/api-test";
+import Explorer from "@/pages/explorer";
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/profile" component={Profile} />
       <Route path="/api-test" component={ApiTest} />
+      <Route path="/explorer" component={Explorer} />
       <Route component={NotFound} />
     </Switch>
   );

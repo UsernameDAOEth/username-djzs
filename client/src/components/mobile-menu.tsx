@@ -15,6 +15,7 @@ export const MobileMenu = () => {
     { href: "/", label: "HOME", icon: Home },
     { href: "/profile", label: "PROFILE", icon: User },
     { href: "/api-test", label: "API_TEST", icon: Terminal },
+    { href: "/explorer", label: "EXPLORER", icon: ShieldCheck },
     { href: "/#agent", label: "DJZS_PROTOCOL", icon: ShieldCheck },
     { href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", label: "ANYTYPE_VAULT", icon: ShieldCheck, external: true },
   ];
