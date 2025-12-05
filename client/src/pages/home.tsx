@@ -86,7 +86,7 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
-            <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
+            <a href="https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
             <a href="#" className="hover:text-primary hover:underline decoration-2 underline-offset-4">EXPLORER</a>
             <Link href="/profile">
               <BrutalButton className="h-8 text-xs px-4">

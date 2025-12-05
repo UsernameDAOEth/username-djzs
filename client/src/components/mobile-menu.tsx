@@ -16,6 +16,7 @@ export const MobileMenu = () => {
     { href: "/profile", label: "PROFILE", icon: User },
     { href: "/api-test", label: "API_TEST", icon: Terminal },
     { href: "#", label: "DJZS_PROTOCOL", icon: ShieldCheck },
+    { href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", label: "ANYTYPE_VAULT", icon: ShieldCheck, external: true },
   ];
 
   return (
@@ -44,6 +45,22 @@ export const MobileMenu = () => {
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
+                  const isExternal = (item as any).external;
+                  
+                  if (isExternal) {
+                    return (
+                      <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>
+                        <div className={cn(
+                          "flex items-center gap-4 p-3 border-2 hover:bg-primary hover:text-black transition-all cursor-pointer group",
+                          "text-primary/70 border-primary/30"
+                        )}>
+                          <Icon className="w-5 h-5" />
+                          <span className="text-lg font-black tracking-tighter">{item.label}</span>
+                        </div>
+                      </a>
+                    );
+                  }
+                  
                   return (
                     <Link key={item.label} href={item.href} onClick={() => setIsOpen(false)}>
                       <div className={cn(
