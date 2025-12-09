@@ -61,8 +61,8 @@ export interface AgentInsight {
 const STORAGE_KEY = "vana_contributions_v1";
 const INSIGHTS_KEY = "vana_insights_v1";
 
-// Helper to get contributions
-const getContributions = (): ContributionResult[] => {
+// Helper to read stored contributions from localStorage
+const readStoredContributions = (): ContributionResult[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -71,13 +71,13 @@ const getContributions = (): ContributionResult[] => {
   }
 };
 
-// Helper to save contributions
-const saveContributions = (contributions: ContributionResult[]) => {
+// Helper to save contributions to localStorage
+const writeStoredContributions = (contributions: ContributionResult[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(contributions));
 };
 
-// Helper to get insights
-const getInsights = (): AgentInsight[] => {
+// Helper to read stored insights from localStorage
+const readStoredInsights = (): AgentInsight[] => {
   try {
     const stored = localStorage.getItem(INSIGHTS_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -86,8 +86,8 @@ const getInsights = (): AgentInsight[] => {
   }
 };
 
-// Helper to save insights
-const saveInsights = (insights: AgentInsight[]) => {
+// Helper to save insights to localStorage
+const writeStoredInsights = (insights: AgentInsight[]) => {
   localStorage.setItem(INSIGHTS_KEY, JSON.stringify(insights));
 };
 
@@ -163,12 +163,12 @@ export const vanaService = {
     };
 
     // Store contribution
-    const contributions = getContributions();
+    const contributions = readStoredContributions();
     contributions.push(result);
-    saveContributions(contributions);
+    writeStoredContributions(contributions);
 
     // Store insight as contributed
-    const insights = getInsights();
+    const insights = readStoredInsights();
     insights.push({
       id: nanoid(12),
       agentId: insight.agentId,
@@ -179,7 +179,7 @@ export const vanaService = {
       contributed: true,
       vrc20Earned
     });
-    saveInsights(insights);
+    writeStoredInsights(insights);
 
     return result;
   },
@@ -187,13 +187,13 @@ export const vanaService = {
   // Get user's contributions
   async getContributions(): Promise<ContributionResult[]> {
     await new Promise(r => setTimeout(r, 300));
-    return getContributions();
+    return readStoredContributions();
   },
 
   // Get user's total earnings
   async getTotalEarnings(): Promise<{ vana: string; vrc20: Record<string, string> }> {
     await new Promise(r => setTimeout(r, 300));
-    const contributions = getContributions();
+    const contributions = readStoredContributions();
     const totalVRC20 = contributions.reduce((sum, c) => sum + parseFloat(c.vrc20Earned), 0);
     return {
       vana: (totalVRC20 * 0.1).toFixed(4),
