@@ -1,7 +1,5 @@
 // Web3.bio Universal Profile API Service
-// API Documentation: https://api.web3.bio/
-
-const API_BASE = "https://api.web3.bio";
+// Uses backend proxy at /api/web3bio/* to avoid rate limits
 
 export interface Web3BioProfile {
   address: string;
@@ -50,9 +48,10 @@ export interface UniversalProfile {
 }
 
 // Fetch universal profiles for an identity (address, ENS, Lens, Farcaster, etc.)
+// Uses backend proxy to avoid rate limits and enable API key usage
 export async function fetchUniversalProfile(identity: string): Promise<UniversalProfile | null> {
   try {
-    const response = await fetch(`${API_BASE}/profile/${encodeURIComponent(identity)}`);
+    const response = await fetch(`/api/web3bio/profile/${encodeURIComponent(identity)}`);
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -61,7 +60,12 @@ export async function fetchUniversalProfile(identity: string): Promise<Universal
       throw new Error(`Web3.bio API error: ${response.status}`);
     }
 
-    const profiles: Web3BioProfile[] = await response.json();
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || "Unknown error");
+    }
+    
+    const profiles: Web3BioProfile[] = data.profiles;
     
     if (!profiles || profiles.length === 0) {
       return null;
@@ -121,7 +125,7 @@ export async function fetchUniversalProfile(identity: string): Promise<Universal
 // Fetch a basic name service resolution (lighter response)
 export async function fetchNameService(identity: string): Promise<Web3BioProfile[] | null> {
   try {
-    const response = await fetch(`${API_BASE}/ns/${encodeURIComponent(identity)}`);
+    const response = await fetch(`/api/web3bio/ns/${encodeURIComponent(identity)}`);
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -130,7 +134,12 @@ export async function fetchNameService(identity: string): Promise<Web3BioProfile
       throw new Error(`Web3.bio NS API error: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || "Unknown error");
+    }
+    
+    return data.profiles;
   } catch (error) {
     console.error("[Web3.bio] Error fetching name service:", error);
     throw error;
@@ -143,7 +152,7 @@ export async function fetchPlatformProfile(
   identity: string
 ): Promise<Web3BioProfile | null> {
   try {
-    const response = await fetch(`${API_BASE}/profile/${platform}/${encodeURIComponent(identity)}`);
+    const response = await fetch(`/api/web3bio/${platform}/${encodeURIComponent(identity)}`);
     
     if (!response.ok) {
       if (response.status === 404) {
@@ -152,7 +161,12 @@ export async function fetchPlatformProfile(
       throw new Error(`Web3.bio ${platform} API error: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.error || "Unknown error");
+    }
+    
+    return data.profile;
   } catch (error) {
     console.error(`[Web3.bio] Error fetching ${platform} profile:`, error);
     throw error;

@@ -20,6 +20,7 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 ✅ **API Test Infrastructure** - `/api-test` page with three endpoint tests
 ✅ **Vana DataDAO Integration** - Full data contribution, monetization, and collective intelligence
 ✅ **Explorer Page** (`/explorer`) - Agent discovery, DataDAO browsing, and SQL query interface
+✅ **Web3.bio Integration** - Universal profile resolution across ENS, Farcaster, Lens, Basenames, Linea, Solana
 
 ### 🚀 BACKEND API ENDPOINTS
 - **POST `/api/test-irys`** - Upload test JSON to Irys
@@ -43,6 +44,12 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 - **GET `/api/vana/stats`** - Network-wide statistics
 - **POST `/api/vana/contribute`** - Contribute agent insight to DataDAO, earn VRC-20 tokens
 - **POST `/api/vana/query`** - Query collective intelligence from DataDAO (TEE-protected)
+
+### 🌐 WEB3.BIO UNIVERSAL PROFILE API
+- **GET `/api/web3bio/profile/:identity`** - Universal profile lookup (ENS, Farcaster, Lens, Basenames, etc.)
+- **GET `/api/web3bio/ns/:identity`** - Basic name service resolution (lighter response)
+- **GET `/api/web3bio/:platform/:identity`** - Platform-specific profile lookup
+  - Platforms: ens, farcaster, lens, basenames, linea, unstoppabledomains, solana
 
 ### 📱 ACTIVE PAGES
 - **`/` (Home)** - Landing page with system architecture diagram
@@ -73,13 +80,17 @@ client/src/
 │   └── anytype-userprofile.schema.json (JSON schema)
 └── lib/
     ├── djzs-api.ts (API client)
-    └── irys-service.ts (Irys utilities)
+    ├── irys-service.ts (Irys utilities)
+    ├── vana-service.ts (Vana DataDAO client)
+    └── web3bio-service.ts (Web3.bio universal profile client)
 ```
 
 ### Backend Structure
 ```
 server/
 ├── routes.ts (API endpoints - /api/test-irys, /api/test-mcp, /api/profile/publish)
+├── vana-routes.ts (Vana DataDAO API endpoints)
+├── web3bio-routes.ts (Web3.bio proxy endpoints)
 ├── storage.ts (Storage interface and implementations)
 └── app.ts (Express setup with middleware)
 ```
