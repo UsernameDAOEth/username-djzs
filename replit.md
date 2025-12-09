@@ -1,13 +1,13 @@
 # Username DAO × DJZS Protocol - Decentralized dApp
 
 ## Project Overview
-Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentralized crypto infrastructure where users mint a Username NFT to spawn personal AI agents. The system uses local-first architecture with Anytype Vault for private data storage, Irys Network for permanent archiving, and micropayment-based AI queries via x402 protocol.
+Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentralized crypto infrastructure where users mint a Username NFT to spawn personal AI agents. The system uses local-first architecture with Anytype Vault for private data storage, Irys Network for permanent archiving, Vana DataDAO for collective intelligence, and micropayment-based AI queries via x402 protocol.
 
 **Design System**: Digital brutalism with neon green (#b2ff59) accent color, Space Grotesk/Chakra Petch/Space Mono typography, and raw "Bushwick agency-level" aesthetic.
 
 **Stack**: React + Vite + Express + PostgreSQL (Drizzle ORM) + Tailwind CSS + TypeScript
 
-## Recent Progress (Session: Dec 1-3, 2025)
+## Recent Progress (Session: Dec 9, 2025)
 
 ### ✅ COMPLETED FEATURES
 ✅ **Frontend Prototype** - Agent Console with live logs, 3D interactive elements, Matrix Rain effects
@@ -18,6 +18,8 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 ✅ **Irys Network Integration** - @irys/sdk on Base Mainnet, verified working
 ✅ **Agent Console Debugging** - Added test IDs to all interactive elements
 ✅ **API Test Infrastructure** - `/api-test` page with three endpoint tests
+✅ **Vana DataDAO Integration** - Full data contribution, monetization, and collective intelligence
+✅ **Explorer Page** (`/explorer`) - Agent discovery, DataDAO browsing, and SQL query interface
 
 ### 🚀 BACKEND API ENDPOINTS
 - **POST `/api/test-irys`** - Upload test JSON to Irys
@@ -35,10 +37,18 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 - **GET `/api/mcp-diagnostic`** - Diagnose MCP connectivity
   - Tests port 31009, endpoint reachability, API key configuration
 
+### 🏛️ VANA DATADAO ENDPOINTS
+- **GET `/api/vana/status`** - Check Vana integration status
+- **GET `/api/vana/datadaos`** - List available DataDAOs
+- **GET `/api/vana/stats`** - Network-wide statistics
+- **POST `/api/vana/contribute`** - Contribute agent insight to DataDAO, earn VRC-20 tokens
+- **POST `/api/vana/query`** - Query collective intelligence from DataDAO (TEE-protected)
+
 ### 📱 ACTIVE PAGES
 - **`/` (Home)** - Landing page with system architecture diagram
 - **`/profile`** - User profile dashboard (accessible ✅)
 - **`/api-test`** - Integration testing interface with brutalist UI
+- **`/explorer`** - Agent discovery + Vana DataDAO hub (NEW ✅)
 
 ## Architecture
 
