@@ -4,10 +4,14 @@ import { storage } from "./storage";
 import { Uploader } from "@irys/upload";
 import { BaseEth } from "@irys/upload-ethereum";
 import vanaRoutes from "./vana-routes";
+import web3bioRoutes from "./web3bio-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register Vana DataDAO routes
   app.use(vanaRoutes);
+  
+  // Register Web3.bio Universal Profile routes
+  app.use(web3bioRoutes);
   // Test endpoint for IRYS upload
   app.post("/api/test-irys", async (req, res) => {
     try {

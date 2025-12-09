@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { 
@@ -14,7 +14,10 @@ import {
   Wallet,
   Grid,
   Layers,
-  Hash
+  Hash,
+  Search,
+  Globe,
+  User
 } from "lucide-react";
 import { BrutalButton, BrutalCard, GlitchText } from "@/components/ui/brutalist";
 import { ThreeDCard } from "@/components/3d-card";
@@ -22,8 +25,38 @@ import { WireframeCore } from "@/components/wireframe-core";
 import { CyberGrid } from "@/components/cyber-grid";
 import { UserProfile } from "@/types/user-profile";
 import { MobileMenu } from "@/components/mobile-menu";
+import { Input } from "@/components/ui/input";
+import { fetchUniversalProfile, type UniversalProfile, getPlatformDisplayName, getPlatformColor } from "@/lib/web3bio-service";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Profile() {
+  const { toast } = useToast();
+  const [lookupInput, setLookupInput] = useState("");
+  const [isLooking, setIsLooking] = useState(false);
+  const [web3Profile, setWeb3Profile] = useState<UniversalProfile | null>(null);
+
+  const handleLookup = async () => {
+    if (!lookupInput.trim()) return;
+    setIsLooking(true);
+    try {
+      const profile = await fetchUniversalProfile(lookupInput.trim());
+      if (profile) {
+        setWeb3Profile(profile);
+        toast({
+          title: "PROFILE_FOUND",
+          description: `Found ${profile.profiles.length} identities for ${profile.primaryIdentity}`,
+          className: "bg-primary text-primary-foreground font-mono border-2 border-black",
+        });
+      } else {
+        toast({ title: "NOT_FOUND", description: "No profile found for this identity", variant: "destructive" });
+      }
+    } catch (e) {
+      toast({ title: "LOOKUP_FAILED", description: "Could not fetch profile", variant: "destructive" });
+    } finally {
+      setIsLooking(false);
+    }
+  };
+
   // Mock User Data matching the schema
   const user: UserProfile = {
     id: "user-123",
@@ -282,6 +315,135 @@ export default function Profile() {
                     </div>
                 ))}
             </div>
+        </section>
+
+        {/* Web3.bio Universal Profile Lookup */}
+        <section className="space-y-4 border-t-2 border-primary/30 pt-8">
+            <div className="flex items-center justify-between border-b border-primary/30 pb-2">
+                <h3 className="text-xl font-black uppercase flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    WEB3 IDENTITY LOOKUP
+                </h3>
+                <div className="text-xs font-mono text-primary/50">POWERED BY WEB3.BIO</div>
+            </div>
+            
+            <div className="flex gap-4 max-w-xl">
+                <div className="flex-1 relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary pointer-events-none" />
+                    <Input
+                        placeholder="Enter ENS, Lens, Farcaster, or wallet..."
+                        value={lookupInput}
+                        onChange={(e) => setLookupInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleLookup()}
+                        className="pl-12 font-mono text-sm border-2 border-primary rounded-none focus-visible:ring-0 focus-visible:border-primary bg-black/40"
+                        data-testid="input-web3bio-lookup"
+                    />
+                </div>
+                <BrutalButton 
+                    onClick={handleLookup} 
+                    disabled={isLooking || !lookupInput.trim()}
+                    className="gap-2"
+                    data-testid="button-web3bio-lookup"
+                >
+                    {isLooking ? "LOOKING..." : "LOOKUP"}
+                </BrutalButton>
+            </div>
+
+            {web3Profile && (
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="grid md:grid-cols-2 gap-6"
+                >
+                    {/* Profile Summary */}
+                    <BrutalCard className="p-6 bg-black/80 space-y-4">
+                        <div className="flex items-start gap-4">
+                            {web3Profile.avatar ? (
+                                <img 
+                                    src={web3Profile.avatar} 
+                                    alt={web3Profile.displayName} 
+                                    className="w-16 h-16 border-2 border-primary object-cover"
+                                    data-testid="img-web3bio-avatar"
+                                />
+                            ) : (
+                                <div className="w-16 h-16 border-2 border-primary bg-primary/20 flex items-center justify-center">
+                                    <User className="w-8 h-8 text-primary" />
+                                </div>
+                            )}
+                            <div className="flex-1">
+                                <h4 className="text-xl font-black" data-testid="text-web3bio-displayname">{web3Profile.displayName}</h4>
+                                <div className="font-mono text-xs text-primary/60 mt-1" data-testid="text-web3bio-address">
+                                    {web3Profile.address.slice(0, 10)}...{web3Profile.address.slice(-8)}
+                                </div>
+                                {web3Profile.description && (
+                                    <p className="text-sm text-primary/80 mt-2" data-testid="text-web3bio-description">{web3Profile.description}</p>
+                                )}
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-xs font-mono pt-4 border-t border-primary/20">
+                            <div>
+                                <div className="text-primary/50">FOLLOWERS</div>
+                                <div className="text-lg font-bold text-primary">{web3Profile.totalFollowers.toLocaleString()}</div>
+                            </div>
+                            <div>
+                                <div className="text-primary/50">FOLLOWING</div>
+                                <div className="text-lg font-bold text-primary">{web3Profile.totalFollowing.toLocaleString()}</div>
+                            </div>
+                        </div>
+
+                        {Object.keys(web3Profile.links).length > 0 && (
+                            <div className="flex flex-wrap gap-2 pt-4 border-t border-primary/20">
+                                {Object.entries(web3Profile.links).map(([key, url]) => url && (
+                                    <a 
+                                        key={key}
+                                        href={url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs font-mono bg-primary/10 hover:bg-primary/20 px-2 py-1 border border-primary/30 hover:border-primary transition-colors flex items-center gap-1"
+                                    >
+                                        <ExternalLink className="w-3 h-3" />
+                                        {key.toUpperCase()}
+                                    </a>
+                                ))}
+                            </div>
+                        )}
+                    </BrutalCard>
+
+                    {/* Platform Identities */}
+                    <div className="space-y-3">
+                        <div className="text-xs font-mono text-primary/50 uppercase">CROSS-PLATFORM IDENTITIES ({web3Profile.profiles.length})</div>
+                        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                            {web3Profile.profiles.map((p, i) => (
+                                <div 
+                                    key={i}
+                                    className="p-3 border border-primary/30 bg-black/40 flex items-center justify-between hover:border-primary transition-colors"
+                                    data-testid={`card-platform-${p.platform}`}
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div 
+                                            className="w-8 h-8 flex items-center justify-center text-[10px] font-bold text-black"
+                                            style={{ backgroundColor: getPlatformColor(p.platform) }}
+                                        >
+                                            {p.platform.slice(0, 2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="font-bold text-sm">{p.identity}</div>
+                                            <div className="text-[10px] text-primary/50">{getPlatformDisplayName(p.platform)}</div>
+                                        </div>
+                                    </div>
+                                    {p.social?.follower !== undefined && (
+                                        <div className="text-xs font-mono text-right">
+                                            <div className="text-primary">{p.social.follower.toLocaleString()}</div>
+                                            <div className="text-primary/50">followers</div>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
+            )}
         </section>
 
       </main>
