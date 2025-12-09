@@ -78,7 +78,7 @@ export default function Home() {
       />
 
       {/* Sticky Header */}
-      <header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
+      <header className="sticky top-0 z-[50] w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 bg-primary animate-pulse" />

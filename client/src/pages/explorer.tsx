@@ -103,7 +103,7 @@ export default function Explorer() {
         style={{ backgroundImage: `url(${noiseTexture})`, backgroundSize: '200px' }}
       />
 
-      <header className="sticky top-0 z-40 w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
+      <header className="sticky top-0 z-[50] w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer">

@@ -24,7 +24,8 @@ export const MobileMenu = () => {
     <div className="md:hidden">
       <BrutalButton 
         onClick={toggleMenu} 
-        className="fixed top-4 right-4 z-50 h-10 w-10 p-0 flex items-center justify-center border-2 border-primary bg-black text-primary shadow-[4px_4px_0px_rgba(178,255,89,0.5)]"
+        className="h-10 w-10 p-0 flex items-center justify-center border-2 border-primary bg-black text-primary shadow-[4px_4px_0px_rgba(178,255,89,0.5)] relative z-[60]"
+        data-testid="button-mobile-menu"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </BrutalButton>
@@ -36,7 +37,7 @@ export const MobileMenu = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 20, stiffness: 100 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col p-6 pt-24 space-y-8 border-l-2 border-primary"
+            className="fixed inset-0 z-[55] bg-black backdrop-blur-xl flex flex-col p-6 pt-24 space-y-8 border-l-2 border-primary"
           >
             {/* Background Grid Effect */}
             <div className="absolute inset-0 z-[-1] bg-[linear-gradient(rgba(178,255,89,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(178,255,89,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
