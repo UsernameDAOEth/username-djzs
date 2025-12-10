@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Wallet } from "lucide-react";
 import logoImage from "@assets/1b6b08c2244019f727791915b0c3fb41385d1c9b9769daea763eb6276f1b5_1765335205229.jpeg";
+import { CyberGrid } from "@/components/cyber-grid";
 import {
   HeroSection,
   AgentConsole,
@@ -9,9 +10,6 @@ import {
   ApiTestSection,
   Footer,
 } from "@/components/landing";
-
-const GRID_BG =
-  "min-h-screen bg-slate-950 bg-[radial-gradient(circle_at_1px_1px,#1e3a8a_1px,transparent_0)] bg-[length:32px_32px] text-slate-100";
 
 function Header() {
   return (
@@ -51,13 +49,20 @@ function Header() {
 
 export default function Home() {
   return (
-    <div className={GRID_BG}>
-      <Header />
-      <HeroSection />
-      <AgentConsole />
-      <SystemArchitectureSection />
-      <ApiTestSection />
-      <Footer />
+    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <CyberGrid />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_90%)]" />
+      </div>
+      
+      <div className="relative z-10">
+        <Header />
+        <HeroSection />
+        <AgentConsole />
+        <SystemArchitectureSection />
+        <ApiTestSection />
+        <Footer />
+      </div>
     </div>
   );
 }
