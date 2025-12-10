@@ -4,6 +4,7 @@ import { Wallet, Home, User, Search, FlaskConical, ExternalLink } from "lucide-r
 import { BrutalButton } from "@/components/ui/brutalist";
 import { MobileMenu } from "@/components/mobile-menu";
 import { cn } from "@/lib/utils";
+import logoImage from "@assets/1b6b08c2244019f727791915b0c3fb41385d1c9b9769daea763eb6276f1b5_1765335205229.jpeg";
 
 interface NavItem {
   label: string;
@@ -27,7 +28,11 @@ export const Navigation = () => {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="h-6 w-6 bg-primary animate-pulse group-hover:rotate-180 transition-transform duration-500" />
+            <img 
+              src={logoImage} 
+              alt="Username DAO" 
+              className="h-8 w-8 object-contain group-hover:scale-110 transition-transform duration-300"
+            />
             <span className="font-mono text-xl font-bold tracking-tighter group-hover:text-primary transition-colors">
               USERNAME_DAO
             </span>
