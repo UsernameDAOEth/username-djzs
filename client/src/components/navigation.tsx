@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Wallet, Home, User, Search, FlaskConical, ExternalLink } from "lucide-react";
-import { BrutalButton } from "@/components/ui/brutalist";
+import { Wallet, ExternalLink } from "lucide-react";
 import { MobileMenu } from "@/components/mobile-menu";
 import { cn } from "@/lib/utils";
 import logoImage from "@assets/1b6b08c2244019f727791915b0c3fb41385d1c9b9769daea763eb6276f1b5_1765335205229.jpeg";
@@ -9,23 +8,22 @@ import logoImage from "@assets/1b6b08c2244019f727791915b0c3fb41385d1c9b9769daea7
 interface NavItem {
   label: string;
   href: string;
-  icon?: React.ComponentType<{ className?: string }>;
   external?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { label: "HOME", href: "/", icon: Home },
-  { label: "EXPLORER", href: "/explorer", icon: Search },
-  { label: "ANYTYPE_VAULT", href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", icon: ExternalLink, external: true },
-  { label: "API_TEST", href: "/api-test", icon: FlaskConical },
+  { label: "HOME", href: "/" },
+  { label: "EXPLORER", href: "/explorer" },
+  { label: "ANYTYPE_VAULT", href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", external: true },
+  { label: "API_TEST", href: "/api-test" },
 ];
 
 export const Navigation = () => {
   const [location] = useLocation();
 
   return (
-    <header className="sticky top-0 z-[50] w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-sky-500/20 bg-slate-950/90 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
             <img 
@@ -33,16 +31,15 @@ export const Navigation = () => {
               alt="Username DAO" 
               className="h-8 w-8 object-contain group-hover:scale-110 transition-transform duration-300"
             />
-            <span className="font-mono text-xl font-bold tracking-tighter group-hover:text-primary transition-colors">
+            <span className="font-mono text-sm font-bold tracking-tight text-slate-100 group-hover:text-sky-400 transition-colors">
               USERNAME_DAO
             </span>
           </div>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6 font-mono text-sm">
+        <nav className="hidden md:flex items-center gap-6 font-mono text-xs">
           {navItems.map((item) => {
             const isActive = location === item.href;
-            const Icon = item.icon;
             
             if (item.external) {
               return (
@@ -51,7 +48,7 @@ export const Navigation = () => {
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 hover:text-primary transition-colors"
+                  className="flex items-center gap-1 text-slate-300 hover:text-sky-400 transition-colors"
                   data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
                 >
                   {item.label}
@@ -65,14 +62,16 @@ export const Navigation = () => {
                 key={item.label} 
                 href={item.href}
                 className={cn(
-                  "relative px-2 py-1 transition-all hover:text-primary",
-                  isActive && "text-primary font-bold"
+                  "relative px-2 py-1 transition-all",
+                  isActive 
+                    ? "text-sky-400 font-bold" 
+                    : "text-slate-300 hover:text-sky-400"
                 )}
                 data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
               >
                 {item.label}
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400" />
                 )}
               </Link>
             );
@@ -81,12 +80,12 @@ export const Navigation = () => {
           <Link 
             href="/profile"
             className={cn(
-              "inline-flex items-center h-8 text-xs px-4 border-2 border-primary bg-background hover:bg-primary/10 transition-colors",
-              location === "/profile" && "bg-primary/20"
+              "inline-flex items-center gap-2 rounded-md border border-sky-400 bg-sky-950/70 px-4 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition",
+              location === "/profile" && "bg-sky-900/70"
             )}
             data-testid="nav-profile"
           >
-            <Wallet className="w-3 h-3 mr-2" />
+            <Wallet className="w-3 h-3" />
             PROFILE
           </Link>
         </nav>

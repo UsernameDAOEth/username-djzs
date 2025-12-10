@@ -95,11 +95,11 @@ export default function Profile() {
   const mainNft = user.nfts?.[0];
 
   return (
-    <div className="min-h-screen bg-background text-primary font-mono selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-mono relative overflow-hidden">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <CyberGrid />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_90%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_90%)]" />
       </div>
 
       {/* Navigation Bar */}

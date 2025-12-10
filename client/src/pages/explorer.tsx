@@ -97,8 +97,12 @@ export default function Explorer() {
   const queryTemplates = vanaService.getQueryTemplates();
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground overflow-x-hidden relative">
-      <CyberGrid />
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-mono relative overflow-hidden">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <CyberGrid />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_90%)]" />
+      </div>
       <div 
         className="fixed inset-0 pointer-events-none z-30 opacity-[0.15] mix-blend-overlay"
         style={{ backgroundImage: `url(${noiseTexture})`, backgroundSize: '200px' }}

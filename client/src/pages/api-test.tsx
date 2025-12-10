@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 import { 
   Terminal, 
   Zap, 
@@ -9,13 +8,10 @@ import {
   CheckCircle2, 
   XCircle, 
   Loader2,
-  ArrowLeft,
   Hash,
   ExternalLink
 } from "lucide-react";
-import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
 import { CyberGrid } from "@/components/cyber-grid";
-import { MobileMenu } from "@/components/mobile-menu";
 import { Navigation } from "@/components/navigation";
 
 export default function ApiTest() {
@@ -86,76 +82,70 @@ export default function ApiTest() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-primary font-mono selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-mono relative overflow-hidden">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <CyberGrid />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_90%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_90%)]" />
       </div>
 
       {/* Navigation Bar */}
       <Navigation />
 
-      <main className="relative z-10 pt-24 pb-20 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
+      <main className="relative z-10 pt-8 pb-20 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
         
         {/* Header */}
-        <div className="space-y-4">
-          <Link href="/">
-            <BrutalButton variant="outline" className="gap-2" data-testid="button-back">
-              <ArrowLeft className="w-4 h-4" />
-              BACK TO HOME
-            </BrutalButton>
-          </Link>
-          
-          <div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-2">
-              API <span className="text-primary">TEST</span>
-            </h1>
-            <p className="text-primary/60 text-sm">Test Anytype MCP + Irys Network Integration</p>
-          </div>
+        <div className="space-y-2">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter">
+            API <span className="text-sky-400">TEST</span>
+          </h1>
+          <p className="text-slate-400 text-sm">Test Anytype MCP + Irys Network Integration</p>
         </div>
 
         {/* Test Cards */}
         <div className="space-y-6">
           
           {/* IRYS Test */}
-          <BrutalCard className="p-6 space-y-4">
+          <motion.div 
+            className="rounded-xl border border-sky-500/40 bg-slate-900/80 p-6 space-y-4"
+            whileHover={{ scale: 1.01 }}
+          >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Upload className="w-5 h-5" />
+                <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
+                  <Upload className="w-5 h-5 text-sky-400" />
                   IRYS UPLOAD TEST
                 </h2>
-                <p className="text-xs text-primary/60">Upload JSON to Irys Network (Base Mainnet)</p>
+                <p className="text-xs text-slate-400">Upload JSON to Irys Network (Base Mainnet)</p>
               </div>
-              <BrutalButton 
+              <button 
                 onClick={testIrys} 
                 disabled={irysLoading}
-                className="gap-2"
+                className="inline-flex items-center gap-2 rounded-md border border-sky-400 bg-sky-950/70 px-4 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition disabled:opacity-50"
                 data-testid="button-test-irys"
               >
                 {irysLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                 {irysLoading ? "UPLOADING..." : "TEST"}
-              </BrutalButton>
+              </button>
             </div>
 
             {irysResult && (
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t-2 border-primary/20 pt-4"
+                className="border-t border-sky-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {irysResult.success ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   ) : (
-                    <XCircle className="w-5 h-5 text-red-500" />
+                    <XCircle className="w-5 h-5 text-red-400" />
                   )}
-                  <span className="font-bold text-sm">
+                  <span className="font-bold text-sm text-slate-100">
                     {irysResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-primary/20" data-testid="text-irys-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-sky-500/20 rounded text-slate-300" data-testid="text-irys-result">
                   {JSON.stringify(irysResult, null, 2)}
                 </pre>
                 {irysResult.receipt?.url && (
@@ -163,7 +153,7 @@ export default function ApiTest() {
                     href={irysResult.receipt.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-3 text-primary hover:text-white transition-colors text-sm"
+                    className="inline-flex items-center gap-2 mt-3 text-sky-400 hover:text-sky-300 transition-colors text-sm"
                     data-testid="link-irys-gateway"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -172,90 +162,96 @@ export default function ApiTest() {
                 )}
               </motion.div>
             )}
-          </BrutalCard>
+          </motion.div>
 
           {/* MCP Test */}
-          <BrutalCard className="p-6 space-y-4">
+          <motion.div 
+            className="rounded-xl border border-sky-500/40 bg-slate-900/80 p-6 space-y-4"
+            whileHover={{ scale: 1.01 }}
+          >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Database className="w-5 h-5" />
+                <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
+                  <Database className="w-5 h-5 text-sky-400" />
                   ANYTYPE MCP TEST
                 </h2>
-                <p className="text-xs text-primary/60">Connect to Anytype MCP API (localhost:31009)</p>
+                <p className="text-xs text-slate-400">Connect to Anytype MCP API (localhost:31009)</p>
               </div>
-              <BrutalButton 
+              <button 
                 onClick={testMcp} 
                 disabled={mcpLoading}
-                className="gap-2"
+                className="inline-flex items-center gap-2 rounded-md border border-sky-400 bg-sky-950/70 px-4 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition disabled:opacity-50"
                 data-testid="button-test-mcp"
               >
                 {mcpLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Terminal className="w-4 h-4" />}
                 {mcpLoading ? "CONNECTING..." : "TEST"}
-              </BrutalButton>
+              </button>
             </div>
 
             {mcpResult && (
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t-2 border-primary/20 pt-4"
+                className="border-t border-sky-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {mcpResult.success ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   ) : (
-                    <XCircle className="w-5 h-5 text-red-500" />
+                    <XCircle className="w-5 h-5 text-red-400" />
                   )}
-                  <span className="font-bold text-sm">
+                  <span className="font-bold text-sm text-slate-100">
                     {mcpResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-primary/20" data-testid="text-mcp-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-sky-500/20 rounded text-slate-300" data-testid="text-mcp-result">
                   {JSON.stringify(mcpResult, null, 2)}
                 </pre>
               </motion.div>
             )}
-          </BrutalCard>
+          </motion.div>
 
           {/* Full Flow Test */}
-          <BrutalCard className="p-6 space-y-4 border-2 border-primary/50">
+          <motion.div 
+            className="rounded-xl border-2 border-sky-400/60 bg-slate-900/80 p-6 space-y-4"
+            whileHover={{ scale: 1.01 }}
+          >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
-                <h2 className="text-xl font-bold flex items-center gap-2">
-                  <Hash className="w-5 h-5" />
+                <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
+                  <Hash className="w-5 h-5 text-sky-400" />
                   FULL FLOW TEST
                 </h2>
-                <p className="text-xs text-primary/60">Anytype → IRYS → Receipt Storage</p>
+                <p className="text-xs text-slate-400">Anytype → IRYS → Receipt Storage</p>
               </div>
-              <BrutalButton 
+              <button 
                 onClick={testPublish} 
                 disabled={publishLoading}
-                className="gap-2 bg-primary text-black hover:bg-primary/80"
+                className="inline-flex items-center gap-2 rounded-md bg-sky-400 px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-sky-300 transition disabled:opacity-50"
                 data-testid="button-test-publish"
               >
                 {publishLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
                 {publishLoading ? "PUBLISHING..." : "PUBLISH"}
-              </BrutalButton>
+              </button>
             </div>
 
             {publishResult && (
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t-2 border-primary/20 pt-4"
+                className="border-t border-sky-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {publishResult.success ? (
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   ) : (
-                    <XCircle className="w-5 h-5 text-red-500" />
+                    <XCircle className="w-5 h-5 text-red-400" />
                   )}
-                  <span className="font-bold text-sm">
+                  <span className="font-bold text-sm text-slate-100">
                     {publishResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-primary/20" data-testid="text-publish-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-sky-500/20 rounded text-slate-300" data-testid="text-publish-result">
                   {JSON.stringify(publishResult, null, 2)}
                 </pre>
                 {publishResult.irys?.url && (
@@ -263,7 +259,7 @@ export default function ApiTest() {
                     href={publishResult.irys.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-3 text-primary hover:text-white transition-colors text-sm"
+                    className="inline-flex items-center gap-2 mt-3 text-sky-400 hover:text-sky-300 transition-colors text-sm"
                     data-testid="link-publish-gateway"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -272,23 +268,23 @@ export default function ApiTest() {
                 )}
               </motion.div>
             )}
-          </BrutalCard>
+          </motion.div>
 
         </div>
 
         {/* Info Box */}
-        <BrutalCard className="p-6 bg-primary/5 border-primary/30">
-          <h3 className="font-bold mb-2 flex items-center gap-2">
-            <Terminal className="w-4 h-4" />
+        <div className="rounded-xl border border-sky-500/30 bg-sky-950/30 p-6">
+          <h3 className="font-bold mb-2 flex items-center gap-2 text-slate-100">
+            <Terminal className="w-4 h-4 text-sky-400" />
             REQUIREMENTS
           </h3>
-          <ul className="text-xs space-y-1 text-primary/70">
+          <ul className="text-xs space-y-1 text-slate-400">
             <li>• Anytype desktop app must be running</li>
             <li>• MCP server enabled on port 31009</li>
             <li>• ANYTYPE_API_KEY configured in secrets</li>
             <li>• PRIVATE_KEY configured for Irys uploads</li>
           </ul>
-        </BrutalCard>
+        </div>
 
       </main>
     </div>
