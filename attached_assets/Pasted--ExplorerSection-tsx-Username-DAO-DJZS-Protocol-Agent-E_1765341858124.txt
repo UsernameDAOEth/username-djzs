@@ -1,0 +1,203 @@
+// ExplorerSection.tsx
+// Username DAO × DJZS Protocol — Agent Explorer (drop-in replacement)
+
+import React, { useEffect, useState } from "react";
+
+interface AgentCard {
+  username: string;
+  role: string;      // Founder / Researcher / Explorer / Early Adopter etc.
+  level: number;
+  xp: number;
+  zones: number;
+  entries: number;
+  vaultStatus: "CONNECTED" | "DISCONNECTED" | "PENDING";
+  borderColor: string; // color for dot indicator
+}
+
+const MOCK_AGENTS: AgentCard[] = [
+  {
+    username: "@DJZS",
+    role: "FOUNDER",
+    level: 5,
+    xp: 2450,
+    zones: 8,
+    entries: 42,
+    vaultStatus: "CONNECTED",
+    borderColor: "bg-yellow-300"
+  },
+  {
+    username: "@ZEROCOOL",
+    role: "EARLY_ADOPTER",
+    level: 3,
+    xp: 1200,
+    zones: 5,
+    entries: 28,
+    vaultStatus: "PENDING",
+    borderColor: "bg-green-400"
+  },
+  {
+    username: "@MINDMELD",
+    role: "EXPLORER",
+    level: 2,
+    xp: 800,
+    zones: 3,
+    entries: 15,
+    vaultStatus: "CONNECTED",
+    borderColor: "bg-blue-400"
+  },
+  {
+    username: "@PROTOCOL_ALICE",
+    role: "RESEARCHER",
+    level: 4,
+    xp: 1850,
+    zones: 6,
+    entries: 35,
+    vaultStatus: "DISCONNECTED",
+    borderColor: "bg-yellow-300"
+  }
+];
+
+export default function ExplorerSection() {
+  const [agents, setAgents] = useState<AgentCard[]>([]);
+
+  useEffect(() => {
+    // Replace with real backend later:
+    // fetch("/api/agents").then((r) => r.json()).then(setAgents);
+    setAgents(MOCK_AGENTS);
+  }, []);
+
+  return (
+    <div className="px-6 py-20 text-white">
+      {/* ---------- HEADER ---------- */}
+      <div className="max-w-6xl mx-auto mb-10">
+        <h1 className="text-5xl font-bold tracking-tight mb-2">AGENT EXPLORER</h1>
+        <p className="text-slate-300 text-sm max-w-xl leading-relaxed">
+          Discover Username DAO agents, explore DJZS Protocol activity,  
+          and inspect vault-linked intelligence profiles.
+        </p>
+
+        {/* Search bar */}
+        <div className="mt-6 border border-sky-500/40 rounded-md w-full md:w-96 p-2 flex items-center gap-2 bg-black/40">
+          <svg
+            width="18"
+            height="18"
+            fill="#8ab5ff"
+            className="opacity-70"
+          >
+            <path d="M11.742 10.344h-.79l-.28-.27a6.471 6.471 0 001.48-4.04A6.497 6.497 0 005.65 0a6.497 6.497 0 00-6.5 6.03 6.497 6.497 0 006.5 6.03c1.52 0 2.92-.5 4.04-1.48l.27.28v.79l4.99 4.99L16.72 15z" />
+          </svg>
+          <input
+            placeholder="SEARCH_AGENTS (@username)"
+            className="bg-transparent w-full outline-none text-slate-200 placeholder:text-slate-500 text-sm"
+          />
+        </div>
+      </div>
+
+      {/* ---------- AGENT CARDS ---------- */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {agents.map((agent) => (
+          <div
+            key={agent.username}
+            className="border border-sky-400/40 rounded-xl p-5 relative"
+            style={{ boxShadow: "0 0 20px rgba(0, 115, 255, 0.25)" }}
+          >
+            {/* Role badge + status dot */}
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              <div
+                className={`h-2 w-2 rounded-full ${agent.borderColor}`}
+              ></div>
+            </div>
+
+            {/* Username */}
+            <div className="text-xl font-bold tracking-wide">{agent.username}</div>
+            <div className="text-xs font-mono text-sky-300/90 mt-1">{agent.role}</div>
+
+            {/* Stats */}
+            <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-mono">
+              <div>
+                <div className="text-slate-400">LEVEL</div>
+                <div className="text-sky-300 text-lg">{agent.level}</div>
+              </div>
+              <div>
+                <div className="text-slate-400">XP</div>
+                <div className="text-sky-300 text-lg">{agent.xp}</div>
+              </div>
+              <div>
+                <div className="text-slate-400">ZONES</div>
+                <div className="text-sky-300 text-lg">{agent.zones}</div>
+              </div>
+              <div>
+                <div className="text-slate-400">ENTRIES</div>
+                <div className="text-sky-300 text-lg">{agent.entries}</div>
+              </div>
+            </div>
+
+            {/* Vault link */}
+            <div className="mt-5 text-xs font-mono text-slate-400">
+              VAULT LINK:{" "}
+              {agent.vaultStatus === "CONNECTED" && (
+                <span className="text-emerald-400">CONNECTED</span>
+              )}
+              {agent.vaultStatus === "PENDING" && (
+                <span className="text-yellow-300">PENDING</span>
+              )}
+              {agent.vaultStatus === "DISCONNECTED" && (
+                <span className="text-red-400">DISCONNECTED</span>
+              )}
+            </div>
+
+            {/* Button */}
+            <button className="mt-4 w-full bg-sky-400 text-black font-semibold text-sm py-2 rounded-md hover:bg-sky-300 transition">
+              VIEW_VAULT
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* ---------- STATS SECTION ---------- */}
+      <div className="max-w-6xl mx-auto mt-16">
+        <h2 className="text-2xl font-bold tracking-wide mb-6">DJZS NETWORK STATS</h2>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-5 text-center">
+          <div className="border border-sky-500/40 p-5 rounded-lg">
+            <div className="text-4xl mb-2">🧠</div>
+            <div className="text-lg font-bold">10</div>
+            <div className="text-xs text-slate-400">ZONES</div>
+          </div>
+
+          <div className="border border-sky-500/40 p-5 rounded-lg">
+            <div className="text-4xl mb-2">👤</div>
+            <div className="text-lg font-bold">4,212</div>
+            <div className="text-xs text-slate-400">AGENTS</div>
+          </div>
+
+          <div className="border border-sky-500/40 p-5 rounded-lg">
+            <div className="text-4xl mb-2">📚</div>
+            <div className="text-lg font-bold">18.7K</div>
+            <div className="text-xs text-slate-400">JOURNAL ENTRIES</div>
+          </div>
+
+          <div className="border border-sky-500/40 p-5 rounded-lg">
+            <div className="text-4xl mb-2">🔗</div>
+            <div className="text-lg font-bold">3,928</div>
+            <div className="text-xs text-slate-400">VAULT CONNECTIONS</div>
+          </div>
+
+          <div className="border border-sky-500/40 p-5 rounded-lg">
+            <div className="text-4xl mb-2">🔮</div>
+            <div className="text-lg font-bold">42.5k</div>
+            <div className="text-xs text-slate-400">INSIGHTS GENERATED</div>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="max-w-6xl mx-auto mt-14 text-center">
+        <p className="text-slate-400 text-sm mb-3">Ready to activate your agent?</p>
+        <button className="px-6 py-3 bg-sky-400 hover:bg-sky-300 transition text-black font-bold rounded-md shadow-md">
+          ⚡ ACTIVATE_AGENT
+        </button>
+      </div>
+    </div>
+  );
+}
