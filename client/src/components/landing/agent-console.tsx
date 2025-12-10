@@ -42,28 +42,20 @@ export function AgentConsole() {
         body: JSON.stringify(payload),
       });
       
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      
       const data = await res.json();
       
-      setReply(data.reply || `DJZS Agent processed ${selectedZone.code} in ${mode} mode.`);
-      setJournalId(data.journalId || `journal_${selectedZone.code.toLowerCase()}_${Date.now()}`);
-      setStatus("COMPLETE");
+      if (data.ok) {
+        setReply(data.reply);
+        setJournalId(data.journalId);
+        setStatus("COMPLETE");
+      } else {
+        setReply(`Error: ${data.message || "Unknown error"}`);
+        setStatus("ERROR");
+      }
     } catch (err) {
       console.error(err);
-      await new Promise((resolve) => setTimeout(resolve, 900));
-      const fakeId = `journal_${selectedZone.code.toLowerCase()}_${Math.floor(
-        Math.random() * 1000
-      ).toString().padStart(4, "0")}`;
-
-      setReply(
-        `DJZS Agent reply for ${selectedZone.code} in ${mode} mode.\n\n` +
-          `Payload sent:\n${JSON.stringify(payload, null, 2)}`
-      );
-      setJournalId(fakeId);
-      setStatus("COMPLETE");
+      setReply("Agent connection failed. Check backend status.");
+      setStatus("ERROR");
     } finally {
       setLoading(false);
     }

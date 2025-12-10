@@ -224,6 +224,133 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Agent initialization endpoint - Username DAO × DJZS Protocol
+  app.post("/api/agent/init", async (req, res) => {
+    try {
+      const { username, wallet } = req.body || {};
+
+      if (!username && !wallet) {
+        return res.status(400).json({
+          ok: false,
+          error: "MISSING_PARAMS",
+          message: "Provide at least a username or wallet address.",
+        });
+      }
+
+      // Resolve identity from web3.bio (wallet or ENS)
+      const identityKey = wallet || username;
+      let web3Profile = null;
+
+      try {
+        const web3bioUrl = `https://api.web3.bio/profile/${encodeURIComponent(identityKey)}`;
+        const headers: Record<string, string> = {};
+        
+        if (process.env.WEB3BIO_API_KEY) {
+          headers["X-API-KEY"] = `Bearer ${process.env.WEB3BIO_API_KEY}`;
+        }
+
+        const resp = await fetch(web3bioUrl, { headers });
+        
+        if (resp.ok) {
+          const data = await resp.json();
+          if (Array.isArray(data) && data.length > 0) {
+            web3Profile = data[0];
+          }
+        }
+      } catch (err) {
+        console.error("web3.bio fetch error:", err);
+      }
+
+      // Generate an Agent ID
+      const safeName = (username || (web3Profile && web3Profile.identity) || "agent")
+        .toLowerCase()
+        .replace(/[^a-z0-9_]/g, "_");
+
+      const agentId = `agent_${safeName}`;
+
+      // Build Agent Card payload
+      const payload = {
+        ok: true,
+        agentId,
+        username: username || (web3Profile && web3Profile.identity) || null,
+        wallet: wallet || (web3Profile && web3Profile.address) || null,
+        protocol: "DJZS v1.0",
+        status: "READY",
+        vaultLink: "PENDING",
+
+        web3Identity: web3Profile
+          ? {
+              identity: web3Profile.identity,
+              platform: web3Profile.platform,
+              displayName: web3Profile.displayName,
+              avatar: web3Profile.avatar,
+              description: web3Profile.description,
+            }
+          : null,
+
+        meta: {
+          source: "web3.bio",
+          at: new Date().toISOString(),
+        },
+      };
+
+      return res.json(payload);
+    } catch (err: any) {
+      console.error("Agent init error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "INTERNAL_ERROR",
+        message: "Failed to initialize agent. Check server logs.",
+      });
+    }
+  });
+
+  // Generic agent query endpoint
+  app.post("/api/agent", async (req, res) => {
+    try {
+      const { zoneCode, intent, input, userWallet, options } = req.body || {};
+
+      if (!input) {
+        return res.status(400).json({
+          ok: false,
+          error: "MISSING_INPUT",
+          message: "Input directive is required.",
+        });
+      }
+
+      // Generate a journal ID
+      const journalId = `journal_${(zoneCode || "general").toLowerCase()}_${Date.now()}`;
+
+      // Simulated DJZS Agent response
+      const reply = `DJZS Agent processed your request in zone ${zoneCode || "GENERAL"}.\n\nIntent: ${intent || "general"}\nInput: ${input}\n\nThis is a simulated response. Connect to Anytype MCP for live agent processing.`;
+
+      return res.json({
+        ok: true,
+        journalId,
+        reply,
+        zone: zoneCode,
+        intent,
+        options,
+        meta: {
+          processedAt: new Date().toISOString(),
+          protocol: "DJZS v1.0",
+        },
+      });
+    } catch (err: any) {
+      console.error("Agent query error:", err);
+      return res.status(500).json({
+        ok: false,
+        error: "INTERNAL_ERROR",
+        message: "Failed to process agent query.",
+      });
+    }
+  });
+
+  // Health check endpoint
+  app.get("/health", (_req, res) => {
+    res.json({ ok: true, service: "djzs-agent-backend", status: "UP" });
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

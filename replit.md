@@ -24,6 +24,15 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 ✅ **Web3.bio Integration** - Universal profile resolution across ENS, Farcaster, Lens, Basenames, Linea, Solana
 
 ### 🚀 BACKEND API ENDPOINTS
+- **POST `/api/agent/init`** - Initialize DJZS Agent with username/wallet
+  - Body: `{ username: string, wallet: string }`
+  - Returns: Agent ID, web3 identity, protocol status
+  - Resolves identity via Web3.bio API
+  
+- **POST `/api/agent`** - Process agent directives
+  - Body: `{ zoneCode, intent, input, userWallet, options }`
+  - Returns: Agent reply, journal ID, processing metadata
+
 - **POST `/api/test-irys`** - Upload test JSON to Irys
   - Status: ✅ **WORKING** (verified on Base Mainnet)
   - Returns: Receipt ID, timestamp, gateway URL
@@ -38,6 +47,9 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 
 - **GET `/api/mcp-diagnostic`** - Diagnose MCP connectivity
   - Tests port 31009, endpoint reachability, API key configuration
+
+- **GET `/health`** - Health check endpoint for deployments
+  - Returns: `{ ok: true, service: "djzs-agent-backend", status: "UP" }`
 
 ### 🏛️ VANA DATADAO ENDPOINTS
 - **GET `/api/vana/status`** - Check Vana integration status

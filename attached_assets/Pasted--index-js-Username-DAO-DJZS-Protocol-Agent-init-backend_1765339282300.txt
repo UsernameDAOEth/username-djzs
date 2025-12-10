@@ -1,0 +1,128 @@
+// index.js
+// Username DAO × DJZS Protocol – Agent init backend
+// Copy–paste into a Node.js Replit and hit "Run".
+// Assumes Node 18+ (global fetch). If not, install node-fetch and adjust.
+
+// npm install express cors (if you haven't yet)
+
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Optional: set this in Replit Secrets if you get a Web3.bio API key
+// (not required for basic usage, but recommended)
+// KEY NAME: WEB3BIO_API_KEY
+const WEB3BIO_API_KEY = process.env.WEB3BIO_API_KEY || null;
+const WEB3BIO_BASE = "https://api.web3.bio/profile";
+
+/**
+ * Helper: fetch identity profile from Web3.bio
+ * identity can be a wallet address or ENS like "djzs.eth"
+ */
+async function fetchWeb3BioProfile(identity) {
+  if (!identity) return null;
+
+  const url = `${WEB3BIO_BASE}/${encodeURIComponent(identity)}`;
+
+  const headers = {};
+  if (WEB3BIO_API_KEY) {
+    headers["X-API-KEY"] = `Bearer ${WEB3BIO_API_KEY}`;
+  }
+
+  const resp = await fetch(url, { headers });
+
+  if (!resp.ok) {
+    console.error("web3.bio error", resp.status, await resp.text());
+    return null;
+  }
+
+  const data = await resp.json();
+  // /profile/{identity} returns an array of profiles
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0];
+  }
+  return null;
+}
+
+/**
+ * POST /api/agent/init
+ *
+ * Body: { username: string, wallet: string }
+ *
+ * Returns an Agent Card payload the frontend can use
+ * to render your "DJZS Agent Core" card.
+ */
+app.post("/api/agent/init", async (req, res) => {
+  try {
+    const { username, wallet } = req.body || {};
+
+    if (!username && !wallet) {
+      return res.status(400).json({
+        ok: false,
+        error: "MISSING_PARAMS",
+        message: "Provide at least a username or wallet address.",
+      });
+    }
+
+    // 1) Resolve identity from web3.bio (wallet or ENS)
+    const identityKey = wallet || username;
+    const web3Profile = await fetchWeb3BioProfile(identityKey);
+
+    // 2) Generate an Agent ID (simple example – replace with your own scheme)
+    const safeName = (username || (web3Profile && web3Profile.identity) || "agent")
+      .toLowerCase()
+      .replace(/[^a-z0-9_]/g, "_");
+
+    const agentId = `agent_${safeName}`;
+
+    // 3) Build Agent Card payload
+    const payload = {
+      ok: true,
+      agentId,
+      username: username || (web3Profile && web3Profile.identity) || null,
+      wallet: wallet || (web3Profile && web3Profile.address) || null,
+      protocol: "DJZS v1.0",
+      status: "READY",
+      vaultLink: "PENDING", // will become "ACTIVE" when MCP bridge connects
+
+      web3Identity: web3Profile
+        ? {
+          identity: web3Profile.identity,
+          platform: web3Profile.platform,
+          displayName: web3Profile.displayName,
+          avatar: web3Profile.avatar,
+          description: web3Profile.description,
+        }
+        : null,
+
+      // nice to have for UI
+      meta: {
+        source: "web3.bio",
+        at: new Date().toISOString(),
+      },
+    };
+
+    return res.json(payload);
+  } catch (err) {
+    console.error("Agent init error:", err);
+    return res.status(500).json({
+      ok: false,
+      error: "INTERNAL_ERROR",
+      message: "Failed to initialize agent. Check server logs.",
+    });
+  }
+});
+
+// Simple health check
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, service: "djzs-agent-backend", status: "UP" });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 DJZS backend listening on http://localhost:${PORT}`);
+});
