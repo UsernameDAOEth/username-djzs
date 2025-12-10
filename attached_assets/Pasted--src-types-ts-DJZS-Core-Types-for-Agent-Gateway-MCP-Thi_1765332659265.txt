@@ -1,0 +1,388 @@
+// src/types.ts
+
+//
+// 🌌 DJZS – Core Types for Agent Gateway + MCP
+// This file defines:
+// - /api/agent request/response contracts
+// - Core DJZS domain types (Zones, Journals, Users, Onchain refs)
+// - MCP payload shapes for Anytype <-> Gateway methods
+//
+
+// ========== 1. Core Enums / String Literal Types ==========
+
+export type DJZSIntent =
+  | "research"        // DYOR-style project/token research
+  | "journal"         // Reflective journaling, Time Zone, etc.
+  | "trade-log"       // Log a trade & get analysis
+  | "identity"        // DID / usernames / reputation
+  | "defi"            // DeFi-specific flows
+  | "desci"           // DeSci research
+  | "infra"           // DePIN / infra notes
+  | "general";        // fallback
+
+export type DJZSAttachmentType =
+  | "url"             // article link, tweet, doc, etc.
+  | "txHash"          // onchain transaction hash
+  | "journalId"       // reference to an existing journal
+  | "fileRef";        // uploaded file reference (IPFS/Irys/etc.)
+
+export type DJZSAgentSource =
+  | "web"
+  | "anytype"
+  | "frame"
+  | "api"
+  | "other";
+
+export type DJZSErrorCode =
+  | "INVALID_REQUEST"
+  | "UNKNOWN_ZONE"
+  | "MCP_ERROR"
+  | "LLM_ERROR"
+  | "IRYS_ERROR"
+  | "ONCHAIN_ERROR"
+  | "INTERNAL_ERROR";
+
+
+// ========== 2. Attachments & Options ==========
+
+export interface DJZSAttachment {
+  type: DJZSAttachmentType;
+  value: string;       // URL, hash, id, etc.
+  label?: string;      // human-friendly label like "Whitepaper"
+}
+
+export interface DJZSAgentOptions {
+  /**
+   * Whether to persist this interaction as a DJZS Journal.
+   * default: true
+   */
+  saveJournal?: boolean;
+
+  /**
+   * Whether to upload a snapshot of the journal to Irys.
+   * default: zone-config-specific
+   */
+  uploadToIrys?: boolean;
+
+  /**
+   * Whether to immediately mint an NFT representation (public or private).
+   * default: false
+   */
+  mintImmediately?: boolean;
+
+  /**
+   * Optional override for LLM temperature (0–1).
+   */
+  temperature?: number;
+}
+
+
+// ========== 3. /api/agent – Request Schema ==========
+
+export interface DJZSAgentRequest {
+  /**
+   * DJZS Zone code, e.g. "01_DYOR", "07_DEFI", "10_TIME".
+   */
+  zoneCode: string;
+
+  /**
+   * High-level intent for this request (research, journal, etc.).
+   */
+  intent: DJZSIntent;
+
+  /**
+   * The main user input (question, reflection, instructions).
+   */
+  input: string;
+
+  /**
+   * Optional: user wallet address to bind this to a DJZS User.
+   */
+  userWallet?: string;
+
+  /**
+   * Optional: internal user ID (if you use something beyond wallet).
+   */
+  userId?: string;
+
+  /**
+   * Optional attachments: URLs, tx hashes, journal references, etc.
+   */
+  attachments?: DJZSAttachment[];
+
+  /**
+   * Where this request originated (web UI, Anytype button, frame, etc.).
+   */
+  source?: DJZSAgentSource;
+
+  /**
+   * Optional locale hint, e.g. "en-US".
+   */
+  locale?: string;
+
+  /**
+   * Optional correlation ID for tracing across logs/systems.
+   */
+  correlationId?: string;
+
+  /**
+   * Optional flags and overrides.
+   */
+  options?: DJZSAgentOptions;
+}
+
+
+// ========== 4. /api/agent – Response Schema ==========
+
+export interface DJZSAgentJournalRef {
+  id: string;          // Journal ID (your ID that maps to Anytype object)
+  zoneCode: string;
+  /**
+   * Optional: link to your web UI representation of this journal.
+   * (Never exposes the raw local vault.)
+   */
+  url?: string;
+}
+
+export interface DJZSAgentOnchainRefs {
+  /**
+   * Irys upload identifier / URL if snapshot was uploaded.
+   */
+  irysId?: string;
+
+  /**
+   * Public NFT tokenId on Base (or other public chain), if minted.
+   */
+  publicTokenId?: string;
+
+  /**
+   * Private NFT tokenId on Aztec (or other private chain), if minted.
+   */
+  privateTokenId?: string;
+}
+
+export interface DJZSAgentResponseMeta {
+  model?: string;
+  latencyMs?: number;
+  correlationId?: string;
+}
+
+export interface DJZSAgentSuccessResponse {
+  ok: true;
+
+  zoneCode: string;
+  intent: DJZSIntent;
+
+  /**
+   * Main AI message returned to the user.
+   */
+  reply: string;
+
+  /**
+   * Optional short summary of what the agent did.
+   */
+  summary?: string;
+
+  /**
+   * Reference to the created/updated journal entry, if any.
+   */
+  journal?: DJZSAgentJournalRef;
+
+  /**
+   * Onchain references (Irys, NFTs, etc.), if any.
+   */
+  onchain?: DJZSAgentOnchainRefs;
+
+  /**
+   * Diagnostics and observability.
+   */
+  meta?: DJZSAgentResponseMeta;
+}
+
+export interface DJZSAgentErrorResponse {
+  ok: false;
+
+  errorCode: DJZSErrorCode;
+  message: string;
+  /**
+   * Optional raw details for logging / debugging (never show to end-user directly).
+   */
+  details?: unknown;
+}
+
+/**
+ * Union type for /api/agent response.
+ */
+export type DJZSAgentApiResponse =
+  | DJZSAgentSuccessResponse
+  | DJZSAgentErrorResponse;
+
+
+// ========== 5. DJZS Domain Types (Zones, Users, Journals) ==========
+
+/**
+ * Lightweight summary of a Zone (for listing).
+ */
+export interface DjzsZoneSummary {
+  id: string;           // Anytype object ID or internal ID
+  zoneCode: string;     // e.g. "01_DYOR"
+  name: string;         // e.g. "Zone 01 – DYOR"
+  shortDescription: string;
+  emoji?: string;       // e.g. "🌌"
+}
+
+/**
+ * Full Zone configuration used to build system prompts for the Agent.
+ */
+export interface DjzsZoneConfig extends DjzsZoneSummary {
+  fullDescription: string;
+
+  /**
+   * Prompt snippet describing the persona and behavior of this Zone's Agent.
+   */
+  agentPersona: string;
+
+  /**
+   * Which intents this Zone commonly supports.
+   */
+  allowedIntents: DJZSIntent[];
+
+  /**
+   * Which logical tools this Zone prefers (LLM, web search, onchain, etc.).
+   * This is descriptive; your backend decides what to actually call.
+   */
+  allowedTools: string[];
+
+  /**
+   * Default behavior for this Zone if options are not specified in the request.
+   */
+  defaultOptions?: DJZSAgentOptions;
+}
+
+/**
+ * DJZS User representation (backed by Anytype object).
+ */
+export interface DjzsUser {
+  userId: string;          // unique ID (may be derived from wallet)
+  wallet?: string;
+  displayName?: string;
+  journalCount?: number;
+}
+
+/**
+ * Short journal summary, used when listing recent entries.
+ */
+export interface DjzsJournalSummary {
+  id: string;
+  zoneCode: string;
+  title: string;
+  createdAt: string;       // ISO date string
+  summary?: string;
+  tags?: string[];
+}
+
+/**
+ * Full journal representation for retrieval / re-analysis.
+ */
+export interface DjzsJournal extends DjzsJournalSummary {
+  rawInput: string;
+  aiReply?: string;
+  attachments?: DJZSAttachment[];
+  onchain?: DJZSAgentOnchainRefs;
+}
+
+
+// ========== 6. MCP Method Payloads (Request/Response) ==========
+//
+// These types describe the JSON payloads exchanged between the
+// Agent Gateway and the Anytype MCP server for DJZS-specific methods.
+//
+
+// -- djzs.zone.list --
+
+export interface DjzsZoneListRequest {
+  // currently no filters, but kept for future expansion
+}
+
+export interface DjzsZoneListResponse {
+  zones: DjzsZoneSummary[];
+}
+
+// -- djzs.zone.getConfig --
+
+export interface DjzsZoneGetConfigRequest {
+  zoneCode: string;
+}
+
+export interface DjzsZoneGetConfigResponse {
+  zone: DjzsZoneConfig;
+}
+
+// -- djzs.user.getOrCreateByWallet --
+
+export interface DjzsUserGetOrCreateByWalletRequest {
+  wallet: string;
+}
+
+export interface DjzsUserGetOrCreateByWalletResponse {
+  user: DjzsUser;
+}
+
+// -- djzs.journal.listRecent --
+
+export interface DjzsJournalListRecentRequest {
+  zoneCode: string;
+  userId: string;
+  limit?: number;
+}
+
+export interface DjzsJournalListRecentResponse {
+  journals: DjzsJournalSummary[];
+}
+
+// -- djzs.journal.create --
+
+export interface DjzsJournalCreateRequest {
+  zoneCode: string;
+  userId: string;
+
+  title: string;
+  rawInput: string;
+  aiReply: string;
+  intent: DJZSIntent;
+
+  attachments?: DJZSAttachment[];
+  onchain?: DJZSAgentOnchainRefs;
+}
+
+export interface DjzsJournalCreateResponse {
+  journalId: string;
+  zoneCode: string;
+  createdAt: string;     // ISO date string
+}
+
+// -- djzs.journal.updateOnchainRefs --
+
+export interface DjzsJournalUpdateOnchainRefsRequest {
+  journalId: string;
+  onchain: DJZSAgentOnchainRefs;
+}
+
+export interface DjzsJournalUpdateOnchainRefsResponse {
+  journalId: string;
+  updated: boolean;
+}
+
+// -- djzs.journal.get (optional) --
+
+export interface DjzsJournalGetRequest {
+  journalId: string;
+}
+
+export interface DjzsJournalGetResponse {
+  journal: DjzsJournal;
+}
+
+//
+// End of types.ts
+//
