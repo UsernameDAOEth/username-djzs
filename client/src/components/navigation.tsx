@@ -22,7 +22,7 @@ export const Navigation = () => {
   const [location] = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-sky-500/20 bg-slate-950/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-cyan-500/20 bg-slate-950/90 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto flex h-14 items-center justify-between px-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
@@ -31,7 +31,7 @@ export const Navigation = () => {
               alt="Username DAO" 
               className="h-8 w-8 object-contain group-hover:scale-110 transition-transform duration-300"
             />
-            <span className="font-mono text-sm font-bold tracking-tight text-slate-100 group-hover:text-sky-400 transition-colors">
+            <span className="font-mono text-sm font-bold tracking-tight text-slate-100 group-hover:text-cyan-400 transition-colors">
               USERNAME_DAO
             </span>
           </div>
@@ -48,7 +48,7 @@ export const Navigation = () => {
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-slate-300 hover:text-sky-400 transition-colors"
+                  className="flex items-center gap-1 text-slate-300 hover:text-cyan-400 transition-colors"
                   data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
                 >
                   {item.label}
@@ -64,14 +64,14 @@ export const Navigation = () => {
                 className={cn(
                   "relative px-2 py-1 transition-all",
                   isActive 
-                    ? "text-sky-400 font-bold" 
-                    : "text-slate-300 hover:text-sky-400"
+                    ? "text-cyan-400 font-bold" 
+                    : "text-slate-300 hover:text-cyan-400"
                 )}
                 data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
               >
                 {item.label}
                 {isActive && (
-                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-sky-400" />
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-cyan-400" />
                 )}
               </Link>
             );
@@ -80,8 +80,8 @@ export const Navigation = () => {
           <Link 
             href="/profile"
             className={cn(
-              "inline-flex items-center gap-2 rounded-md border border-sky-400 bg-sky-950/70 px-4 py-2 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition",
-              location === "/profile" && "bg-sky-900/70"
+              "inline-flex items-center gap-2 rounded-md border border-cyan-400 bg-cyan-950/70 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-900/70 transition",
+              location === "/profile" && "bg-cyan-900/70"
             )}
             data-testid="nav-profile"
           >

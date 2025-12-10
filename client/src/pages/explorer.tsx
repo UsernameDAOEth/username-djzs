@@ -105,8 +105,8 @@ export default function Explorer() {
           </p>
 
           {/* Search bar */}
-          <div className="mt-6 border border-sky-500/40 rounded-md w-full md:w-96 p-3 flex items-center gap-3 bg-black/40">
-            <Search className="w-4 h-4 text-sky-400/70" />
+          <div className="mt-6 border border-cyan-500/40 rounded-md w-full md:w-96 p-3 flex items-center gap-3 bg-black/40">
+            <Search className="w-4 h-4 text-cyan-400/70" />
             <input
               placeholder="SEARCH_AGENTS (@username)"
               value={searchQuery}
@@ -126,8 +126,8 @@ export default function Explorer() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.03, y: -5 }}
-              className="border border-sky-400/40 rounded-xl p-5 relative bg-slate-900/50 cursor-pointer"
-              style={{ boxShadow: "0 0 20px rgba(56, 189, 248, 0.15)" }}
+              className="border border-cyan-400/40 rounded-xl p-5 relative bg-slate-900/50 cursor-pointer"
+              style={{ boxShadow: "0 0 20px rgba(34, 211, 238, 0.15)" }}
               data-testid={`card-agent-${agent.username}`}
             >
               {/* Status dot */}
@@ -137,25 +137,25 @@ export default function Explorer() {
 
               {/* Username */}
               <div className="text-xl font-bold tracking-wide text-slate-100">{agent.username}</div>
-              <div className="text-xs font-mono text-sky-400 mt-1">{agent.role}</div>
+              <div className="text-xs font-mono text-cyan-400 mt-1">{agent.role}</div>
 
               {/* Stats */}
               <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-mono">
                 <div>
                   <div className="text-slate-500">LEVEL</div>
-                  <div className="text-sky-300 text-lg">{agent.level}</div>
+                  <div className="text-cyan-300 text-lg">{agent.level}</div>
                 </div>
                 <div>
                   <div className="text-slate-500">XP</div>
-                  <div className="text-sky-300 text-lg">{agent.xp}</div>
+                  <div className="text-cyan-300 text-lg">{agent.xp}</div>
                 </div>
                 <div>
                   <div className="text-slate-500">ZONES</div>
-                  <div className="text-sky-300 text-lg">{agent.zones}</div>
+                  <div className="text-cyan-300 text-lg">{agent.zones}</div>
                 </div>
                 <div>
                   <div className="text-slate-500">ENTRIES</div>
-                  <div className="text-sky-300 text-lg">{agent.entries}</div>
+                  <div className="text-cyan-300 text-lg">{agent.entries}</div>
                 </div>
               </div>
 
@@ -175,7 +175,7 @@ export default function Explorer() {
 
               {/* Button */}
               <button 
-                className="mt-4 w-full bg-sky-400 text-slate-900 font-semibold text-sm py-2 rounded-md hover:bg-sky-300 transition"
+                className="mt-4 w-full bg-cyan-400 text-slate-900 font-semibold text-sm py-2 rounded-md hover:bg-cyan-300 transition"
                 data-testid={`button-view-vault-${agent.username}`}
               >
                 VIEW_VAULT
@@ -191,7 +191,7 @@ export default function Explorer() {
           viewport={{ once: true }}
         >
           <h2 className="text-2xl font-bold tracking-wide mb-6 text-slate-100">
-            DJZS <span className="text-sky-400">NETWORK STATS</span>
+            DJZS <span className="text-cyan-400">NETWORK STATS</span>
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-5 text-center">
@@ -203,7 +203,7 @@ export default function Explorer() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
-                className="border border-sky-500/40 p-5 rounded-lg bg-slate-900/50"
+                className="border border-cyan-500/40 p-5 rounded-lg bg-slate-900/50"
               >
                 <div className="text-4xl mb-2">{stat.emoji}</div>
                 <div className="text-lg font-bold text-slate-100">{stat.value}</div>
@@ -222,7 +222,7 @@ export default function Explorer() {
         >
           <p className="text-slate-500 text-sm mb-3">Ready to activate your agent?</p>
           <motion.button 
-            className="px-6 py-3 bg-sky-400 hover:bg-sky-300 transition text-slate-900 font-bold rounded-md shadow-lg shadow-sky-500/20 inline-flex items-center gap-2"
+            className="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 transition text-slate-900 font-bold rounded-md shadow-lg shadow-cyan-500/20 inline-flex items-center gap-2"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
             data-testid="button-activate-agent"

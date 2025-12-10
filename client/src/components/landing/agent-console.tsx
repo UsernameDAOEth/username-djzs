@@ -142,13 +142,13 @@ export function AgentConsole() {
                   value={wallet}
                   onChange={(e) => setWallet(e.target.value)}
                   placeholder="0x… (bind this session to a wallet identity)"
-                  className="flex-1 rounded-md border border-sky-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/70"
+                  className="flex-1 rounded-md border border-cyan-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/70"
                 />
                 <button
                   data-testid="button-connect-wallet"
                   onClick={handleConnectWallet}
                   disabled={connectingWallet}
-                  className="inline-flex items-center justify-center gap-2 rounded-md border border-sky-500/40 bg-slate-950/60 px-3 py-2 text-sm font-semibold text-sky-300 hover:bg-slate-950/80 hover:border-sky-400 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-cyan-500/40 bg-slate-950/60 px-3 py-2 text-sm font-semibold text-cyan-300 hover:bg-slate-950/80 hover:border-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
                 >
                   {connectingWallet ? (
                     <>
