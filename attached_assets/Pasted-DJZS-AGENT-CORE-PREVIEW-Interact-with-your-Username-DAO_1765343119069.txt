@@ -1,0 +1,84 @@
+DJZS AGENT CORE PREVIEW
+Interact with your Username DAO Agent running the DJZS Protocol v1.0 engine.
+Your directives are processed locally, and—when MCP is active—saved directly
+into your Anytype Vault.
+
+INPUT DIRECTIVE
+Type a question, journal reflection, or research request…
+
+TARGET ZONE
+Choose the Zone that will guide your Agent's persona and reasoning.
+
+PROCESSING MODE
+QUICK — Simple answers
+JOURNAL — Problem → Solution → Use Cases
+RESEARCH — Full analysis
+ALPHA — High-value insights
+
+EXECUTE_DIRECTIVE
+
+STATUS: IDLE    ● AGENT_CORE: ONLINE    PROTOCOL: DJZS v1.0
+
+DATA_PERSISTENCE
+LOCAL API STATUS: DISCONNECTED
+Your Agent is not yet linked to your Anytype Vault. Activate the MCP bridge
+to enable local journaling and structured knowledge storage.
+
+INITIATE_MCP_BRIDGE
+Requires Anytype desktop + DJZS MCP server running locally.
+
+─────────────────────────────────────────────
+SYSTEM ARCHITECTURE
+
+01  CHOOSE USERNAME  
+Your identity layer. Your handle spawns your local-first Agent.
+
+02  AGENT ACTIVATES  
+Your Agent boots using DJZS Protocol. Persistent. Local-first.
+Never cloud-hosted by default.
+
+03  LOCAL SPACE  
+Your intelligence is stored inside your Anytype Vault—private,
+encrypted, sovereign.
+
+04  PAY PER INSIGHT  
+Micropayments per request (x402). Pay only for compute.
+
+05  AGENT WRITES  
+Journal entries and structured knowledge saved locally via the MCP bridge.
+
+06  KNOWLEDGE EVOLVES  
+Your graph expands. Your Agent learns your style and strengthens insights.
+
+07  MINT OR EXPORT  
+Create NFTs, archives, or proofs. Fully optional.
+
+08  FULL OWNERSHIP  
+Your name. Your Agent. Your mind. No lock-in.
+
+─────────────────────────────────────────────
+DJZS DEVELOPER CONSOLE
+Run integration checks for DJZS MCP, Irys uploads, and full
+Agent → Vault → Irys flows.
+
+IRYS UPLOAD TEST  
+Upload JSON to Irys Network (Base).
+
+TEST
+
+ANYTYPE MCP TEST  
+Connect to the DJZS MCP server exposed by your Anytype environment.
+Expected: 200 OK from /health.
+
+TEST
+
+FULL FLOW TEST  
+End-to-end: Anytype → DJZS Agent → Irys receipt.
+
+PUBLISH
+
+REQUIREMENTS
+• Anytype desktop app running  
+• DJZS MCP server exposed locally  
+• ANYTYPE_API_KEY stored as secret  
+• PRIVATE_KEY set for Irys uploads

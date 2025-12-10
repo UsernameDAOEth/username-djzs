@@ -4,10 +4,10 @@ import { SYSTEM_STEPS } from "./config";
 
 export function SystemArchitectureSection() {
   return (
-    <section className="px-6 py-16 lg:px-12 border-t border-sky-500/20">
+    <section className="px-6 py-16 lg:px-12 border-t border-cyan-500/20">
       <div className="max-w-6xl mx-auto space-y-8">
         <motion.h2 
-          className="text-sm font-mono tracking-[0.25em] text-sky-300 uppercase"
+          className="text-sm font-mono tracking-[0.25em] text-cyan-300 uppercase"
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -26,12 +26,12 @@ export function SystemArchitectureSection() {
               whileHover={{ 
                 scale: 1.05, 
                 y: -8,
-                boxShadow: "0 15px 40px rgba(56,189,248,0.15)"
+                boxShadow: "0 15px 40px rgba(34,211,238,0.15)"
               }}
-              className="rounded-xl border border-sky-500/40 bg-slate-950/70 p-4 shadow-md shadow-sky-950/70 cursor-pointer"
+              className="rounded-xl border border-cyan-500/40 bg-slate-950/70 p-4 shadow-md shadow-cyan-950/70 cursor-pointer"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-sky-300">
+                <span className="text-xs font-mono text-cyan-300">
                   {step.id}
                 </span>
                 <motion.span 

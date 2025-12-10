@@ -12,13 +12,13 @@ export function HeroSection() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/40 bg-sky-950/40 px-4 py-1 text-xs tracking-[0.2em] uppercase mb-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-950/40 px-4 py-1 text-xs tracking-[0.2em] uppercase mb-5">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             USERNAME_DAO · DJZS Protocol
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
             <span className="block">YOUR NAME</span>
-            <span className="block text-sky-400">IS YOUR AGENT</span>
+            <span className="block text-cyan-400">IS YOUR AGENT</span>
           </h1>
           <p className="mt-5 max-w-xl text-sm sm:text-base text-slate-200/90">
             Claim a Username. Activate your personal DJZS Protocol Agent. Store
@@ -28,7 +28,7 @@ export function HeroSection() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button 
               data-testid="button-claim-username"
-              className="rounded-md bg-sky-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-sky-500/40 hover:bg-sky-300 transition"
+              className="rounded-md bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-cyan-500/40 hover:bg-cyan-300 transition"
             >
               CLAIM_USERNAME
             </button>
@@ -46,8 +46,8 @@ export function HeroSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <ThreeDCard className="cursor-pointer">
-            <div className="rounded-xl border border-sky-500/60 bg-slate-900/80 p-5 shadow-xl shadow-sky-900/60 backdrop-blur relative overflow-hidden">
-              <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(93,173,226,0.03)_50%)] bg-[length:100%_4px] pointer-events-none" />
+            <div className="rounded-xl border border-cyan-500/60 bg-slate-900/80 p-5 shadow-xl shadow-cyan-900/60 backdrop-blur relative overflow-hidden">
+              <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(34,211,238,0.03)_50%)] bg-[length:100%_4px] pointer-events-none" />
               
               <div className="text-xs font-mono text-slate-300/80 flex items-center justify-between mb-3 relative z-10">
                 <span>AGENT_ID: UNASSIGNED</span>
@@ -56,7 +56,7 @@ export function HeroSection() {
                   AGENT_CORE: READY
                 </span>
               </div>
-              <div className="border border-sky-500/30 rounded-md p-4 text-center relative z-10">
+              <div className="border border-cyan-500/30 rounded-md p-4 text-center relative z-10">
                 <div className="flex justify-center mb-3">
                   <motion.img 
                     src={logoImage} 
