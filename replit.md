@@ -7,17 +7,18 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 
 **Stack**: React + Vite + Express + PostgreSQL (Drizzle ORM) + Tailwind CSS + TypeScript
 
-## Recent Progress (Session: Dec 9, 2025)
+## Recent Progress (Session: Dec 10, 2025)
 
 ### ✅ COMPLETED FEATURES
-✅ **Frontend Prototype** - Agent Console with live logs, 3D interactive elements, Matrix Rain effects
+✅ **NEW Landing Page Redesign** - Zone-based DJZS Protocol UI with 10 zones and 4 processing modes
+✅ **HeroSection** - "YOUR NAME IS YOUR AGENT" hero with Username DAO branding
+✅ **ZoneSelector** - 10 DJZS zones (Research, Identity, Testnet, Social, RWA, Infra, DeFi, AI, Science, Time)
+✅ **ModeSelector** - 4 processing modes (QUICK, JOURNAL, RESEARCH, ALPHA)
+✅ **AgentConsole v2** - Zone/mode-aware agent interface with wallet binding
+✅ **SystemArchitectureSection** - 8-step onboarding flow visualization
+✅ **ApiTestSection** - Integrated developer console for Irys/MCP/Flow testing
 ✅ **Profile Page** (`/profile`) - 3D NFT card, agent status dashboard, activity log, achievements inventory
-✅ **Anytype UserProfile Schema** - JSON schema + TypeScript types
-✅ **Mobile Navigation** - Responsive MobileMenu with all routes
-✅ **Full-Stack Express Backend** - API routes, storage layer, middleware
 ✅ **Irys Network Integration** - @irys/sdk on Base Mainnet, verified working
-✅ **Agent Console Debugging** - Added test IDs to all interactive elements
-✅ **API Test Infrastructure** - `/api-test` page with three endpoint tests
 ✅ **Vana DataDAO Integration** - Full data contribution, monetization, and collective intelligence
 ✅ **Explorer Page** (`/explorer`) - Agent discovery, DataDAO browsing, and SQL query interface
 ✅ **Web3.bio Integration** - Universal profile resolution across ENS, Farcaster, Lens, Basenames, Linea, Solana
@@ -63,21 +64,27 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 ```
 client/src/
 ├── pages/
-│   ├── home.tsx (landing page)
+│   ├── home.tsx (landing page with zone-based UI)
 │   ├── profile.tsx (user profile dashboard)
-│   ├── api-test.tsx (NEW - integration testing UI)
+│   ├── explorer.tsx (agent discovery + DataDAO)
+│   ├── api-test.tsx (integration testing UI)
 │   └── not-found.tsx
 ├── components/
-│   ├── djzs-agent-console.tsx (AI agent interface)
+│   ├── landing/ (NEW - modular landing page components)
+│   │   ├── config.ts (ZONES, PROCESSING_MODES, SYSTEM_STEPS)
+│   │   ├── hero-section.tsx
+│   │   ├── zone-selector.tsx
+│   │   ├── mode-selector.tsx
+│   │   ├── agent-console.tsx
+│   │   ├── system-architecture.tsx
+│   │   ├── api-test-section.tsx
+│   │   └── footer.tsx
+│   ├── djzs-agent-console.tsx (legacy agent interface)
 │   ├── 3d-card.tsx (3D NFT visualization)
-│   ├── wireframe-core.tsx (animated vector graphic)
-│   ├── cyber-grid.tsx (ambient background)
-│   ├── mobile-menu.tsx (responsive navigation)
+│   ├── navigation.tsx (shared navigation)
 │   └── ui/ (brutalist UI components)
 ├── types/
 │   └── user-profile.ts (UserProfile interface)
-├── schemas/
-│   └── anytype-userprofile.schema.json (JSON schema)
 └── lib/
     ├── djzs-api.ts (API client)
     ├── irys-service.ts (Irys utilities)
