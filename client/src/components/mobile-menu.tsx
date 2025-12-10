@@ -50,44 +50,36 @@ export const MobileMenu = () => {
                   
                   if (isExternal) {
                     return (
-                      <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setIsOpen(false)}>
-                        <div className={cn(
+                      <a 
+                        key={item.label} 
+                        href={item.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
                           "flex items-center gap-4 p-3 border-2 hover:bg-primary hover:text-black transition-all cursor-pointer group",
                           "text-primary/70 border-primary/30"
-                        )}>
-                          <Icon className="w-5 h-5" />
-                          <span className="text-lg font-black tracking-tighter">{item.label}</span>
-                        </div>
-                      </a>
-                    );
-                  }
-
-                  const isAnchor = item.href.startsWith("#");
-                  
-                  if (isAnchor) {
-                    return (
-                      <a key={item.label} href={item.href} onClick={() => setIsOpen(false)}>
-                        <div className={cn(
-                          "flex items-center gap-4 p-3 border-2 hover:bg-primary hover:text-black transition-all cursor-pointer group",
-                          "text-primary/70 border-primary/30"
-                        )}>
-                          <Icon className="w-5 h-5" />
-                          <span className="text-lg font-black tracking-tighter">{item.label}</span>
-                        </div>
+                        )}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span className="text-lg font-black tracking-tighter">{item.label}</span>
                       </a>
                     );
                   }
                   
                   return (
-                    <Link key={item.label} href={item.href} onClick={() => setIsOpen(false)}>
-                      <div className={cn(
+                    <Link 
+                      key={item.label} 
+                      href={item.href} 
+                      onClick={() => setIsOpen(false)}
+                      className={cn(
                         "flex items-center gap-4 p-3 border-2 hover:bg-primary hover:text-black transition-all cursor-pointer group",
                         isActive ? "bg-primary/10 border-primary text-primary" : "text-primary/70 border-primary/30"
-                      )}>
-                        <Icon className="w-5 h-5" />
-                        <span className="text-lg font-black tracking-tighter">{item.label}</span>
-                        {isActive && <div className="ml-auto w-2 h-2 bg-primary rounded-full animate-pulse" />}
-                      </div>
+                      )}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="text-lg font-black tracking-tighter">{item.label}</span>
+                      {isActive && <div className="ml-auto w-2 h-2 bg-primary rounded-full animate-pulse" />}
                     </Link>
                   );
                 })}

@@ -61,34 +61,33 @@ export const Navigation = () => {
             }
             
             return (
-              <Link key={item.label} href={item.href}>
-                <a 
-                  className={cn(
-                    "relative px-2 py-1 transition-all hover:text-primary",
-                    isActive && "text-primary font-bold"
-                  )}
-                  data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
-                >
-                  {item.label}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-                  )}
-                </a>
+              <Link 
+                key={item.label} 
+                href={item.href}
+                className={cn(
+                  "relative px-2 py-1 transition-all hover:text-primary",
+                  isActive && "text-primary font-bold"
+                )}
+                data-testid={`nav-${item.label.toLowerCase().replace('_', '-')}`}
+              >
+                {item.label}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+                )}
               </Link>
             );
           })}
           
-          <Link href="/profile">
-            <BrutalButton 
-              className={cn(
-                "h-8 text-xs px-4",
-                location === "/profile" && "bg-primary/20"
-              )}
-              data-testid="nav-profile"
-            >
-              <Wallet className="w-3 h-3 mr-2" />
-              PROFILE
-            </BrutalButton>
+          <Link 
+            href="/profile"
+            className={cn(
+              "inline-flex items-center h-8 text-xs px-4 border-2 border-primary bg-background hover:bg-primary/10 transition-colors",
+              location === "/profile" && "bg-primary/20"
+            )}
+            data-testid="nav-profile"
+          >
+            <Wallet className="w-3 h-3 mr-2" />
+            PROFILE
           </Link>
         </nav>
         
