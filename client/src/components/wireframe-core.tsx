@@ -65,8 +65,8 @@ export const WireframeCore = ({ className }: { className?: string }) => {
       const cx = width / 2;
       const cy = height / 2;
 
-      ctx.strokeStyle = '#E8A838'; // Cosmic Amber/Gold
-      ctx.fillStyle = '#E8A838';
+      ctx.strokeStyle = '#5DADE2'; // Sky Blue
+      ctx.fillStyle = '#5DADE2';
       
       // Update angles
       angleX += 0.005;

@@ -125,10 +125,10 @@ export default function Home() {
                     /// DJZS PROTOCOL ACTIVE ///
                   </div>
                </div>
-               <div className="relative z-10 text-center space-y-4 p-8 bg-background/90 backdrop-blur-sm border-2 border-foreground transition-transform shadow-[10px_10px_0px_rgba(232,168,56,0.2)]">
+               <div className="relative z-10 text-center space-y-4 p-8 bg-background/90 backdrop-blur-sm border-2 border-foreground transition-transform shadow-[10px_10px_0px_rgba(93,173,226,0.2)]">
                  <GlitchText text="DJZS" className="text-7xl md:text-9xl block" />
                  <div className="font-mono text-sm">AGENT_ID: {activeAgent ? `@${activeAgent.toUpperCase()}` : "UNASSIGNED"}</div>
-                 <div className={`w-full h-2 mt-4 loading-bar ${activeAgent ? "bg-accent shadow-[0_0_10px_rgba(20,184,166,0.8)]" : "bg-primary"}`} />
+                 <div className={`w-full h-2 mt-4 loading-bar ${activeAgent ? "bg-accent shadow-[0_0_10px_rgba(218,165,32,0.8)]" : "bg-primary"}`} />
                </div>
             </ThreeDCard>
           </div>

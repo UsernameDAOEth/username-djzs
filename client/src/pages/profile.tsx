@@ -141,7 +141,7 @@ export default function Profile() {
                     </div>
                     
                     {/* Scanline Effect */}
-                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(232,168,56,0.05)_50%)] bg-[length:100%_4px] pointer-events-none z-30" />
+                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(93,173,226,0.05)_50%)] bg-[length:100%_4px] pointer-events-none z-30" />
                 </ThreeDCard>
 
                 <div className="flex gap-2">

@@ -215,7 +215,7 @@ export const DjzsAgentConsole = () => {
   };
 
   return (
-    <BrutalCard className="w-full max-w-6xl mx-auto bg-background/90 backdrop-blur-xl p-0 overflow-hidden border-2 border-primary shadow-[0px_0px_40px_rgba(232,168,56,0.2)]">
+    <BrutalCard className="w-full max-w-6xl mx-auto bg-background/90 backdrop-blur-xl p-0 overflow-hidden border-2 border-primary shadow-[0px_0px_40px_rgba(93,173,226,0.2)]">
       {/* Terminal Header */}
       <div className="bg-primary/10 text-primary p-2 border-b-2 border-primary flex justify-between items-center relative overflow-hidden">
         {/* Header Glitch Scanline */}
@@ -351,7 +351,7 @@ export const DjzsAgentConsole = () => {
 
                 {/* Live Logs Overlay */}
                 {loading && (
-                    <div className="absolute bottom-4 left-4 right-4 p-4 bg-background/90 border border-primary/30 text-[10px] font-mono text-primary shadow-[0_0_20px_rgba(232,168,56,0.1)]">
+                    <div className="absolute bottom-4 left-4 right-4 p-4 bg-background/90 border border-primary/30 text-[10px] font-mono text-primary shadow-[0_0_20px_rgba(93,173,226,0.1)]">
                         <div className="flex flex-col-reverse gap-1 h-32 overflow-hidden">
                             {logs.map((log, i) => (
                                 <div key={i} className="animate-in fade-in slide-in-from-left-4 duration-100 flex gap-2">

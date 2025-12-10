@@ -198,5 +198,5 @@ export function getPlatformColor(platform: string): string {
     solana: "#9945FF",
     unstoppabledomains: "#0D67FE",
   };
-  return colors[platform] || "#E8A838";
+  return colors[platform] || "#5DADE2";
 }
