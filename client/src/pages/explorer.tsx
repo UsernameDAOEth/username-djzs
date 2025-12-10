@@ -5,6 +5,7 @@ import { Search, Zap, TrendingUp, ArrowRight, Database, Coins, Brain, Send, Play
 import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
 import { CyberGrid } from "@/components/cyber-grid";
 import { MobileMenu } from "@/components/mobile-menu";
+import { Navigation } from "@/components/navigation";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,22 +104,7 @@ export default function Explorer() {
         style={{ backgroundImage: `url(${noiseTexture})`, backgroundSize: '200px' }}
       />
 
-      <header className="sticky top-0 z-[50] w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer">
-              <div className="h-6 w-6 bg-primary animate-pulse" />
-              <span className="font-mono text-xl font-bold tracking-tighter">USERNAME_DAO</span>
-            </div>
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
-            <Link href="/"><a className="hover:text-primary hover:underline decoration-2 underline-offset-4">HOME</a></Link>
-            <Link href="/profile"><a className="hover:text-primary hover:underline decoration-2 underline-offset-4">PROFILE</a></Link>
-            <a href="/api-test" className="hover:text-primary hover:underline decoration-2 underline-offset-4">API_TEST</a>
-          </nav>
-          <MobileMenu />
-        </div>
-      </header>
+      <Navigation />
 
       <main className="container mx-auto px-4 py-12 md:py-24 space-y-12 relative z-20">
         {/* Hero */}

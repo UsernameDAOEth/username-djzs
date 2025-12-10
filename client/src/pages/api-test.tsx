@@ -16,6 +16,7 @@ import {
 import { BrutalButton, BrutalCard } from "@/components/ui/brutalist";
 import { CyberGrid } from "@/components/cyber-grid";
 import { MobileMenu } from "@/components/mobile-menu";
+import { Navigation } from "@/components/navigation";
 
 export default function ApiTest() {
   const [irysLoading, setIrysLoading] = useState(false);
@@ -85,7 +86,7 @@ export default function ApiTest() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-primary font-mono selection:bg-primary selection:text-black relative overflow-hidden">
+    <div className="min-h-screen bg-background text-primary font-mono selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <CyberGrid />
@@ -93,19 +94,7 @@ export default function ApiTest() {
       </div>
 
       {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-primary bg-black/90 backdrop-blur-md h-16 flex items-center justify-between px-6">
-        <Link href="/">
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="w-8 h-8 bg-primary text-black flex items-center justify-center font-bold text-xl group-hover:rotate-180 transition-transform duration-500">
-              D
-            </div>
-            <span className="font-bold tracking-tighter text-xl group-hover:text-white transition-colors">
-              USERNAME<span className="text-primary">DAO</span>
-            </span>
-          </div>
-        </Link>
-        <MobileMenu />
-      </nav>
+      <Navigation />
 
       <main className="relative z-10 pt-24 pb-20 px-4 md:px-8 max-w-5xl mx-auto space-y-8">
         

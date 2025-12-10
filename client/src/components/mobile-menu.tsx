@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShieldCheck, Wallet, Terminal, Home, User } from "lucide-react";
+import { Menu, X, ShieldCheck, Wallet, Terminal, Home, User, Search, ExternalLink, FlaskConical } from "lucide-react";
 import { BrutalButton } from "@/components/ui/brutalist";
 import { cn } from "@/lib/utils";
 
@@ -13,11 +13,10 @@ export const MobileMenu = () => {
 
   const menuItems = [
     { href: "/", label: "HOME", icon: Home },
+    { href: "/explorer", label: "EXPLORER", icon: Search },
     { href: "/profile", label: "PROFILE", icon: User },
-    { href: "/api-test", label: "API_TEST", icon: Terminal },
-    { href: "/explorer", label: "EXPLORER", icon: ShieldCheck },
-    { href: "/#agent", label: "DJZS_PROTOCOL", icon: ShieldCheck },
-    { href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", label: "ANYTYPE_VAULT", icon: ShieldCheck, external: true },
+    { href: "/api-test", label: "API_TEST", icon: FlaskConical },
+    { href: "https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ", label: "ANYTYPE_VAULT", icon: ExternalLink, external: true },
   ];
 
   return (

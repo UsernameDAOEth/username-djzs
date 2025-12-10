@@ -25,6 +25,7 @@ import { WireframeCore } from "@/components/wireframe-core";
 import { CyberGrid } from "@/components/cyber-grid";
 import { UserProfile } from "@/types/user-profile";
 import { MobileMenu } from "@/components/mobile-menu";
+import { Navigation } from "@/components/navigation";
 import { Input } from "@/components/ui/input";
 import { fetchUniversalProfile, type UniversalProfile, getPlatformDisplayName, getPlatformColor } from "@/lib/web3bio-service";
 import { useToast } from "@/hooks/use-toast";
@@ -101,31 +102,8 @@ export default function Profile() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,black_90%)]" />
       </div>
 
-      {/* Navigation Bar (Simplified) */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-primary bg-background/90 backdrop-blur-md h-16 flex items-center justify-between px-6">
-        <Link href="/">
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="w-8 h-8 bg-primary text-black flex items-center justify-center font-bold text-xl group-hover:rotate-180 transition-transform duration-500">
-              D
-            </div>
-            <span className="font-bold tracking-tighter text-xl group-hover:text-white transition-colors">
-              USERNAME<span className="text-primary">DAO</span>
-            </span>
-          </div>
-        </Link>
-
-        <div className="flex items-center gap-4">
-           <div className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-widest text-primary/70">
-              <span className="flex items-center gap-1"><div className="w-2 h-2 bg-accent rounded-full animate-pulse"/> {mainNft?.chain || "BASE MAINNET"}</span>
-              <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3"/> CONNECTED</span>
-           </div>
-           <BrutalButton className="h-8 text-xs px-4">
-              <Wallet className="w-3 h-3 mr-2" />
-              {user.ethAddress?.slice(0,8)}...
-           </BrutalButton>
-        </div>
-        <MobileMenu />
-      </nav>
+      {/* Navigation Bar */}
+      <Navigation />
 
       <main className="relative z-10 pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
         

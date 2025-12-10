@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import noiseTexture from "@assets/generated_images/raw_gritty_noise_texture_overlay.png";
 import { CyberGrid } from "@/components/cyber-grid";
 import { WireframeCore } from "@/components/wireframe-core";
+import { Navigation } from "@/components/navigation";
 
 import { ThreeDCard } from "@/components/3d-card";
 import { irysService } from "@/lib/irys-service";
@@ -78,28 +79,7 @@ export default function Home() {
       />
 
       {/* Sticky Header */}
-      <header className="sticky top-0 z-[50] w-full border-b-2 border-border bg-background/90 backdrop-blur-sm">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 bg-primary animate-pulse" />
-            <span className="font-mono text-xl font-bold tracking-tighter">USERNAME_DAO</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-8 font-mono text-sm">
-            <a href="#agent" className="hover:text-primary hover:underline decoration-2 underline-offset-4">DJZS_PROTOCOL</a>
-            <a href="https://invite.any.coop/bafybeiebtlepvip6x6hmu3aao3cdn4cfampgd2vvgx7i7gah5phc43euqm#A2Hx7HDnZiTZMZxSbABvEVidAmMytp1YdhfdisNbxTMZ" target="_blank" rel="noopener noreferrer" className="hover:text-primary hover:underline decoration-2 underline-offset-4">ANYTYPE_VAULT</a>
-            <Link href="/explorer">
-              <a className="hover:text-primary hover:underline decoration-2 underline-offset-4">EXPLORER</a>
-            </Link>
-            <Link href="/profile">
-              <BrutalButton className="h-8 text-xs px-4">
-                 <Wallet className="w-3 h-3 mr-2" />
-                 PROFILE
-              </BrutalButton>
-            </Link>
-          </nav>
-          <MobileMenu />
-        </div>
-      </header>
+      <Navigation />
 
       {/* Marquee */}
       <Marquee text="/// YOUR NAME IS YOUR AGENT /// NO CLOUD /// LOCAL FIRST /// PAY PER INSIGHT /// " />
