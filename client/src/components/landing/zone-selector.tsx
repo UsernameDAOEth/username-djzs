@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { Zone, ZONES } from "./config";
 
 interface ZoneSelectorProps {
@@ -18,13 +19,22 @@ export function ZoneSelector({ selectedCode, onSelect }: ZoneSelectorProps) {
         </span>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {ZONES.map((zone) => {
+        {ZONES.map((zone, index) => {
           const isActive = zone.code === selectedCode;
           return (
-            <button
+            <motion.button
               key={zone.code}
               data-testid={`button-zone-${zone.code}`}
               onClick={() => onSelect(zone)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              whileHover={{ 
+                scale: 1.05, 
+                y: -5,
+                boxShadow: "0 10px 30px rgba(56,189,248,0.2)"
+              }}
+              whileTap={{ scale: 0.98 }}
               className={`flex-shrink-0 rounded-lg border px-3 py-2 text-left transition min-w-[9rem] ${
                 isActive
                   ? "border-sky-400 bg-sky-950/60 shadow-[0_0_0_1px_rgba(56,189,248,0.6)]"
@@ -41,7 +51,7 @@ export function ZoneSelector({ selectedCode, onSelect }: ZoneSelectorProps) {
               <p className="mt-1 text-[0.65rem] text-slate-300/80">
                 {zone.shortDescription}
               </p>
-            </button>
+            </motion.button>
           );
         })}
       </div>

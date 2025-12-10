@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 interface TestResult {
   loading: boolean;
@@ -89,11 +90,20 @@ export function ApiTestSection() {
           </p>
         </div>
         <div className="space-y-3">
-          {tests.map((item) => (
-            <div
+          {tests.map((item, index) => (
+            <motion.div
               key={item.title}
               data-testid={`card-test-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
-              className="flex items-center justify-between rounded-lg border border-sky-500/40 bg-slate-950/80 px-4 py-3"
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ 
+                scale: 1.02, 
+                x: 5,
+                boxShadow: "0 5px 20px rgba(56,189,248,0.1)"
+              }}
+              className="flex items-center justify-between rounded-lg border border-sky-500/40 bg-slate-950/80 px-4 py-3 cursor-pointer"
             >
               <div className="flex-1">
                 <div className="text-xs font-mono text-slate-200">
@@ -103,20 +113,26 @@ export function ApiTestSection() {
                   {item.desc}
                 </div>
                 {item.state.result && (
-                  <div className={`mt-1 text-[0.7rem] font-mono ${item.state.error ? 'text-red-400' : 'text-emerald-400'}`}>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className={`mt-1 text-[0.7rem] font-mono ${item.state.error ? 'text-red-400' : 'text-emerald-400'}`}
+                  >
                     {item.state.result}
-                  </div>
+                  </motion.div>
                 )}
               </div>
-              <button 
+              <motion.button 
                 data-testid={`button-test-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={item.onClick}
                 disabled={item.state.loading}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 className="rounded-md border border-sky-400 bg-sky-950/70 px-4 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition disabled:opacity-50"
               >
                 {item.state.loading ? "..." : item.cta}
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           ))}
         </div>
         <div className="mt-4 text-[0.7rem] text-slate-400 font-mono space-y-1">
