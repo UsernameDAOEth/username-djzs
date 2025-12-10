@@ -1,0 +1,165 @@
+Here’s a Replit Deployments–ready prompt you can copy-paste straight into the Deployments “Configure with AI” box (or chat) so it sets things up as a proper production service.
+
+⸻
+
+🚀 Replit Deployments Prompt (copy everything below)
+
+I am deploying a Node.js backend for my project Username DAO × DJZS Protocol.
+
+I need a production-ready HTTP API suitable for Replit Deployments with:
+	•	Node 18+
+	•	Express
+	•	CORS enabled
+	•	Health check endpoint for readiness/liveness
+	•	Environment-variable based config
+
+1. Core Architecture
+
+This backend powers the Username → DJZS Agent flow:
+	1.	A user mints a Username NFT (e.g. @djzs) on-chain.
+	2.	The frontend calls my backend with:
+
+{
+  "username": "djzs",
+  "wallet": "0x1234..."
+}
+
+
+	3.	The backend:
+	•	Resolves web3 identity via web3.bio
+	•	Generates an agentId
+	•	Returns an Agent Card JSON used to render a “DJZS Agent Core” UI card.
+
+Conceptually:
+	•	USERNAME DAO = identity layer (usernames / wallets)
+	•	DJZS Protocol = agent layer (agent core, zones, journaling)
+	•	Minting a username → spawns a DJZS Agent
+	•	Agent binds to identity and, later, to an Anytype Vault via MCP.
+
+2. Endpoints Needed
+
+Create an Express server with these routes:
+
+POST /api/agent/init
+	•	Accepts JSON body:
+
+{
+  "username": "djzs",
+  "wallet": "0x1234..."
+}
+
+
+	•	username and/or wallet can be provided (at least one is required).
+	•	Uses web3.bio to resolve identity:
+	•	Base URL: https://api.web3.bio/profile
+	•	Request: GET https://api.web3.bio/profile/<wallet-or-ens>
+	•	Optionally include header X-API-KEY: Bearer <WEB3BIO_API_KEY>
+if the env var WEB3BIO_API_KEY is set.
+	•	From the first profile result (if any), pull:
+	•	identity (ENS or handle)
+	•	platform
+	•	displayName
+	•	avatar
+	•	description
+	•	address
+	•	Generate an agentId string, e.g.:
+
+const safeName = (username || identity || "agent")
+  .toLowerCase()
+  .replace(/[^a-z0-9_]/g, "_");
+const agentId = `agent_${safeName}`;
+
+
+	•	Return JSON like:
+
+{
+  "ok": true,
+  "agentId": "agent_djzs",
+  "username": "djzs",
+  "wallet": "0x1234...",
+  "protocol": "DJZS v1.0",
+  "status": "READY",
+  "vaultLink": "PENDING",
+  "web3Identity": {
+    "identity": "...",
+    "platform": "...",
+    "displayName": "...",
+    "avatar": "...",
+    "description": "..."
+  },
+  "meta": {
+    "source": "web3.bio",
+    "at": "2025-01-01T00:00:00.000Z"
+  }
+}
+
+
+	•	On error (bad params, failed fetch, etc.), respond with:
+
+{
+  "ok": false,
+  "error": "MISSING_PARAMS" | "INTERNAL_ERROR",
+  "message": "Human readable explanation"
+}
+
+
+
+GET /health
+	•	Simple readiness / liveness check.
+	•	Response:
+
+{
+  "ok": true,
+  "service": "djzs-agent-backend",
+  "status": "UP"
+}
+
+
+
+3. Deployment Requirements
+	•	Use PORT = process.env.PORT || 3000 so Replit Deployments can control the port.
+	•	Enable CORS (for now allow all origins; I will tighten later).
+	•	Use express.json() for JSON bodies.
+	•	Use node index.js as the start command.
+
+4. Files to Generate
+
+Please create or update:
+	1.	package.json
+	•	Scripts:
+
+{
+  "start": "node index.js"
+}
+
+
+	•	Dependencies:
+	•	"express"
+	•	"cors"
+	•	(No need for node-fetch if using Node 18+ global fetch)
+
+	2.	index.js
+	•	Express server implementing /api/agent/init and /health exactly as described.
+	•	Handles WEB3BIO_API_KEY via process.env.WEB3BIO_API_KEY.
+	3.	(Optional) A short README.md describing:
+	•	What the service does
+	•	How to hit /api/agent/init
+	•	Example curl command
+
+5. Frontend Usage (for context)
+
+My frontend (React/Tailwind) will call:
+
+const res = await fetch("https://<deployment-url>/api/agent/init", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username: "djzs", wallet: "0x1234..." })
+});
+const data = await res.json();
+// data.agentId, data.web3Identity, etc. will be used to render the Agent Card.
+
+Make sure the backend response matches this expectation.
+
+⸻
+
+END OF PROMPT — please generate the code and configuration for a Replit Deployment.
