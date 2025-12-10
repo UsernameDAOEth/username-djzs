@@ -215,7 +215,7 @@ export const DjzsAgentConsole = () => {
   };
 
   return (
-    <BrutalCard className="w-full max-w-6xl mx-auto bg-black/90 backdrop-blur-xl p-0 overflow-hidden border-2 border-primary shadow-[0px_0px_40px_rgba(178,255,89,0.2)]">
+    <BrutalCard className="w-full max-w-6xl mx-auto bg-background/90 backdrop-blur-xl p-0 overflow-hidden border-2 border-primary shadow-[0px_0px_40px_rgba(232,168,56,0.2)]">
       {/* Terminal Header */}
       <div className="bg-primary/10 text-primary p-2 border-b-2 border-primary flex justify-between items-center relative overflow-hidden">
         {/* Header Glitch Scanline */}
@@ -325,7 +325,7 @@ export const DjzsAgentConsole = () => {
             {/* Status Bar */}
             <div className="border-b border-primary/30 p-2 flex justify-between text-[10px] font-mono text-primary/50 uppercase tracking-wider bg-black/80 backdrop-blur-sm z-10">
                 <div className="flex gap-4">
-                    <span>STATUS: {loading ? <span className="text-primary animate-pulse">PROCESSING...</span> : <span className="text-green-500">IDLE</span>}</span>
+                    <span>STATUS: {loading ? <span className="text-primary animate-pulse">PROCESSING...</span> : <span className="text-accent">IDLE</span>}</span>
                     <span>MEM: 128MB</span>
                 </div>
                 <div className="flex gap-2">
@@ -351,7 +351,7 @@ export const DjzsAgentConsole = () => {
 
                 {/* Live Logs Overlay */}
                 {loading && (
-                    <div className="absolute bottom-4 left-4 right-4 p-4 bg-black/90 border border-primary/30 text-[10px] font-mono text-primary shadow-[0_0_20px_rgba(178,255,89,0.1)]">
+                    <div className="absolute bottom-4 left-4 right-4 p-4 bg-background/90 border border-primary/30 text-[10px] font-mono text-primary shadow-[0_0_20px_rgba(232,168,56,0.1)]">
                         <div className="flex flex-col-reverse gap-1 h-32 overflow-hidden">
                             {logs.map((log, i) => (
                                 <div key={i} className="animate-in fade-in slide-in-from-left-4 duration-100 flex gap-2">

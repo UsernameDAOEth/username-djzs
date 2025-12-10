@@ -28,7 +28,7 @@ export const MatrixRain = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = '#b2ff59'; // Neon Green
+      ctx.fillStyle = '#E8A838'; // Cosmic Amber/Gold
       ctx.font = '10px monospace';
 
       for (let i = 0; i < drops.length; i++) {

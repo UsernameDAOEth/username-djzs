@@ -94,7 +94,7 @@ export default function Profile() {
   const mainNft = user.nfts?.[0];
 
   return (
-    <div className="min-h-screen bg-black text-primary font-mono selection:bg-primary selection:text-black relative overflow-hidden">
+    <div className="min-h-screen bg-background text-primary font-mono selection:bg-primary selection:text-primary-foreground relative overflow-hidden">
       {/* Ambient Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <CyberGrid />
@@ -102,7 +102,7 @@ export default function Profile() {
       </div>
 
       {/* Navigation Bar (Simplified) */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-primary bg-black/90 backdrop-blur-md h-16 flex items-center justify-between px-6">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b-2 border-primary bg-background/90 backdrop-blur-md h-16 flex items-center justify-between px-6">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
             <div className="w-8 h-8 bg-primary text-black flex items-center justify-center font-bold text-xl group-hover:rotate-180 transition-transform duration-500">
@@ -116,7 +116,7 @@ export default function Profile() {
 
         <div className="flex items-center gap-4">
            <div className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-widest text-primary/70">
-              <span className="flex items-center gap-1"><div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/> {mainNft?.chain || "BASE MAINNET"}</span>
+              <span className="flex items-center gap-1"><div className="w-2 h-2 bg-accent rounded-full animate-pulse"/> {mainNft?.chain || "BASE MAINNET"}</span>
               <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3"/> CONNECTED</span>
            </div>
            <BrutalButton className="h-8 text-xs px-4">
@@ -163,7 +163,7 @@ export default function Profile() {
                     </div>
                     
                     {/* Scanline Effect */}
-                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(178,255,89,0.05)_50%)] bg-[length:100%_4px] pointer-events-none z-30" />
+                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(232,168,56,0.05)_50%)] bg-[length:100%_4px] pointer-events-none z-30" />
                 </ThreeDCard>
 
                 <div className="flex gap-2">
@@ -249,9 +249,9 @@ export default function Profile() {
                             ACTIVITY_LOG
                         </span>
                         <div className="flex gap-1">
-                            <div className="w-2 h-2 rounded-full bg-red-500/50"/>
-                            <div className="w-2 h-2 rounded-full bg-yellow-500/50"/>
-                            <div className="w-2 h-2 rounded-full bg-green-500/50"/>
+                            <div className="w-2 h-2 rounded-full bg-destructive/50"/>
+                            <div className="w-2 h-2 rounded-full bg-primary/50"/>
+                            <div className="w-2 h-2 rounded-full bg-accent/50"/>
                         </div>
                     </div>
                     

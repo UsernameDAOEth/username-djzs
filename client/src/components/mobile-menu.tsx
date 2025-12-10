@@ -24,7 +24,7 @@ export const MobileMenu = () => {
     <div className="md:hidden">
       <BrutalButton 
         onClick={toggleMenu} 
-        className="h-10 w-10 p-0 flex items-center justify-center border-2 border-primary bg-black text-primary shadow-[4px_4px_0px_rgba(178,255,89,0.5)] relative z-[60]"
+        className="h-10 w-10 p-0 flex items-center justify-center border-2 border-primary bg-background text-primary shadow-[4px_4px_0px_rgba(232,168,56,0.5)] relative z-[60]"
         data-testid="button-mobile-menu"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -37,10 +37,10 @@ export const MobileMenu = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 20, stiffness: 100 }}
-            className="fixed inset-0 z-[55] bg-black backdrop-blur-xl flex flex-col p-6 pt-24 space-y-8 border-l-2 border-primary"
+            className="fixed inset-0 z-[55] bg-background backdrop-blur-xl flex flex-col p-6 pt-24 space-y-8 border-l-2 border-primary"
           >
-            {/* Background Grid Effect */}
-            <div className="absolute inset-0 z-[-1] bg-[linear-gradient(rgba(178,255,89,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(178,255,89,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+            {/* Background Grid Effect - Cosmic Amber */}
+            <div className="absolute inset-0 z-[-1] bg-[linear-gradient(rgba(232,168,56,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(232,168,56,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
 
             <div className="space-y-2">
                 <div className="text-xs font-mono text-primary/50 uppercase tracking-widest mb-4 border-b border-primary/30 pb-2">/// NAVIGATION</div>
@@ -114,7 +114,7 @@ export const MobileMenu = () => {
                     <div className="flex justify-between text-[10px] font-mono">
                         <span className="text-primary/50">NETWORK</span>
                         <div className="flex items-center gap-1 text-primary">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/>
+                            <div className="w-2 h-2 bg-accent rounded-full animate-pulse"/>
                             BASE MAINNET
                         </div>
                     </div>

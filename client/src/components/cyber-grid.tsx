@@ -25,9 +25,9 @@ export const CyberGrid = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // Fade out
       ctx.fillRect(0, 0, width, height);
       
-      ctx.strokeStyle = '#b2ff59'; // Neon Green
+      ctx.strokeStyle = '#E8A838'; // Cosmic Amber/Gold
       ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.15;
+      ctx.globalAlpha = 0.12;
 
       // Vertical lines
       for (let x = 0; x <= width; x += gridSize) {
@@ -47,15 +47,15 @@ export const CyberGrid = () => {
 
       offset = (offset + speed) % gridSize;
 
-      // Random glitch artifacts
+      // Random glitch artifacts - cosmic teal and amber
       if (Math.random() > 0.95) {
         const rx = Math.random() * width;
         const ry = Math.random() * height;
         const rw = Math.random() * 100;
         const rh = Math.random() * 5;
         
-        ctx.fillStyle = '#b2ff59';
-        ctx.globalAlpha = 0.3;
+        ctx.fillStyle = Math.random() > 0.5 ? '#E8A838' : '#14B8A6';
+        ctx.globalAlpha = 0.25;
         ctx.fillRect(rx, ry, rw, rh);
       }
 

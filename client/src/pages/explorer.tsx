@@ -199,7 +199,7 @@ export default function Explorer() {
                       <h3 className="text-lg font-black uppercase">{agent.username}</h3>
                       <div className="inline-block bg-primary text-black px-2 py-1 text-[10px] font-bold mt-2">{agent.tag}</div>
                     </div>
-                    <div className={`w-3 h-3 rounded-full ${agent.status === "ACTIVE" ? "bg-green-500 animate-pulse" : "bg-gray-500"}`} />
+                    <div className={`w-3 h-3 rounded-full ${agent.status === "ACTIVE" ? "bg-accent animate-pulse" : "bg-gray-500"}`} />
                   </div>
                   <div className="grid grid-cols-2 gap-3 py-4 border-y border-border text-xs font-mono">
                     <div><div className="text-primary/60">LEVEL</div><div className="text-lg font-bold text-primary">{agent.level}</div></div>

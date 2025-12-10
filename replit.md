@@ -3,7 +3,7 @@
 ## Project Overview
 Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentralized crypto infrastructure where users mint a Username NFT to spawn personal AI agents. The system uses local-first architecture with Anytype Vault for private data storage, Irys Network for permanent archiving, Vana DataDAO for collective intelligence, and micropayment-based AI queries via x402 protocol.
 
-**Design System**: Digital brutalism with neon green (#b2ff59) accent color, Space Grotesk/Chakra Petch/Space Mono typography, and raw "Bushwick agency-level" aesthetic.
+**Design System**: Digital brutalism with cosmic color palette - amber/gold primary (#E8A838), teal/cyan accent (#14B8A6), deep space dark backgrounds (HSL 225 40% 6%), Space Grotesk/Chakra Petch/Space Mono typography, and raw "Bushwick agency-level" aesthetic.
 
 **Stack**: React + Vite + Express + PostgreSQL (Drizzle ORM) + Tailwind CSS + TypeScript
 
@@ -147,10 +147,11 @@ Application is production-ready with:
 ## Design Specifications
 
 ### Color Palette
-- **Primary**: #b2ff59 (Neon Green - Brutalist accent)
-- **Background**: #000000 (Pure Black)
-- **Text**: #ffffff (White) with primary accents
-- **Secondary**: Primary with opacity variations
+- **Primary**: #E8A838 (Cosmic Amber/Gold - warm accent)
+- **Secondary/Accent**: #14B8A6 (Cosmic Teal/Cyan - cool accent)
+- **Background**: HSL(225 40% 6%) (Deep Space Dark Blue-Black)
+- **Foreground**: HSL(45 20% 95%) (Warm Light)
+- **Card/Muted**: Deep space blues with subtle warmth
 
 ### Typography
 - **Display/Headings**: Space Grotesk, Space Mono
