@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Wallet as WalletIcon, Loader2 } from "lucide-react";
 import { Zone, ProcessingMode, DJZSIntent, ZONES } from "./config";
 import { ZoneSelector } from "./zone-selector";
 import { ModeSelector } from "./mode-selector";
@@ -12,6 +13,28 @@ export function AgentConsole() {
   const [reply, setReply] = useState<string | null>(null);
   const [status, setStatus] = useState("IDLE");
   const [journalId, setJournalId] = useState<string | null>(null);
+  const [connectingWallet, setConnectingWallet] = useState(false);
+
+  async function handleConnectWallet() {
+    setConnectingWallet(true);
+    try {
+      if (typeof window !== "undefined" && (window as any).ethereum) {
+        const accounts = await (window as any).ethereum.request({
+          method: "eth_requestAccounts",
+        });
+        if (accounts && accounts[0]) {
+          setWallet(accounts[0]);
+        }
+      } else {
+        alert("MetaMask or Web3 wallet not detected. Please install it first.");
+      }
+    } catch (err) {
+      console.error("Wallet connection failed:", err);
+      alert("Failed to connect wallet. Please try again.");
+    } finally {
+      setConnectingWallet(false);
+    }
+  }
 
   async function handleExecute() {
     if (!directive.trim()) return;
@@ -112,14 +135,34 @@ export function AgentConsole() {
               <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
                 OPTIONAL · WALLET BINDING
               </span>
-              <input
-                type="text"
-                data-testid="input-wallet"
-                value={wallet}
-                onChange={(e) => setWallet(e.target.value)}
-                placeholder="0x… (bind this session to a wallet identity)"
-                className="w-full rounded-md border border-sky-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/70"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  data-testid="input-wallet"
+                  value={wallet}
+                  onChange={(e) => setWallet(e.target.value)}
+                  placeholder="0x… (bind this session to a wallet identity)"
+                  className="flex-1 rounded-md border border-sky-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-400/70"
+                />
+                <button
+                  data-testid="button-connect-wallet"
+                  onClick={handleConnectWallet}
+                  disabled={connectingWallet}
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-sky-500/40 bg-slate-950/60 px-3 py-2 text-sm font-semibold text-sky-300 hover:bg-slate-950/80 hover:border-sky-400 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                >
+                  {connectingWallet ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      CONNECTING…
+                    </>
+                  ) : (
+                    <>
+                      <WalletIcon className="w-4 h-4" />
+                      CONNECT
+                    </>
+                  )}
+                </button>
+              </div>
               <p className="text-[0.65rem] text-slate-400">
                 If provided, your Journals will be linked to this wallet inside
                 DJZS/Anytype.
