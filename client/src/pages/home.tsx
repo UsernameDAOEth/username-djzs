@@ -31,10 +31,10 @@ function Header() {
         </Link>
         
         <nav className="hidden md:flex items-center gap-6 font-mono text-xs">
-          <Link href="/" className="text-sky-400">HOME</Link>
-          <Link href="/profile" className="text-slate-300 hover:text-sky-400 transition">PROFILE</Link>
-          <Link href="/explorer" className="text-slate-300 hover:text-sky-400 transition">EXPLORER</Link>
-          <Link href="/api-test" className="text-slate-300 hover:text-sky-400 transition">API_TEST</Link>
+          <Link href="/" data-testid="link-nav-home" className="text-sky-400">HOME</Link>
+          <Link href="/profile" data-testid="link-nav-profile" className="text-slate-300 hover:text-sky-400 transition">PROFILE</Link>
+          <Link href="/explorer" data-testid="link-nav-explorer" className="text-slate-300 hover:text-sky-400 transition">EXPLORER</Link>
+          <Link href="/api-test" data-testid="link-nav-api-test" className="text-slate-300 hover:text-sky-400 transition">API_TEST</Link>
         </nav>
         
         <button 

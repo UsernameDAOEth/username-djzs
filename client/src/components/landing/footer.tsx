@@ -7,9 +7,9 @@ export function Footer() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-3">
         <div>© {new Date().getFullYear()} USERNAME DAO × DJZS Protocol.</div>
         <div className="flex flex-wrap gap-4">
-          <Link href="/profile" className="hover:text-sky-300 transition">Profile</Link>
-          <Link href="/explorer" className="hover:text-sky-300 transition">Explorer</Link>
-          <Link href="/api-test" className="hover:text-sky-300 transition">API Test</Link>
+          <Link href="/profile" data-testid="link-footer-profile" className="hover:text-sky-300 transition">Profile</Link>
+          <Link href="/explorer" data-testid="link-footer-explorer" className="hover:text-sky-300 transition">Explorer</Link>
+          <Link href="/api-test" data-testid="link-footer-api-test" className="hover:text-sky-300 transition">API Test</Link>
           <span>ECOSYSTEM: Username DAO · DJZS · Anytype</span>
         </div>
       </div>

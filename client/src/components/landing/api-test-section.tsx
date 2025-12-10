@@ -109,6 +109,7 @@ export function ApiTestSection() {
                 )}
               </div>
               <button 
+                data-testid={`button-test-${item.title.toLowerCase().replace(/\s+/g, '-')}`}
                 onClick={item.onClick}
                 disabled={item.state.loading}
                 className="rounded-md border border-sky-400 bg-sky-950/70 px-4 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition disabled:opacity-50"
