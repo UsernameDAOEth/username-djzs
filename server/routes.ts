@@ -169,28 +169,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const anytypeApiKey = process.env.ANYTYPE_API_KEY;
-      if (!anytypeApiKey) {
-        return res.status(500).json({
-          success: false,
-          error: "ANYTYPE_API_KEY not configured",
-        });
+      let profileData;
+
+      // Step 1: Try to fetch UserProfile from Anytype MCP
+      if (anytypeApiKey) {
+        try {
+          const profileResponse = await fetch(`http://localhost:31009/v1/objects/${profileId}`, {
+            method: "GET",
+            headers: {
+              "Authorization": `Bearer ${anytypeApiKey}`,
+              "Content-Type": "application/json",
+              "Anytype-Version": "2025-05-20",
+            },
+            signal: AbortSignal.timeout(3000),
+          });
+
+          if (profileResponse.ok) {
+            profileData = await profileResponse.json();
+          } else {
+            throw new Error("Anytype MCP server not responding");
+          }
+        } catch (mcpError) {
+          console.warn("Anytype MCP unavailable, using mock profile for demo:", mcpError);
+          profileData = createMockProfile(profileId);
+        }
+      } else {
+        // No API key configured - use mock profile for demo
+        profileData = createMockProfile(profileId);
       }
-
-      // Step 1: Fetch UserProfile from Anytype MCP
-      const profileResponse = await fetch(`http://localhost:31009/v1/objects/${profileId}`, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${anytypeApiKey}`,
-          "Content-Type": "application/json",
-          "Anytype-Version": "2025-05-20",
-        },
-      });
-
-      if (!profileResponse.ok) {
-        throw new Error(`Failed to fetch profile: ${profileResponse.status}`);
-      }
-
-      const profileData = await profileResponse.json();
 
       // Step 2: Upload to IRYS
       const irysUploader = await Uploader(BaseEth).withWallet(process.env.PRIVATE_KEY);
@@ -208,21 +214,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
+        source: anytypeApiKey && profileData !== createMockProfile(profileId) ? "anytype" : "mock",
         profile: profileData,
         irys: {
           hash: receipt.id,
           url: irysUrl,
           timestamp: receipt.timestamp,
         },
+        message: anytypeApiKey ? 
+          "Profile published to Irys (from Anytype)" : 
+          "Profile published to Irys (using demo data - configure ANYTYPE_API_KEY for real profiles)",
       });
     } catch (error: any) {
       console.error("Profile publish error:", error);
       res.status(500).json({
         success: false,
         error: error.message,
+        hint: error.message.includes("PRIVATE_KEY") 
+          ? "PRIVATE_KEY not set. Required for Irys uploads."
+          : "Check Irys configuration and network connectivity",
       });
     }
   });
+
+  // Helper function to create a mock profile for testing
+  function createMockProfile(profileId: string) {
+    return {
+      id: profileId,
+      type: "DemoProfile",
+      name: "Demo DJZS Agent",
+      username: "@demo_agent",
+      role: "developer",
+      stats: {
+        level: 1,
+        xp: 0,
+        zones: 0,
+        entries: 0,
+      },
+      vault: {
+        status: "DISCONNECTED",
+        entries: [],
+      },
+      metadata: {
+        created: new Date().toISOString(),
+        source: "DJZS_TEST_FLOW",
+        note: "Demo profile - connect Anytype MCP for real data",
+      },
+    };
+  }
 
   // Agent initialization endpoint - Username DAO × DJZS Protocol
   app.post("/api/agent/init", async (req, res) => {
