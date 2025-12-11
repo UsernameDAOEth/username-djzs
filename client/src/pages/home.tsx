@@ -171,8 +171,8 @@ const HeroSection: React.FC = () => {
             Identity Layer: Username DAO · Agent Layer: DJZS
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-            <span className="block">YOUR NAME</span>
-            <span className="block text-lime-400">IS YOUR AGENT</span>
+            <span className="block">Username</span>
+            <span className="block text-lime-400">As A Brand</span>
           </h1>
           <p className="mt-5 max-w-xl text-sm sm:text-base text-slate-200/90">
             Mint a Username. Spawn your DJZS Agent. Sync with your Anytype Vault via MCP.
