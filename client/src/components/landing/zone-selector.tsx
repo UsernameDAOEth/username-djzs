@@ -32,13 +32,13 @@ export function ZoneSelector({ selectedCode, onSelect }: ZoneSelectorProps) {
               whileHover={{ 
                 scale: 1.05, 
                 y: -5,
-                boxShadow: "0 10px 30px rgba(34,211,238,0.2)"
+                boxShadow: "0 10px 30px rgba(163,230,53,0.2)"
               }}
               whileTap={{ scale: 0.98 }}
               className={`flex-shrink-0 rounded-lg border px-3 py-2 text-left transition min-w-[9rem] ${
                 isActive
-                  ? "border-cyan-400 bg-cyan-950/60 shadow-[0_0_0_1px_rgba(34,211,238,0.6)]"
-                  : "border-cyan-500/30 bg-slate-950/60 hover:border-cyan-300/60"
+                  ? "border-lime-400 bg-lime-950/60 shadow-[0_0_0_1px_rgba(163,230,53,0.6)]"
+                  : "border-lime-500/30 bg-slate-950/60 hover:border-lime-300/60"
               }`}
             >
               <div className="flex items-center gap-2 text-xs font-mono">

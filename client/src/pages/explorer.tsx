@@ -97,7 +97,7 @@ export default function Explorer() {
           animate={{ opacity: 1, y: 0 }}
         >
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">
-            AGENT <span className="text-sky-400">EXPLORER</span>
+            AGENT <span className="text-lime-400">EXPLORER</span>
           </h1>
           <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
             Discover Username DAO agents, explore DJZS Protocol activity,
@@ -105,8 +105,8 @@ export default function Explorer() {
           </p>
 
           {/* Search bar */}
-          <div className="mt-6 border border-cyan-500/40 rounded-md w-full md:w-96 p-3 flex items-center gap-3 bg-black/40">
-            <Search className="w-4 h-4 text-cyan-400/70" />
+          <div className="mt-6 border border-lime-500/40 rounded-md w-full md:w-96 p-3 flex items-center gap-3 bg-black/40">
+            <Search className="w-4 h-4 text-lime-400/70" />
             <input
               placeholder="SEARCH_AGENTS (@username)"
               value={searchQuery}

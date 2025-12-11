@@ -85,11 +85,11 @@ export function AgentConsole() {
   }
 
   return (
-    <section className="px-6 py-16 lg:px-12 border-t border-cyan-500/20 bg-slate-950/80">
+    <section className="px-6 py-16 lg:px-12 border-t border-lime-500/20 bg-slate-950/80">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-3">
           <div>
-            <h2 className="text-sm font-mono tracking-[0.25em] text-cyan-300 uppercase">
+            <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
               DJZS AGENT CORE PREVIEW
             </h2>
             <p className="mt-2 max-w-xl text-sm text-slate-200/90">
@@ -116,7 +116,7 @@ export function AgentConsole() {
               </div>
               <textarea
                 data-testid="input-directive"
-                className="w-full rounded-md border border-cyan-500/40 bg-slate-950/60 p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/70"
+                className="w-full rounded-md border border-lime-500/40 bg-slate-950/60 p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
                 rows={6}
                 placeholder="Enter your directive…"
                 value={directive}
@@ -142,13 +142,13 @@ export function AgentConsole() {
                   value={wallet}
                   onChange={(e) => setWallet(e.target.value)}
                   placeholder="0x… (bind this session to a wallet identity)"
-                  className="flex-1 rounded-md border border-cyan-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400/70"
+                  className="flex-1 rounded-md border border-lime-500/40 bg-slate-950/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
                 />
                 <button
                   data-testid="button-connect-wallet"
                   onClick={handleConnectWallet}
                   disabled={connectingWallet}
-                  className="inline-flex items-center justify-center gap-2 rounded-md border border-cyan-500/40 bg-slate-950/60 px-3 py-2 text-sm font-semibold text-cyan-300 hover:bg-slate-950/80 hover:border-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-lime-500/40 bg-slate-950/60 px-3 py-2 text-sm font-semibold text-lime-300 hover:bg-slate-950/80 hover:border-lime-400 disabled:opacity-50 disabled:cursor-not-allowed transition whitespace-nowrap"
                 >
                   {connectingWallet ? (
                     <>
@@ -173,7 +173,7 @@ export function AgentConsole() {
               data-testid="button-execute"
               onClick={handleExecute}
               disabled={loading || !directive.trim()}
-              className="mt-2 inline-flex items-center justify-center rounded-md bg-cyan-400 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-lg shadow-cyan-500/40 hover:bg-cyan-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="mt-2 inline-flex items-center justify-center rounded-md bg-lime-400 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
               {loading ? "PROCESSING…" : "EXECUTE_DIRECTIVE"}
             </button>
@@ -188,7 +188,7 @@ export function AgentConsole() {
                       ? "text-red-400"
                       : status === "COMPLETE"
                       ? "text-emerald-400"
-                      : "text-cyan-300"
+                      : "text-lime-300"
                   }
                 >
                   {status}
@@ -199,13 +199,13 @@ export function AgentConsole() {
           </div>
 
           <div className="space-y-6">
-            <div className="rounded-lg border border-cyan-500/40 bg-slate-950/70 p-4">
+            <div className="rounded-lg border border-lime-500/40 bg-slate-950/70 p-4">
               <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase mb-3">
                 AGENT REPLY
               </div>
               <div 
                 data-testid="text-agent-reply"
-                className="h-64 overflow-auto rounded-md bg-slate-950/80 border border-cyan-500/30 p-3 font-mono text-[0.7rem] text-slate-200/90"
+                className="h-64 overflow-auto rounded-md bg-slate-950/80 border border-lime-500/30 p-3 font-mono text-[0.7rem] text-slate-200/90"
               >
                 {reply ? (
                   <pre className="whitespace-pre-wrap">{reply}</pre>
@@ -222,7 +222,7 @@ export function AgentConsole() {
               )}
             </div>
 
-            <div className="rounded-lg border border-cyan-500/40 bg-slate-950/70 p-4 space-y-3">
+            <div className="rounded-lg border border-lime-500/40 bg-slate-950/70 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
                   DATA_PERSISTENCE
@@ -231,7 +231,7 @@ export function AgentConsole() {
                   LOCAL API STATUS: DISCONNECTED
                 </div>
               </div>
-              <div className="rounded-md border border-cyan-500/30 bg-slate-950/80 p-4 text-center space-y-2">
+              <div className="rounded-md border border-lime-500/30 bg-slate-950/80 p-4 text-center space-y-2">
                 <div className="text-2xl">🔒</div>
                 <p className="text-[0.75rem] text-slate-200/90">
                   Your agent is offline from your Anytype Vault. Connect using
@@ -239,7 +239,7 @@ export function AgentConsole() {
                 </p>
                 <button 
                   data-testid="button-mcp-bridge"
-                  className="mt-2 inline-flex items-center justify-center rounded-md border border-cyan-400 bg-cyan-950/70 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-900/70 transition"
+                  className="mt-2 inline-flex items-center justify-center rounded-md border border-lime-400 bg-lime-950/70 px-4 py-2 text-xs font-semibold text-lime-200 hover:bg-lime-900/70 transition"
                 >
                   INITIATE_MCP_BRIDGE
                 </button>

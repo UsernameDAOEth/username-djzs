@@ -31,13 +31,13 @@ export function ModeSelector({ mode, onChange }: ModeSelectorProps) {
               transition={{ delay: index * 0.1 }}
               whileHover={{ 
                 scale: 1.03, 
-                boxShadow: "0 5px 20px rgba(34,211,238,0.15)"
+                boxShadow: "0 5px 20px rgba(163,230,53,0.15)"
               }}
               whileTap={{ scale: 0.97 }}
               className={`rounded-md border px-3 py-2 text-left transition ${
                 isActive
-                  ? "border-cyan-400 bg-cyan-900/70"
-                  : "border-cyan-500/40 bg-slate-950/60 hover:border-cyan-300/60"
+                  ? "border-lime-400 bg-lime-900/70"
+                  : "border-lime-500/40 bg-slate-950/60 hover:border-lime-300/60"
               }`}
             >
               <div className="text-xs font-mono">{m.label}</div>

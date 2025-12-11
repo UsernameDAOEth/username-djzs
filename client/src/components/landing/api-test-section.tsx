@@ -78,10 +78,10 @@ export function ApiTestSection() {
   ];
 
   return (
-    <section className="px-6 py-16 lg:px-12 border-t border-sky-500/20 bg-slate-950/90">
+    <section className="px-6 py-16 lg:px-12 border-t border-lime-500/20 bg-slate-950/90">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
-          <h2 className="text-sm font-mono tracking-[0.25em] text-sky-300 uppercase">
+          <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
             DJZS DEVELOPER CONSOLE
           </h2>
           <p className="mt-2 text-sm text-slate-200/90">
@@ -101,9 +101,9 @@ export function ApiTestSection() {
               whileHover={{ 
                 scale: 1.02, 
                 x: 5,
-                boxShadow: "0 5px 20px rgba(56,189,248,0.1)"
+                boxShadow: "0 5px 20px rgba(163,230,53,0.1)"
               }}
-              className="flex items-center justify-between rounded-lg border border-sky-500/40 bg-slate-950/80 px-4 py-3 cursor-pointer"
+              className="flex items-center justify-between rounded-lg border border-lime-500/40 bg-slate-950/80 px-4 py-3 cursor-pointer"
             >
               <div className="flex-1">
                 <div className="text-xs font-mono text-slate-200">
@@ -128,7 +128,7 @@ export function ApiTestSection() {
                 disabled={item.state.loading}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="rounded-md border border-sky-400 bg-sky-950/70 px-4 py-1.5 text-xs font-semibold text-sky-200 hover:bg-sky-900/70 transition disabled:opacity-50"
+                className="rounded-md border border-lime-400 bg-lime-950/70 px-4 py-1.5 text-xs font-semibold text-lime-200 hover:bg-lime-900/70 transition disabled:opacity-50"
               >
                 {item.state.loading ? "..." : item.cta}
               </motion.button>

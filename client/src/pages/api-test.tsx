@@ -97,7 +97,7 @@ export default function ApiTest() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-4xl md:text-5xl font-black tracking-tighter">
-            API <span className="text-cyan-400">TEST</span>
+            API <span className="text-lime-400">TEST</span>
           </h1>
           <p className="text-slate-400 text-sm">Test Anytype MCP + Irys Network Integration</p>
         </div>
@@ -107,13 +107,13 @@ export default function ApiTest() {
           
           {/* IRYS Test */}
           <motion.div 
-            className="rounded-xl border border-cyan-500/40 bg-slate-900/80 p-6 space-y-4"
+            className="rounded-xl border border-lime-500/40 bg-slate-900/80 p-6 space-y-4"
             whileHover={{ scale: 1.01 }}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
-                  <Upload className="w-5 h-5 text-cyan-400" />
+                  <Upload className="w-5 h-5 text-lime-400" />
                   IRYS UPLOAD TEST
                 </h2>
                 <p className="text-xs text-slate-400">Upload JSON to Irys Network (Base Mainnet)</p>
@@ -121,7 +121,7 @@ export default function ApiTest() {
               <button 
                 onClick={testIrys} 
                 disabled={irysLoading}
-                className="inline-flex items-center gap-2 rounded-md border border-cyan-400 bg-cyan-950/70 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-900/70 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md border border-lime-400 bg-lime-950/70 px-4 py-2 text-xs font-semibold text-lime-200 hover:bg-lime-900/70 transition disabled:opacity-50"
                 data-testid="button-test-irys"
               >
                 {irysLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
@@ -133,7 +133,7 @@ export default function ApiTest() {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t border-cyan-500/20 pt-4"
+                className="border-t border-lime-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {irysResult.success ? (
@@ -145,7 +145,7 @@ export default function ApiTest() {
                     {irysResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-cyan-500/20 rounded text-slate-300" data-testid="text-irys-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-lime-500/20 rounded text-slate-300" data-testid="text-irys-result">
                   {JSON.stringify(irysResult, null, 2)}
                 </pre>
                 {irysResult.receipt?.url && (
@@ -153,7 +153,7 @@ export default function ApiTest() {
                     href={irysResult.receipt.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-3 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                    className="inline-flex items-center gap-2 mt-3 text-lime-400 hover:text-lime-300 transition-colors text-sm"
                     data-testid="link-irys-gateway"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -166,13 +166,13 @@ export default function ApiTest() {
 
           {/* MCP Test */}
           <motion.div 
-            className="rounded-xl border border-cyan-500/40 bg-slate-900/80 p-6 space-y-4"
+            className="rounded-xl border border-lime-500/40 bg-slate-900/80 p-6 space-y-4"
             whileHover={{ scale: 1.01 }}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
-                  <Database className="w-5 h-5 text-cyan-400" />
+                  <Database className="w-5 h-5 text-lime-400" />
                   ANYTYPE MCP TEST
                 </h2>
                 <p className="text-xs text-slate-400">Connect to Anytype MCP API (localhost:31009)</p>
@@ -180,7 +180,7 @@ export default function ApiTest() {
               <button 
                 onClick={testMcp} 
                 disabled={mcpLoading}
-                className="inline-flex items-center gap-2 rounded-md border border-cyan-400 bg-cyan-950/70 px-4 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-900/70 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md border border-lime-400 bg-lime-950/70 px-4 py-2 text-xs font-semibold text-lime-200 hover:bg-lime-900/70 transition disabled:opacity-50"
                 data-testid="button-test-mcp"
               >
                 {mcpLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Terminal className="w-4 h-4" />}
@@ -192,7 +192,7 @@ export default function ApiTest() {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t border-cyan-500/20 pt-4"
+                className="border-t border-lime-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {mcpResult.success ? (
@@ -204,7 +204,7 @@ export default function ApiTest() {
                     {mcpResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-cyan-500/20 rounded text-slate-300" data-testid="text-mcp-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-lime-500/20 rounded text-slate-300" data-testid="text-mcp-result">
                   {JSON.stringify(mcpResult, null, 2)}
                 </pre>
               </motion.div>
@@ -213,13 +213,13 @@ export default function ApiTest() {
 
           {/* Full Flow Test */}
           <motion.div 
-            className="rounded-xl border-2 border-cyan-400/60 bg-slate-900/80 p-6 space-y-4"
+            className="rounded-xl border-2 border-lime-400/60 bg-slate-900/80 p-6 space-y-4"
             whileHover={{ scale: 1.01 }}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1">
                 <h2 className="text-xl font-bold flex items-center gap-2 text-slate-100">
-                  <Hash className="w-5 h-5 text-cyan-400" />
+                  <Hash className="w-5 h-5 text-lime-400" />
                   FULL FLOW TEST
                 </h2>
                 <p className="text-xs text-slate-400">Anytype → IRYS → Receipt Storage</p>
@@ -227,7 +227,7 @@ export default function ApiTest() {
               <button 
                 onClick={testPublish} 
                 disabled={publishLoading}
-                className="inline-flex items-center gap-2 rounded-md bg-cyan-400 px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-cyan-300 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-slate-900 hover:bg-lime-300 transition disabled:opacity-50"
                 data-testid="button-test-publish"
               >
                 {publishLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
@@ -239,7 +239,7 @@ export default function ApiTest() {
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="border-t border-cyan-500/20 pt-4"
+                className="border-t border-lime-500/20 pt-4"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {publishResult.success ? (
@@ -251,7 +251,7 @@ export default function ApiTest() {
                     {publishResult.success ? "SUCCESS" : "FAILED"}
                   </span>
                 </div>
-                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-cyan-500/20 rounded text-slate-300" data-testid="text-publish-result">
+                <pre className="bg-black/50 p-4 text-xs overflow-auto max-h-64 border border-lime-500/20 rounded text-slate-300" data-testid="text-publish-result">
                   {JSON.stringify(publishResult, null, 2)}
                 </pre>
                 {publishResult.irys?.url && (
@@ -259,7 +259,7 @@ export default function ApiTest() {
                     href={publishResult.irys.url} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-3 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
+                    className="inline-flex items-center gap-2 mt-3 text-lime-400 hover:text-lime-300 transition-colors text-sm"
                     data-testid="link-publish-gateway"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default function ApiTest() {
         {/* Info Box */}
         <div className="rounded-xl border border-cyan-500/30 bg-cyan-950/30 p-6">
           <h3 className="font-bold mb-2 flex items-center gap-2 text-slate-100">
-            <Terminal className="w-4 h-4 text-cyan-400" />
+            <Terminal className="w-4 h-4 text-lime-400" />
             REQUIREMENTS
           </h3>
           <ul className="text-xs space-y-1 text-slate-400">
