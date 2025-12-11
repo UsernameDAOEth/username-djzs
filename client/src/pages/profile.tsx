@@ -362,11 +362,11 @@ export default function Profile() {
                         <div className="grid grid-cols-2 gap-4 text-xs font-mono pt-4 border-t border-primary/20">
                             <div>
                                 <div className="text-primary/50">FOLLOWERS</div>
-                                <div className="text-lg font-bold text-primary">{web3Profile.totalFollowers.toLocaleString()}</div>
+                                <div className="text-lg font-bold text-primary">{(web3Profile.totalFollowers || 0).toLocaleString()}</div>
                             </div>
                             <div>
                                 <div className="text-primary/50">FOLLOWING</div>
-                                <div className="text-lg font-bold text-primary">{web3Profile.totalFollowing.toLocaleString()}</div>
+                                <div className="text-lg font-bold text-primary">{(web3Profile.totalFollowing || 0).toLocaleString()}</div>
                             </div>
                         </div>
 
@@ -410,9 +410,9 @@ export default function Profile() {
                                             <div className="text-[10px] text-primary/50">{getPlatformDisplayName(p.platform)}</div>
                                         </div>
                                     </div>
-                                    {p.social?.follower !== undefined && (
+                                    {p.social?.follower !== undefined && p.social?.follower !== null && (
                                         <div className="text-xs font-mono text-right">
-                                            <div className="text-primary">{p.social.follower.toLocaleString()}</div>
+                                            <div className="text-primary">{(p.social.follower || 0).toLocaleString()}</div>
                                             <div className="text-primary/50">followers</div>
                                         </div>
                                     )}
