@@ -18,6 +18,7 @@
     "@irys/upload": "^0.0.15",
     "@irys/upload-ethereum": "^0.0.16",
     "@jridgewell/trace-mapping": "^0.3.25",
+    "@modelcontextprotocol/sdk": "^1.24.3",
     "@neondatabase/serverless": "^0.10.4",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
