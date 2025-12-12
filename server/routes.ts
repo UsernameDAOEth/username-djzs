@@ -5,6 +5,7 @@ import { Uploader } from "@irys/upload";
 import { BaseEth } from "@irys/upload-ethereum";
 import vanaRoutes from "./vana-routes";
 import web3bioRoutes from "./web3bio-routes";
+import { getAnytypeMcpClient } from "./anytypeMcpClient";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register Vana DataDAO routes
@@ -97,6 +98,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // MCP Health Check - tests connection to Anytype MCP Server
+  app.get("/api/mcp/health", async (_req, res) => {
+    try {
+      const mcp = await getAnytypeMcpClient();
+      const tools = await mcp.listTools();
+      res.json({ ok: true, toolCount: tools?.tools?.length ?? 0, tools });
+    } catch (err: any) {
+      res.status(500).json({ ok: false, error: err?.message ?? String(err) });
     }
   });
 
