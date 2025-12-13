@@ -52,6 +52,8 @@ export default function Home() {
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(1);
   const [username, setUsername] = useState("");
   const [wallet, setWallet] = useState("");
+  const [walletConnected, setWalletConnected] = useState(false);
+  const [connectingWallet, setConnectingWallet] = useState(false);
   const [usernameMinted, setUsernameMinted] = useState(false);
   const [agentActive, setAgentActive] = useState(false);
   const [mcpConnected, setMcpConnected] = useState(false);
@@ -70,8 +72,27 @@ export default function Home() {
     return "READY (VAULT LINKED)";
   }, [processing, agentActive, mcpConnected]);
 
+  const handleConnectWallet = async () => {
+    if (typeof window === "undefined" || !(window as any).ethereum) {
+      alert("Please install MetaMask or another Web3 wallet to connect.");
+      return;
+    }
+    setConnectingWallet(true);
+    try {
+      const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
+      if (accounts && accounts.length > 0) {
+        setWallet(accounts[0]);
+        setWalletConnected(true);
+      }
+    } catch (err) {
+      console.error("Wallet connection failed:", err);
+    } finally {
+      setConnectingWallet(false);
+    }
+  };
+
   const handleMintUsername = () => {
-    if (!username.trim()) return;
+    if (!username.trim() || !walletConnected) return;
     setUsernameMinted(true);
     setOnboardingStep(2);
   };
@@ -120,11 +141,13 @@ export default function Home() {
           step={onboardingStep}
           username={username}
           wallet={wallet}
+          walletConnected={walletConnected}
+          connectingWallet={connectingWallet}
           setUsername={setUsername}
-          setWallet={setWallet}
           usernameMinted={usernameMinted}
           agentActive={agentActive}
           mcpConnected={mcpConnected}
+          onConnectWallet={handleConnectWallet}
           onMint={handleMintUsername}
           onActivateAgent={handleActivateAgent}
           onConnectMCP={handleConnectMCP}
@@ -236,11 +259,13 @@ interface OnboardingProps {
   step: OnboardingStep;
   username: string;
   wallet: string;
+  walletConnected: boolean;
+  connectingWallet: boolean;
   setUsername: (v: string) => void;
-  setWallet: (v: string) => void;
   usernameMinted: boolean;
   agentActive: boolean;
   mcpConnected: boolean;
+  onConnectWallet: () => void;
   onMint: () => void;
   onActivateAgent: () => void;
   onConnectMCP: () => void;
@@ -250,11 +275,13 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
   step,
   username,
   wallet,
+  walletConnected,
+  connectingWallet,
   setUsername,
-  setWallet,
   usernameMinted,
   agentActive,
   mcpConnected,
+  onConnectWallet,
   onMint,
   onActivateAgent,
   onConnectMCP,
@@ -283,33 +310,44 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
             <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
               STEP 1 · USERNAME
             </div>
-            <div className="text-sm font-semibold">Choose and bind your handle.</div>
+            <div className="text-sm font-semibold">Connect wallet and bind your handle.</div>
+            
+            <button
+              onClick={onConnectWallet}
+              disabled={walletConnected || connectingWallet}
+              className={`w-full rounded-md border px-4 py-2 text-xs font-semibold transition ${
+                walletConnected 
+                  ? "border-emerald-400 bg-emerald-950/80 text-emerald-200" 
+                  : "border-lime-500/40 bg-slate-900 text-lime-200 hover:bg-slate-800"
+              } disabled:cursor-not-allowed`}
+              data-testid="button-connect-wallet"
+            >
+              {connectingWallet 
+                ? "CONNECTING..." 
+                : walletConnected 
+                  ? `CONNECTED: ${wallet.slice(0, 6)}...${wallet.slice(-4)}` 
+                  : "CONNECT_WALLET"}
+            </button>
+            
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="@yourname"
-              className="mt-2 w-full rounded-md border border-lime-500/40 bg-slate-950/80 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
+              disabled={!walletConnected}
+              className="w-full rounded-md border border-lime-500/40 bg-slate-950/80 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70 disabled:opacity-50"
               data-testid="input-onboard-username"
-            />
-            <input
-              type="text"
-              value={wallet}
-              onChange={(e) => setWallet(e.target.value)}
-              placeholder="0x… wallet (optional for now)"
-              className="w-full rounded-md border border-lime-500/40 bg-slate-950/80 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
-              data-testid="input-onboard-wallet"
             />
             <button
               onClick={onMint}
-              disabled={!username.trim()}
-              className="mt-2 w-full rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              disabled={!username.trim() || !walletConnected || usernameMinted}
+              className="w-full rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
               data-testid="button-mint-username"
             >
               {usernameMinted ? "USERNAME_MINTED ✓" : "MINT_USERNAME"}
             </button>
             <p className="text-[0.7rem] text-slate-400">
-              Username DAO uses this handle to spawn and track your DJZS Agent identity.
+              Connect your wallet first, then mint your Username to spawn your DJZS Agent.
             </p>
           </motion.div>
 
