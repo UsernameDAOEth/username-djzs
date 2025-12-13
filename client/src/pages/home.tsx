@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Navigation } from "@/components/navigation";
 import { CyberGrid } from "@/components/cyber-grid";
 import { ApiTestSection } from "@/components/landing/api-test-section";
+import { ThreeDCard } from "@/components/3d-card";
 
 type OnboardingStep = 1 | 2 | 3;
 type ProcessingMode = "QUICK" | "JOURNAL" | "RESEARCH" | "ALPHA";
@@ -201,28 +202,30 @@ const HeroSection: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative"
         >
-          <div className="rounded-xl border border-lime-500/60 bg-slate-900/80 p-5 shadow-xl shadow-lime-900/60 backdrop-blur space-y-4">
-            <div className="text-xs font-mono text-slate-300/80 flex items-center justify-between">
-              <span>AGENT_CORE: OFFLINE</span>
-              <span className="inline-flex items-center gap-1 text-slate-400">
-                <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
-                MCP_BRIDGE: NOT_LINKED
-              </span>
-            </div>
-            <div className="border border-lime-500/40 rounded-md p-4 text-center">
-              <div className="text-[0.7rem] font-mono tracking-[0.25em] uppercase text-slate-300">
-                Welcome to
+          <ThreeDCard className="cursor-pointer">
+            <div className="rounded-xl border border-lime-500/60 bg-slate-900/80 p-5 shadow-xl shadow-lime-900/60 backdrop-blur space-y-4">
+              <div className="text-xs font-mono text-slate-300/80 flex items-center justify-between">
+                <span>AGENT_CORE: OFFLINE</span>
+                <span className="inline-flex items-center gap-1 text-slate-400">
+                  <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
+                  MCP_BRIDGE: NOT_LINKED
+                </span>
               </div>
-              <div className="text-3xl font-black tracking-[0.3em] mt-1 text-lime-400">DJZSX</div>
-              <div className="text-[0.7rem] uppercase tracking-[0.22em] text-slate-400 mt-2">
-                Private Journaling · Anytype · Aztec-ready
+              <div className="border border-lime-500/40 rounded-md p-4 text-center">
+                <div className="text-[0.7rem] font-mono tracking-[0.25em] uppercase text-slate-300">
+                  Welcome to
+                </div>
+                <div className="text-3xl font-black tracking-[0.3em] mt-1 text-lime-400">Dj-Z-S</div>
+                <div className="text-[0.7rem] uppercase tracking-[0.22em] text-slate-400 mt-2">
+                  Private Journaling · Anytype · Aztec-ready
+                </div>
               </div>
+              <p className="text-[0.7rem] text-slate-300/80 font-mono leading-relaxed">
+                Once you mint your Username, your DJZS Agent Core will bind to that identity and can
+                sync to your Anytype Vault through the MCP bridge.
+              </p>
             </div>
-            <p className="text-[0.7rem] text-slate-300/80 font-mono leading-relaxed">
-              Once you mint your Username, your DJZS Agent Core will bind to that identity and can
-              sync to your Anytype Vault through the MCP bridge.
-            </p>
-          </div>
+          </ThreeDCard>
         </motion.div>
       </div>
     </section>
