@@ -22,7 +22,7 @@ export const MobileMenu = () => {
     <div className="md:hidden">
       <button 
         onClick={toggleMenu} 
-        className="h-10 w-10 p-0 flex items-center justify-center border border-lime-400 bg-slate-950 text-lime-400 rounded-md relative z-[60]"
+        className="h-10 w-10 p-0 flex items-center justify-center border border-lime-400 bg-slate-950 text-lime-400 rounded-md relative z-[110]"
         data-testid="button-mobile-menu"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -35,7 +35,7 @@ export const MobileMenu = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: "100%" }}
             transition={{ type: "spring", damping: 20, stiffness: 100 }}
-            className="fixed inset-0 z-[55] bg-slate-950 backdrop-blur-xl flex flex-col p-6 pt-24 space-y-8 border-l border-lime-500/20"
+            className="fixed inset-0 z-[100] bg-slate-950 flex flex-col p-6 pt-24 space-y-8 overflow-y-auto"
           >
             {/* Background Grid Effect - Lime */}
             <div className="absolute inset-0 z-[-1] bg-[linear-gradient(rgba(163,230,53,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(163,230,53,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
