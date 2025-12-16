@@ -1,84 +1,150 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Zap } from "lucide-react";
-import { CyberGrid } from "@/components/cyber-grid";
 import { Navigation } from "@/components/navigation";
+import { CyberGrid } from "@/components/cyber-grid";
 
-interface AgentCard {
-  username: string;
-  role: string;
-  level: number;
-  xp: number;
-  zones: number;
-  entries: number;
-  vaultStatus: "CONNECTED" | "DISCONNECTED" | "PENDING";
-  borderColor: string;
+type ExplorerItem = {
+  id: string;
+  title: string;
+  summary?: string;
+  zoneCode: string;
+  zoneName: string;
+  contentType: "Journal" | "Article" | "Trade" | "Note" | "Link";
+  tags: string[];
+  source?: string;
+  createdAt: string;
+  updatedAt?: string;
+  anytypeObjectId?: string;
+  irysTxId?: string;
+};
+
+const ZONES = [
+  { code: "01_DYOR", name: "DYOR" },
+  { code: "02_DID", name: "Decentralized iD" },
+  { code: "03_TESTNET", name: "Blockchain Testnet" },
+  { code: "04_DESO", name: "Decentralized Social" },
+  { code: "05_RWA", name: "RWA" },
+  { code: "06_DEPIN", name: "DePIN" },
+  { code: "07_DEFI", name: "DeFi" },
+  { code: "08_DEAI", name: "Decentralized A.I." },
+  { code: "09_DESCI", name: "Decentralized Science" },
+  { code: "10_TIME", name: "Time" },
+];
+
+const CONTENT_TYPES: ExplorerItem["contentType"][] = ["Journal", "Article", "Trade", "Note", "Link"];
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
 }
 
-const MOCK_AGENTS: AgentCard[] = [
-  {
-    username: "@DJZS",
-    role: "FOUNDER",
-    level: 5,
-    xp: 2450,
-    zones: 8,
-    entries: 42,
-    vaultStatus: "CONNECTED",
-    borderColor: "bg-yellow-300"
-  },
-  {
-    username: "@ZEROCOOL",
-    role: "EARLY_ADOPTER",
-    level: 3,
-    xp: 1200,
-    zones: 5,
-    entries: 28,
-    vaultStatus: "PENDING",
-    borderColor: "bg-emerald-400"
-  },
-  {
-    username: "@MINDMELD",
-    role: "EXPLORER",
-    level: 2,
-    xp: 800,
-    zones: 3,
-    entries: 15,
-    vaultStatus: "CONNECTED",
-    borderColor: "bg-sky-400"
-  },
-  {
-    username: "@PROTOCOL_ALICE",
-    role: "RESEARCHER",
-    level: 4,
-    xp: 1850,
-    zones: 6,
-    entries: 35,
-    vaultStatus: "DISCONNECTED",
-    borderColor: "bg-yellow-300"
-  }
-];
+function Badge({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border border-lime-500/30 bg-lime-950/40 ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
 
-const NETWORK_STATS = [
-  { emoji: "🧠", value: "10", label: "ZONES" },
-  { emoji: "👤", value: "4,212", label: "AGENTS" },
-  { emoji: "📚", value: "18.7K", label: "JOURNAL ENTRIES" },
-  { emoji: "🔗", value: "3,928", label: "VAULT CONNECTIONS" },
-  { emoji: "🔮", value: "42.5k", label: "INSIGHTS GENERATED" },
-];
+function Card({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-xl border border-lime-500/30 bg-slate-900/80 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function CardBody({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`p-4 ${className}`}>{children}</div>;
+}
+
+function Divider() {
+  return <div className="h-px w-full bg-lime-500/20 my-4" />;
+}
 
 export default function Explorer() {
-  const [agents, setAgents] = useState<AgentCard[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [query, setQuery] = useState("");
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const [sort, setSort] = useState<"recent" | "updated" | "zone">("recent");
+
+  const [zoneFilter, setZoneFilter] = useState<string[]>([]);
+  const [typeFilter, setTypeFilter] = useState<ExplorerItem["contentType"][]>([]);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+
+  const [items, setItems] = useState<ExplorerItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<ExplorerItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const allTags = useMemo(() => {
+    const s = new Set<string>();
+    items.forEach((i) => i.tags.forEach((t) => s.add(t)));
+    return Array.from(s).sort();
+  }, [items]);
 
   useEffect(() => {
-    // TODO: Replace with real backend later:
-    // fetch("/api/agents").then((r) => r.json()).then(setAgents);
-    setAgents(MOCK_AGENTS);
+    let alive = true;
+    async function run() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch("/api/explorer", { cache: "no-store" });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+
+        if (!alive) return;
+        setItems(Array.isArray(data.items) ? data.items : []);
+      } catch (e: any) {
+        if (!alive) return;
+        setItems(mockItems());
+        setError("Using mock data (API unavailable).");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    run();
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const filteredAgents = agents.filter(agent =>
-    agent.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    let out = items.slice();
+
+    if (q) {
+      out = out.filter((i) => {
+        const hay = `${i.title} ${i.summary || ""} ${i.zoneCode} ${i.zoneName} ${i.tags.join(" ")} ${i.source || ""}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if (zoneFilter.length) out = out.filter((i) => zoneFilter.includes(i.zoneCode));
+    if (typeFilter.length) out = out.filter((i) => typeFilter.includes(i.contentType));
+    if (tagFilter.length) out = out.filter((i) => i.tags.some((t) => tagFilter.includes(t)));
+
+    if (sort === "recent") out.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+    if (sort === "updated") out.sort((a, b) => +new Date(b.updatedAt || b.createdAt) - +new Date(a.updatedAt || a.createdAt));
+    if (sort === "zone") out.sort((a, b) => a.zoneCode.localeCompare(b.zoneCode));
+
+    return out;
+  }, [items, query, zoneFilter, typeFilter, tagFilter, sort]);
+
+  function toggleInList<T>(val: T, list: T[], setList: (v: T[]) => void) {
+    setList(list.includes(val) ? list.filter((x) => x !== val) : [...list, val]);
+  }
+
+  function clearAll() {
+    setQuery("");
+    setZoneFilter([]);
+    setTypeFilter([]);
+    setTagFilter([]);
+    setSelected(null);
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-mono relative overflow-hidden">
@@ -89,149 +155,413 @@ export default function Explorer() {
 
       <Navigation />
 
-      <main className="relative z-10 px-6 py-12 max-w-6xl mx-auto">
-        {/* Header */}
-        <motion.div 
-          className="mb-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-2">
-            AGENT <span className="text-lime-400">EXPLORER</span>
-          </h1>
-          <p className="text-slate-400 text-sm max-w-xl leading-relaxed">
-            Discover Username DAO agents, explore DJZS Protocol activity,
-            and inspect vault-linked intelligence profiles.
-          </p>
+      <div className="relative z-10 sticky top-0 backdrop-blur-xl bg-slate-950/80 border-b border-lime-500/20">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-start md:items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="h-9 w-9 rounded-xl bg-lime-950/60 border border-lime-500/30 grid place-items-center text-lg">
+              🌌
+            </div>
+            <div className="leading-tight">
+              <div className="font-semibold text-lime-400">DJZS Explorer</div>
+              <div className="text-xs text-slate-400">Search zones, journals, and sources</div>
+            </div>
+          </div>
 
-          {/* Search bar */}
-          <div className="mt-6 border border-lime-500/40 rounded-md w-full md:w-96 p-3 flex items-center gap-3 bg-black/40">
-            <Search className="w-4 h-4 text-lime-400/70" />
+          <div className="flex-1 px-2 w-full md:w-auto">
             <input
-              placeholder="SEARCH_AGENTS (@username)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent w-full outline-none text-slate-200 placeholder:text-slate-500 text-sm"
-              data-testid="input-search-agents"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search titles, tags, links, summaries…"
+              className="w-full px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/80 outline-none focus:border-lime-400/60 text-sm placeholder:text-slate-500"
+              data-testid="input-explorer-search"
             />
           </div>
-        </motion.div>
 
-        {/* Agent Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {filteredAgents.map((agent, index) => (
-            <motion.div
-              key={agent.username}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.03, y: -5 }}
-              className="border border-cyan-400/40 rounded-xl p-5 relative bg-slate-900/50 cursor-pointer"
-              style={{ boxShadow: "0 0 20px rgba(34, 211, 238, 0.15)" }}
-              data-testid={`card-agent-${agent.username}`}
+          <div className="hidden md:flex items-center gap-2">
+            <button
+              onClick={() => setSort(sort === "recent" ? "updated" : sort === "updated" ? "zone" : "recent")}
+              className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition"
+              data-testid="button-sort"
             >
-              {/* Status dot */}
-              <div className="absolute top-3 right-3 flex items-center gap-2">
-                <div className={`h-2 w-2 rounded-full ${agent.borderColor}`} />
-              </div>
+              Sort: {sort === "recent" ? "Newest" : sort === "updated" ? "Updated" : "Zone"}
+            </button>
+            <button
+              onClick={() => setView(view === "grid" ? "list" : "grid")}
+              className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition"
+              data-testid="button-view"
+            >
+              View: {view}
+            </button>
+            <button
+              onClick={clearAll}
+              className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs text-slate-300 transition"
+              data-testid="button-reset"
+            >
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
 
-              {/* Username */}
-              <div className="text-xl font-bold tracking-wide text-slate-100">{agent.username}</div>
-              <div className="text-xs font-mono text-cyan-400 mt-1">{agent.role}</div>
-
-              {/* Stats */}
-              <div className="mt-4 grid grid-cols-2 gap-3 text-xs font-mono">
-                <div>
-                  <div className="text-slate-500">LEVEL</div>
-                  <div className="text-cyan-300 text-lg">{agent.level}</div>
-                </div>
-                <div>
-                  <div className="text-slate-500">XP</div>
-                  <div className="text-cyan-300 text-lg">{agent.xp}</div>
-                </div>
-                <div>
-                  <div className="text-slate-500">ZONES</div>
-                  <div className="text-cyan-300 text-lg">{agent.zones}</div>
-                </div>
-                <div>
-                  <div className="text-slate-500">ENTRIES</div>
-                  <div className="text-cyan-300 text-lg">{agent.entries}</div>
-                </div>
-              </div>
-
-              {/* Vault link */}
-              <div className="mt-5 text-xs font-mono text-slate-500">
-                VAULT_LINK:{" "}
-                {agent.vaultStatus === "CONNECTED" && (
-                  <span className="text-emerald-400">CONNECTED</span>
-                )}
-                {agent.vaultStatus === "PENDING" && (
-                  <span className="text-yellow-300">PENDING</span>
-                )}
-                {agent.vaultStatus === "DISCONNECTED" && (
-                  <span className="text-red-400">DISCONNECTED</span>
-                )}
-              </div>
-
-              {/* Button */}
-              <button 
-                className="mt-4 w-full bg-cyan-400 text-slate-900 font-semibold text-sm py-2 rounded-md hover:bg-cyan-300 transition"
-                data-testid={`button-view-vault-${agent.username}`}
-              >
-                VIEW_VAULT
+      <main className="relative z-10 max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[260px_1fr_340px] gap-4">
+        <Card className="h-fit">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <div className="font-semibold text-lime-400">Filters</div>
+              <button onClick={clearAll} className="text-xs text-slate-400 hover:text-slate-200">
+                Clear
               </button>
-            </motion.div>
-          ))}
+            </div>
+
+            <div className="mt-4">
+              <div className="text-xs text-slate-500 mb-2">Zones</div>
+              <div className="flex flex-wrap gap-2">
+                {ZONES.map((z) => (
+                  <button
+                    key={z.code}
+                    onClick={() => toggleInList(z.code, zoneFilter, setZoneFilter)}
+                    className={`px-2 py-1 rounded-lg border text-xs transition ${
+                      zoneFilter.includes(z.code)
+                        ? "border-lime-400/60 bg-lime-950/60 text-lime-300"
+                        : "border-lime-500/20 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300"
+                    }`}
+                    data-testid={`filter-zone-${z.code}`}
+                  >
+                    {z.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+
+            <div>
+              <div className="text-xs text-slate-500 mb-2">Content type</div>
+              <div className="flex flex-wrap gap-2">
+                {CONTENT_TYPES.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => toggleInList(t, typeFilter, setTypeFilter)}
+                    className={`px-2 py-1 rounded-lg border text-xs transition ${
+                      typeFilter.includes(t)
+                        ? "border-lime-400/60 bg-lime-950/60 text-lime-300"
+                        : "border-lime-500/20 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300"
+                    }`}
+                    data-testid={`filter-type-${t}`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+
+            <div>
+              <div className="text-xs text-slate-500 mb-2">Tags</div>
+              <div className="max-h-44 overflow-auto pr-1 flex flex-wrap gap-2">
+                {allTags.length ? (
+                  allTags.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => toggleInList(t, tagFilter, setTagFilter)}
+                      className={`px-2 py-1 rounded-lg border text-xs transition ${
+                        tagFilter.includes(t)
+                          ? "border-lime-400/60 bg-lime-950/60 text-lime-300"
+                          : "border-lime-500/20 bg-slate-900/60 hover:bg-slate-800/80 text-slate-300"
+                      }`}
+                      data-testid={`filter-tag-${t}`}
+                    >
+                      #{t}
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-xs text-slate-500">Tags will appear once items load.</div>
+                )}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm text-slate-400">
+              {loading ? "Loading…" : `${filtered.length} result${filtered.length === 1 ? "" : "s"}`}
+              {error ? <span className="ml-2 text-xs text-slate-500">({error})</span> : null}
+            </div>
+            <div className="md:hidden flex gap-2">
+              <button
+                onClick={() => setSort(sort === "recent" ? "updated" : sort === "updated" ? "zone" : "recent")}
+                className="px-2 py-1 rounded-lg border border-lime-500/30 bg-slate-900/60 text-xs"
+              >
+                Sort
+              </button>
+              <button
+                onClick={() => setView(view === "grid" ? "list" : "grid")}
+                className="px-2 py-1 rounded-lg border border-lime-500/30 bg-slate-900/60 text-xs"
+              >
+                View
+              </button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <Card key={idx} className="animate-pulse">
+                  <CardBody>
+                    <div className="h-4 w-2/3 bg-slate-700/50 rounded" />
+                    <div className="h-3 w-full bg-slate-800/50 rounded mt-3" />
+                    <div className="h-3 w-5/6 bg-slate-800/50 rounded mt-2" />
+                    <div className="h-6 w-32 bg-slate-700/50 rounded mt-4" />
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <Card>
+              <CardBody>
+                <div className="font-semibold text-lime-400">No results</div>
+                <div className="text-sm text-slate-400 mt-1">
+                  Try a different search, or clear filters. This Explorer is like "Spotlight for DJZS".
+                </div>
+                <div className="mt-3">
+                  <button
+                    onClick={clearAll}
+                    className="px-3 py-2 rounded-lg border border-lime-500/40 bg-lime-950/40 text-lime-300 text-xs hover:bg-lime-900/60 transition"
+                    data-testid="button-reset-empty"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </CardBody>
+            </Card>
+          ) : view === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {filtered.map((i) => (
+                <motion.div
+                  key={i.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <Card className="hover:border-lime-400/50 transition cursor-pointer">
+                    <CardBody>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="font-semibold leading-tight text-slate-100">{i.title}</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            {i.zoneName} • {i.contentType} • {formatDate(i.createdAt)}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setSelected(i)}
+                          className="shrink-0 px-2 py-1 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition"
+                          data-testid={`button-preview-${i.id}`}
+                        >
+                          Preview
+                        </button>
+                      </div>
+                      {i.summary ? <div className="text-sm text-slate-400 mt-3 line-clamp-3">{i.summary}</div> : null}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <Badge>{i.zoneCode}</Badge>
+                        <Badge>{i.contentType}</Badge>
+                        {i.tags.slice(0, 3).map((t) => (
+                          <Badge key={t} className="text-slate-300">
+                            #{t}
+                          </Badge>
+                        ))}
+                        {i.tags.length > 3 ? <Badge className="text-slate-500">+{i.tags.length - 3}</Badge> : null}
+                      </div>
+                    </CardBody>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map((i) => (
+                <motion.div
+                  key={i.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
+                  <Card className="hover:border-lime-400/50 transition">
+                    <CardBody className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate text-slate-100">{i.title}</div>
+                        <div className="text-xs text-slate-500 mt-1 truncate">
+                          {i.zoneName} • {i.contentType} • {formatDate(i.createdAt)} • {(i.tags || []).slice(0, 5).map((t) => `#${t}`).join(" ")}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelected(i)}
+                        className="shrink-0 px-2 py-1 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition"
+                        data-testid={`button-preview-list-${i.id}`}
+                      >
+                        Preview
+                      </button>
+                    </CardBody>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* DJZS Network Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-2xl font-bold tracking-wide mb-6 text-slate-100">
-            DJZS <span className="text-cyan-400">NETWORK STATS</span>
-          </h2>
+        <Card className="h-fit lg:sticky lg:top-[88px]">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <div className="font-semibold text-lime-400">Preview</div>
+              {selected ? (
+                <button onClick={() => setSelected(null)} className="text-xs text-slate-400 hover:text-slate-200">
+                  Close
+                </button>
+              ) : null}
+            </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-5 text-center">
-            {NETWORK_STATS.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="border border-cyan-500/40 p-5 rounded-lg bg-slate-900/50"
-              >
-                <div className="text-4xl mb-2">{stat.emoji}</div>
-                <div className="text-lg font-bold text-slate-100">{stat.value}</div>
-                <div className="text-xs text-slate-500">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+            {!selected ? (
+              <div className="text-sm text-slate-400 mt-3">
+                Select any result to preview it here. This is where you'll use "Open in Anytype", "Mint", "Share", and "Summarize".
+              </div>
+            ) : (
+              <div className="mt-3 space-y-3">
+                <div>
+                  <div className="text-lg font-semibold leading-tight text-slate-100">{selected.title}</div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    {selected.zoneName} • {selected.contentType} • Created {formatDate(selected.createdAt)}
+                    {selected.updatedAt ? ` • Updated ${formatDate(selected.updatedAt)}` : ""}
+                  </div>
+                </div>
 
-        {/* CTA */}
-        <motion.div 
-          className="mt-14 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <p className="text-slate-500 text-sm mb-3">Ready to activate your agent?</p>
-          <motion.button 
-            className="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 transition text-slate-900 font-bold rounded-md shadow-lg shadow-cyan-500/20 inline-flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            data-testid="button-activate-agent"
-          >
-            <Zap className="w-4 h-4" />
-            ACTIVATE_AGENT
-          </motion.button>
-        </motion.div>
+                {selected.summary ? <div className="text-sm text-slate-300">{selected.summary}</div> : null}
+
+                <div className="flex flex-wrap gap-2">
+                  <Badge>{selected.zoneCode}</Badge>
+                  <Badge>{selected.contentType}</Badge>
+                  {selected.tags.map((t) => (
+                    <Badge key={t}>#{t}</Badge>
+                  ))}
+                </div>
+
+                <Divider />
+
+                <div className="space-y-2">
+                  <div className="text-xs text-slate-500">Quick actions</div>
+
+                  <div className="grid grid-cols-1 gap-2">
+                    <button
+                      onClick={() => alert("Hook: Open in Anytype")}
+                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left"
+                      data-testid="action-open-anytype"
+                    >
+                      Open in Anytype
+                    </button>
+
+                    <button
+                      onClick={() => alert("Hook: Mint / Publish")}
+                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left"
+                      data-testid="action-mint"
+                    >
+                      Mint / Publish
+                    </button>
+
+                    <button
+                      onClick={() => alert("Hook: Summarize with Agent")}
+                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left"
+                      data-testid="action-summarize"
+                    >
+                      Summarize with Agent
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (selected.source?.startsWith("http")) window.open(selected.source, "_blank");
+                        else alert("No source URL.");
+                      }}
+                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left"
+                      data-testid="action-open-source"
+                    >
+                      Open Source
+                    </button>
+                  </div>
+                </div>
+
+                <Divider />
+
+                <div className="text-xs text-slate-500 space-y-1">
+                  <div>Anytype: {selected.anytypeObjectId || "—"}</div>
+                  <div>Irys: {selected.irysTxId || "—"}</div>
+                  <div>Source: {selected.source || "—"}</div>
+                </div>
+              </div>
+            )}
+          </CardBody>
+        </Card>
       </main>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 pb-10 text-xs text-slate-500">
+        Tip: keep Explorer fast. Prefetch minimal fields, then load full object content only when Preview opens.
+      </div>
     </div>
   );
+}
+
+function mockItems(): ExplorerItem[] {
+  return [
+    {
+      id: "1",
+      title: "WAL thesis: storage + distribution flywheel",
+      summary: "Narrative breakdown, risks, token sinks, and which metrics matter over the next 90 days.",
+      zoneCode: "01_DYOR",
+      zoneName: "DYOR",
+      contentType: "Article",
+      tags: ["narratives", "tokenomics", "risk"],
+      source: "https://djzsx.xyz/",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      anytypeObjectId: "anytype_obj_abc",
+      irysTxId: "irys_tx_123",
+    },
+    {
+      id: "2",
+      title: "Agent spec: Anytype MCP → DJZS Zone objects",
+      summary: "Object types, properties, relations, and how a local worker syncs into the vault.",
+      zoneCode: "08_DEAI",
+      zoneName: "Decentralized A.I.",
+      contentType: "Note",
+      tags: ["mcp", "anytype", "agents"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(),
+    },
+    {
+      id: "3",
+      title: "Trade log: WLD 10x plan (entry → TP ladder)",
+      summary: "Risk-defined plan with invalidation level, partials, and journaled reasoning.",
+      zoneCode: "07_DEFI",
+      zoneName: "DeFi",
+      contentType: "Trade",
+      tags: ["risk", "tp/sl", "journal"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(),
+    },
+    {
+      id: "4",
+      title: "Farcaster integration notes",
+      summary: "How to pull cast data, reputation scores, and channel memberships into the vault.",
+      zoneCode: "04_DESO",
+      zoneName: "Decentralized Social",
+      contentType: "Journal",
+      tags: ["farcaster", "social", "integration"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+    },
+    {
+      id: "5",
+      title: "DePIN hardware comparison: Helium vs IoTeX",
+      summary: "Coverage, rewards, and long-term sustainability of physical infrastructure networks.",
+      zoneCode: "06_DEPIN",
+      zoneName: "DePIN",
+      contentType: "Article",
+      tags: ["depin", "hardware", "comparison"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
+    },
+  ];
 }

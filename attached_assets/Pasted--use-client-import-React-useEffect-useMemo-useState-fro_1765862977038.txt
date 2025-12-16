@@ -1,0 +1,519 @@
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+
+// If you already have shadcn/ui installed, swap these simple components
+// for your real imports (Button, Input, Badge, Card, Sheet, etc.)
+function Button(props: any) {
+  return (
+    <button
+      {...props}
+      className={`px-3 py-2 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 active:bg-white/15 transition ${
+        props.className || ""
+      }`}
+    />
+  );
+}
+function Input(props: any) {
+  return (
+    <input
+      {...props}
+      className={`w-full px-3 py-2 rounded-xl border border-white/15 bg-black/30 outline-none focus:border-white/30 ${
+        props.className || ""
+      }`}
+    />
+  );
+}
+function Badge({ children, className = "" }: any) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs border border-white/15 bg-white/5 ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
+function Card({ children, className = "" }: any) {
+  return (
+    <div className={`rounded-2xl border border-white/10 bg-black/30 ${className}`}>
+      {children}
+    </div>
+  );
+}
+function CardBody({ children, className = "" }: any) {
+  return <div className={`p-4 ${className}`}>{children}</div>;
+}
+function Divider() {
+  return <div className="h-px w-full bg-white/10" />;
+}
+
+type ExplorerItem = {
+  id: string;
+  title: string;
+  summary?: string;
+  zoneCode: string; // e.g. "01_DYOR"
+  zoneName: string; // e.g. "DYOR"
+  contentType: "Journal" | "Article" | "Trade" | "Note" | "Link";
+  tags: string[];
+  source?: string; // url or label
+  createdAt: string; // ISO
+  updatedAt?: string; // ISO
+  anytypeObjectId?: string;
+  irysTxId?: string;
+};
+
+const ZONES = [
+  { code: "01_DYOR", name: "DYOR" },
+  { code: "02_DID", name: "Decentralized iD" },
+  { code: "03_TESTNET", name: "Blockchain Testnet" },
+  { code: "04_DESO", name: "Decentralized Social" },
+  { code: "05_RWA", name: "RWA" },
+  { code: "06_DEPIN", name: "DePIN" },
+  { code: "07_DEFI", name: "DeFi" },
+  { code: "08_DEAI", name: "Decentralized A.I." },
+  { code: "09_DESCI", name: "Decentralized Science" },
+  { code: "10_TIME", name: "Time" },
+];
+
+const CONTENT_TYPES: ExplorerItem["contentType"][] = ["Journal", "Article", "Trade", "Note", "Link"];
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+}
+
+export default function ExplorerPage() {
+  // UI state
+  const [query, setQuery] = useState("");
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const [sort, setSort] = useState<"recent" | "updated" | "zone">("recent");
+
+  // filters
+  const [zoneFilter, setZoneFilter] = useState<string[]>([]);
+  const [typeFilter, setTypeFilter] = useState<ExplorerItem["contentType"][]>([]);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+
+  // data
+  const [items, setItems] = useState<ExplorerItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<ExplorerItem | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Replace this with real tags derived from your dataset
+  const allTags = useMemo(() => {
+    const s = new Set<string>();
+    items.forEach((i) => i.tags.forEach((t) => s.add(t)));
+    return Array.from(s).sort();
+  }, [items]);
+
+  // Fetch
+  useEffect(() => {
+    let alive = true;
+    async function run() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // ✅ Wire this to your backend:
+        // Expected: GET /api/explorer returns { items: ExplorerItem[] }
+        const res = await fetch("/api/explorer", { cache: "no-store" });
+        if (!res.ok) throw new Error(`API error: ${res.status}`);
+        const data = await res.json();
+
+        if (!alive) return;
+        setItems(Array.isArray(data.items) ? data.items : []);
+      } catch (e: any) {
+        if (!alive) return;
+        // Fallback mock if endpoint not ready
+        setItems(mockItems());
+        setError("Using mock data (API unavailable).");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    }
+    run();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  // Derived filtering
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    let out = items.slice();
+
+    if (q) {
+      out = out.filter((i) => {
+        const hay = `${i.title} ${i.summary || ""} ${i.zoneCode} ${i.zoneName} ${i.tags.join(" ")} ${i.source || ""}`.toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    if (zoneFilter.length) out = out.filter((i) => zoneFilter.includes(i.zoneCode));
+    if (typeFilter.length) out = out.filter((i) => typeFilter.includes(i.contentType));
+    if (tagFilter.length) out = out.filter((i) => i.tags.some((t) => tagFilter.includes(t)));
+
+    if (sort === "recent") out.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+    if (sort === "updated") out.sort((a, b) => +new Date(b.updatedAt || b.createdAt) - +new Date(a.updatedAt || a.createdAt));
+    if (sort === "zone") out.sort((a, b) => a.zoneCode.localeCompare(b.zoneCode));
+
+    return out;
+  }, [items, query, zoneFilter, typeFilter, tagFilter, sort]);
+
+  function toggleInList<T>(val: T, list: T[], setList: (v: T[]) => void) {
+    setList(list.includes(val) ? list.filter((x) => x !== val) : [...list, val]);
+  }
+
+  function clearAll() {
+    setQuery("");
+    setZoneFilter([]);
+    setTypeFilter([]);
+    setTagFilter([]);
+    setSelected(null);
+  }
+
+  return (
+    <div className="min-h-screen text-white">
+      {/* Cosmic background */}
+      <div className="fixed inset-0 -z-10 bg-black">
+        <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.25),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(236,72,153,0.18),transparent_35%),radial-gradient(circle_at_50%_80%,rgba(34,197,94,0.14),transparent_40%)]" />
+        <div className="absolute inset-0 opacity-30 bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.8))]" />
+      </div>
+
+      {/* Top bar */}
+      <div className="sticky top-0 z-20 backdrop-blur-xl bg-black/40 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="h-9 w-9 rounded-2xl bg-white/10 border border-white/10 grid place-items-center">🌌</div>
+            <div className="leading-tight">
+              <div className="font-semibold">DJZS Explorer</div>
+              <div className="text-xs text-white/60">Search & navigate your zones, journals, and sources</div>
+            </div>
+          </div>
+
+          <div className="flex-1 px-2">
+            <Input
+              value={query}
+              onChange={(e: any) => setQuery(e.target.value)}
+              placeholder="Search titles, tags, links, summaries…"
+            />
+          </div>
+
+          <div className="hidden md:flex items-center gap-2">
+            <Button onClick={() => setSort(sort === "recent" ? "updated" : sort === "updated" ? "zone" : "recent")}>
+              Sort: {sort === "recent" ? "Newest" : sort === "updated" ? "Updated" : "Zone"}
+            </Button>
+            <Button onClick={() => setView(view === "grid" ? "list" : "grid")}>View: {view}</Button>
+            <Button onClick={clearAll} className="text-white/80">
+              Reset
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-[280px_1fr_360px] gap-4">
+        {/* Left filters */}
+        <Card className="h-fit">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <div className="font-semibold">Filters</div>
+              <button onClick={clearAll} className="text-xs text-white/70 hover:text-white">
+                Clear
+              </button>
+            </div>
+
+            <div className="mt-4">
+              <div className="text-xs text-white/60 mb-2">Zones</div>
+              <div className="flex flex-wrap gap-2">
+                {ZONES.map((z) => (
+                  <button
+                    key={z.code}
+                    onClick={() => toggleInList(z.code, zoneFilter, setZoneFilter)}
+                    className={`px-2 py-1 rounded-xl border text-xs transition ${
+                      zoneFilter.includes(z.code)
+                        ? "border-white/30 bg-white/10"
+                        : "border-white/10 bg-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    {z.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+            <div className="mt-4">
+              <div className="text-xs text-white/60 mb-2">Content type</div>
+              <div className="flex flex-wrap gap-2">
+                {CONTENT_TYPES.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => toggleInList(t, typeFilter, setTypeFilter)}
+                    className={`px-2 py-1 rounded-xl border text-xs transition ${
+                      typeFilter.includes(t) ? "border-white/30 bg-white/10" : "border-white/10 bg-white/5 hover:bg-white/10"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+            <div className="mt-4">
+              <div className="text-xs text-white/60 mb-2">Tags</div>
+              <div className="max-h-44 overflow-auto pr-1 flex flex-wrap gap-2">
+                {allTags.length ? (
+                  allTags.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => toggleInList(t, tagFilter, setTagFilter)}
+                      className={`px-2 py-1 rounded-xl border text-xs transition ${
+                        tagFilter.includes(t)
+                          ? "border-white/30 bg-white/10"
+                          : "border-white/10 bg-white/5 hover:bg-white/10"
+                      }`}
+                    >
+                      #{t}
+                    </button>
+                  ))
+                ) : (
+                  <div className="text-xs text-white/50">Tags will appear once items load.</div>
+                )}
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        {/* Results */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-sm text-white/70">
+              {loading ? "Loading…" : `${filtered.length} result${filtered.length === 1 ? "" : "s"}`}
+              {error ? <span className="ml-2 text-xs text-white/50">({error})</span> : null}
+            </div>
+            <div className="md:hidden flex gap-2">
+              <Button onClick={() => setSort(sort === "recent" ? "updated" : sort === "updated" ? "zone" : "recent")}>Sort</Button>
+              <Button onClick={() => setView(view === "grid" ? "list" : "grid")}>View</Button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <Card key={idx} className="animate-pulse">
+                  <CardBody>
+                    <div className="h-4 w-2/3 bg-white/10 rounded" />
+                    <div className="h-3 w-full bg-white/5 rounded mt-3" />
+                    <div className="h-3 w-5/6 bg-white/5 rounded mt-2" />
+                    <div className="h-6 w-32 bg-white/10 rounded mt-4" />
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <Card>
+              <CardBody>
+                <div className="font-semibold">No results</div>
+                <div className="text-sm text-white/70 mt-1">
+                  Try a different search, or clear filters. This Explorer is meant to feel like “Spotlight for DJZS”.
+                </div>
+                <div className="mt-3">
+                  <Button onClick={clearAll}>Reset</Button>
+                </div>
+              </CardBody>
+            </Card>
+          ) : view === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {filtered.map((i) => (
+                <Card key={i.id} className="hover:border-white/20 transition">
+                  <CardBody>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="font-semibold leading-tight">{i.title}</div>
+                        <div className="text-xs text-white/60 mt-1">
+                          {i.zoneName} • {i.contentType} • {formatDate(i.createdAt)}
+                        </div>
+                      </div>
+                      <Button onClick={() => setSelected(i)} className="shrink-0">
+                        Preview
+                      </Button>
+                    </div>
+                    {i.summary ? <div className="text-sm text-white/70 mt-3 line-clamp-3">{i.summary}</div> : null}
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <Badge>{i.zoneCode}</Badge>
+                      <Badge>{i.contentType}</Badge>
+                      {i.tags.slice(0, 3).map((t) => (
+                        <Badge key={t} className="text-white/80">
+                          #{t}
+                        </Badge>
+                      ))}
+                      {i.tags.length > 3 ? <Badge className="text-white/60">+{i.tags.length - 3}</Badge> : null}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {filtered.map((i) => (
+                <Card key={i.id} className="hover:border-white/20 transition">
+                  <CardBody className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-semibold truncate">{i.title}</div>
+                      <div className="text-xs text-white/60 mt-1 truncate">
+                        {i.zoneName} • {i.contentType} • {formatDate(i.createdAt)} • {(i.tags || []).slice(0, 5).map((t) => `#${t}`).join(" ")}
+                      </div>
+                    </div>
+                    <Button onClick={() => setSelected(i)} className="shrink-0">
+                      Preview
+                    </Button>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Preview */}
+        <Card className="h-fit lg:sticky lg:top-[88px]">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <div className="font-semibold">Preview</div>
+              {selected ? (
+                <button onClick={() => setSelected(null)} className="text-xs text-white/70 hover:text-white">
+                  Close
+                </button>
+              ) : null}
+            </div>
+
+            {!selected ? (
+              <div className="text-sm text-white/70 mt-3">
+                Select any result to preview it here. This is where you’ll add “Open in Anytype”, “Mint”, “Share”, and “Summarize”.
+              </div>
+            ) : (
+              <div className="mt-3 space-y-3">
+                <div>
+                  <div className="text-lg font-semibold leading-tight">{selected.title}</div>
+                  <div className="text-xs text-white/60 mt-1">
+                    {selected.zoneName} • {selected.contentType} • Created {formatDate(selected.createdAt)}
+                    {selected.updatedAt ? ` • Updated ${formatDate(selected.updatedAt)}` : ""}
+                  </div>
+                </div>
+
+                {selected.summary ? <div className="text-sm text-white/80">{selected.summary}</div> : null}
+
+                <div className="flex flex-wrap gap-2">
+                  <Badge>{selected.zoneCode}</Badge>
+                  <Badge>{selected.contentType}</Badge>
+                  {selected.tags.map((t) => (
+                    <Badge key={t}>#{t}</Badge>
+                  ))}
+                </div>
+
+                <Divider />
+
+                <div className="space-y-2">
+                  <div className="text-xs text-white/60">Quick actions</div>
+
+                  <div className="grid grid-cols-1 gap-2">
+                    <Button
+                      onClick={() => {
+                        // ✅ Wire to Anytype deep-link or your MCP bridge
+                        // Example: window.open(`/api/anytype/open?id=${selected.anytypeObjectId}`, "_blank")
+                        alert("Hook: Open in Anytype");
+                      }}
+                    >
+                      Open in Anytype
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        // ✅ Wire to your mint endpoint
+                        // fetch(`/api/journal/mint`, {method:"POST", body: JSON.stringify({id: selected.id})})
+                        alert("Hook: Mint / Publish");
+                      }}
+                    >
+                      Mint / Publish
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        // ✅ Wire to your agent summarizer
+                        alert("Hook: Summarize with Agent");
+                      }}
+                    >
+                      Summarize with Agent
+                    </Button>
+
+                    <Button
+                      onClick={() => {
+                        if (selected.source?.startsWith("http")) window.open(selected.source, "_blank");
+                        else alert("No source URL.");
+                      }}
+                    >
+                      Open Source
+                    </Button>
+                  </div>
+                </div>
+
+                <Divider />
+
+                <div className="text-xs text-white/60 space-y-1">
+                  <div>Anytype: {selected.anytypeObjectId || "—"}</div>
+                  <div>Irys: {selected.irysTxId || "—"}</div>
+                  <div>Source: {selected.source || "—"}</div>
+                </div>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 pb-10 text-xs text-white/40">
+        Tip: keep Explorer fast. Prefetch minimal fields, then load full object content only when Preview opens.
+      </div>
+    </div>
+  );
+}
+
+function mockItems(): ExplorerItem[] {
+  return [
+    {
+      id: "1",
+      title: "WAL thesis: storage + distribution flywheel",
+      summary: "Narrative breakdown, risks, token sinks, and which metrics matter over the next 90 days.",
+      zoneCode: "01_DYOR",
+      zoneName: "DYOR",
+      contentType: "Article",
+      tags: ["narratives", "tokenomics", "risk"],
+      source: "https://djzsx.xyz/",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+      anytypeObjectId: "anytype_obj_abc",
+      irysTxId: "irys_tx_123",
+    },
+    {
+      id: "2",
+      title: "Agent spec: Anytype MCP → DJZS Zone objects",
+      summary: "Object types, properties, relations, and how a local worker syncs into the vault.",
+      zoneCode: "08_DEAI",
+      zoneName: "Decentralized A.I.",
+      contentType: "Note",
+      tags: ["mcp", "anytype", "agents"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(),
+    },
+    {
+      id: "3",
+      title: "Trade log: WLD 10x plan (entry → TP ladder)",
+      summary: "Risk-defined plan with invalidation level, partials, and journaled reasoning.",
+      zoneCode: "07_DEFI",
+      zoneName: "DeFi",
+      contentType: "Trade",
+      tags: ["risk", "tp/sl", "journal"],
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(),
+    },
+  ];
+}

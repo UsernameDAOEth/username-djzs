@@ -397,6 +397,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Explorer API endpoint - returns journal/content items
+  app.get("/api/explorer", async (_req, res) => {
+    try {
+      const items = [
+        {
+          id: "1",
+          title: "WAL thesis: storage + distribution flywheel",
+          summary: "Narrative breakdown, risks, token sinks, and which metrics matter over the next 90 days.",
+          zoneCode: "01_DYOR",
+          zoneName: "DYOR",
+          contentType: "Article",
+          tags: ["narratives", "tokenomics", "risk"],
+          source: "https://djzsx.xyz/",
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+          updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
+          anytypeObjectId: "anytype_obj_abc",
+          irysTxId: "irys_tx_123",
+        },
+        {
+          id: "2",
+          title: "Agent spec: Anytype MCP → DJZS Zone objects",
+          summary: "Object types, properties, relations, and how a local worker syncs into the vault.",
+          zoneCode: "08_DEAI",
+          zoneName: "Decentralized A.I.",
+          contentType: "Note",
+          tags: ["mcp", "anytype", "agents"],
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(),
+        },
+        {
+          id: "3",
+          title: "Trade log: WLD 10x plan (entry → TP ladder)",
+          summary: "Risk-defined plan with invalidation level, partials, and journaled reasoning.",
+          zoneCode: "07_DEFI",
+          zoneName: "DeFi",
+          contentType: "Trade",
+          tags: ["risk", "tp/sl", "journal"],
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 1).toISOString(),
+        },
+        {
+          id: "4",
+          title: "Farcaster integration notes",
+          summary: "How to pull cast data, reputation scores, and channel memberships into the vault.",
+          zoneCode: "04_DESO",
+          zoneName: "Decentralized Social",
+          contentType: "Journal",
+          tags: ["farcaster", "social", "integration"],
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+        },
+        {
+          id: "5",
+          title: "DePIN hardware comparison: Helium vs IoTeX",
+          summary: "Coverage, rewards, and long-term sustainability of physical infrastructure networks.",
+          zoneCode: "06_DEPIN",
+          zoneName: "DePIN",
+          contentType: "Article",
+          tags: ["depin", "hardware", "comparison"],
+          createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 12).toISOString(),
+        },
+      ];
+
+      res.json({ items });
+    } catch (error: any) {
+      console.error("Explorer API error:", error);
+      res.status(500).json({ error: error.message, items: [] });
+    }
+  });
+
   // Health check endpoint
   app.get("/health", (_req, res) => {
     res.json({ ok: true, service: "djzs-agent-backend", status: "UP" });
