@@ -7,6 +7,7 @@ import {
   getPublicationPosts, 
   getPostBySlug,
   getUserByWallet,
+  createPost,
 } from "./paragraph-service";
 
 const router = Router();
@@ -124,7 +125,7 @@ router.get("/api/paragraph/user/:wallet", async (req, res) => {
 
 router.post("/api/paragraph/publish", async (req, res) => {
   try {
-    const { title, content, publicationId, tags } = req.body;
+    const { title, content, subtitle, slug, categories, sendNewsletter } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({
@@ -143,29 +144,38 @@ router.post("/api/paragraph/publish", async (req, res) => {
     }
 
     try {
-      const authClient = getParagraphAuthClient();
-      
+      const result = await createPost({
+        title,
+        markdown: content,
+        subtitle,
+        slug,
+        categories,
+        sendNewsletter: sendNewsletter ?? false,
+      });
+
       res.json({
         ok: true,
-        message: "Paragraph API configured and ready for publishing",
-        note: "Create a draft or publish directly using Paragraph's write API",
-        received: {
-          title,
-          contentLength: content.length,
-          publicationId: publicationId || "default",
-          tags: tags || [],
-        },
-        nextSteps: [
-          "1. Configure your publication ID in PARAGRAPH_PUBLICATION_ID",
-          "2. Publishing will create drafts that can be reviewed in Paragraph dashboard",
-          "3. Visit https://paragraph.com to manage your publications",
-        ],
+        message: "Post published successfully to Paragraph",
+        postId: result.id,
+        viewUrl: `https://paragraph.com/post/${result.id}`,
       });
-    } catch (authError: any) {
+    } catch (publishError: any) {
+      console.error("Paragraph publish error:", publishError);
+      
+      // Handle rate limiting
+      if (publishError.message?.includes("429") || publishError.response?.status === 429) {
+        return res.status(429).json({
+          ok: false,
+          error: "Rate limited by Paragraph API",
+          hint: "Please wait a moment and try again. Paragraph limits API requests.",
+          retryAfter: 60,
+        });
+      }
+      
       return res.status(500).json({
         ok: false,
-        error: authError.message,
-        hint: "Failed to initialize Paragraph authenticated client",
+        error: publishError.message || "Failed to publish to Paragraph",
+        hint: "Check your API key permissions and try again",
       });
     }
   } catch (error: any) {

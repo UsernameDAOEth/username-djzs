@@ -112,3 +112,29 @@ export async function getUserByWallet(walletAddress: string): Promise<any | null
     return null;
   }
 }
+
+export interface CreatePostInput {
+  title: string;
+  markdown: string;
+  subtitle?: string;
+  slug?: string;
+  categories?: string[];
+  sendNewsletter?: boolean;
+}
+
+export interface CreatePostResult {
+  id: string;
+}
+
+export async function createPost(input: CreatePostInput): Promise<CreatePostResult> {
+  const api = getParagraphAuthClient();
+  const result = await api.posts.create({
+    title: input.title,
+    markdown: input.markdown,
+    subtitle: input.subtitle,
+    slug: input.slug,
+    categories: input.categories,
+    sendNewsletter: input.sendNewsletter ?? false,
+  });
+  return { id: result.id };
+}
