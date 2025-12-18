@@ -77,6 +77,8 @@ export default function Explorer() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<ExplorerItem | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<string | null>(null);
 
   const allTags = useMemo(() => {
     const s = new Set<string>();
@@ -459,12 +461,41 @@ export default function Explorer() {
                     </button>
 
                     <button
-                      onClick={() => alert("Hook: Mint / Publish")}
-                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left"
+                      onClick={async () => {
+                        if (!selected) return;
+                        setPublishing(true);
+                        setPublishResult(null);
+                        try {
+                          const res = await fetch("/api/paragraph/publish", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              title: selected.title,
+                              content: selected.summary || selected.title,
+                              tags: selected.tags,
+                            }),
+                          });
+                          const data = await res.json();
+                          if (data.ok) {
+                            setPublishResult("Ready to publish via Paragraph API");
+                          } else {
+                            setPublishResult(data.error || "Publishing failed");
+                          }
+                        } catch (err: any) {
+                          setPublishResult(err.message || "Network error");
+                        } finally {
+                          setPublishing(false);
+                        }
+                      }}
+                      disabled={publishing}
+                      className="px-3 py-2 rounded-lg border border-lime-500/30 bg-slate-900/60 hover:bg-slate-800/80 text-xs transition text-left disabled:opacity-50"
                       data-testid="action-mint"
                     >
-                      Mint / Publish
+                      {publishing ? "Publishing..." : "Publish to Paragraph"}
                     </button>
+                    {publishResult && (
+                      <div className="text-xs text-lime-400 px-1">{publishResult}</div>
+                    )}
 
                     <button
                       onClick={() => alert("Hook: Summarize with Agent")}

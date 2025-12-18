@@ -5,6 +5,7 @@ import { Uploader } from "@irys/upload";
 import { BaseEth } from "@irys/upload-ethereum";
 import vanaRoutes from "./vana-routes";
 import web3bioRoutes from "./web3bio-routes";
+import paragraphRoutes from "./paragraph-routes";
 import { getAnytypeMcpClient } from "./anytypeMcpClient";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -13,6 +14,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Web3.bio Universal Profile routes
   app.use(web3bioRoutes);
+  
+  // Register Paragraph publishing routes
+  app.use(paragraphRoutes);
   // Test endpoint for IRYS upload
   app.post("/api/test-irys", async (req, res) => {
     try {
