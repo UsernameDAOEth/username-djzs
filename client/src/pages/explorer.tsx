@@ -345,9 +345,14 @@ export default function Explorer() {
                   key={i.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ scale: 1.01 }}
+                  whileHover={{ 
+                    scale: 1.02, 
+                    y: -4,
+                    transition: { duration: 0.2, ease: "easeOut" }
+                  }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <Card className="hover:border-lime-400/50 transition cursor-pointer">
+                  <Card className="hover:border-lime-400/50 hover:shadow-lg hover:shadow-lime-500/10 transition-all duration-200 cursor-pointer">
                     <CardBody>
                       <div className="flex items-start justify-between gap-3">
                         <div>
@@ -385,10 +390,15 @@ export default function Explorer() {
               {filtered.map((i) => (
                 <motion.div
                   key={i.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  whileHover={{ 
+                    x: 4,
+                    transition: { duration: 0.15, ease: "easeOut" }
+                  }}
+                  whileTap={{ scale: 0.99 }}
                 >
-                  <Card className="hover:border-lime-400/50 transition">
+                  <Card className="hover:border-lime-400/50 hover:shadow-md hover:shadow-lime-500/10 transition-all duration-200">
                     <CardBody className="flex items-center justify-between gap-3">
                       <div className="min-w-0">
                         <div className="font-semibold truncate text-slate-100">{i.title}</div>
