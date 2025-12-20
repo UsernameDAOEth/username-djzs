@@ -17,8 +17,8 @@ export function HeroSection() {
             USERNAME_DAO · DJZS Protocol
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-            <span className="block">YOUR NAME</span>
-            <span className="block text-lime-400">IS YOUR AGENT</span>
+            <span className="block">Username</span>
+            <span className="block text-lime-400 italic">As A Brand</span>
           </h1>
           <p className="mt-5 max-w-xl text-sm sm:text-base text-slate-200/90">
             Claim a Username. Activate your personal DJZS Protocol Agent. Store
