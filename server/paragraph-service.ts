@@ -1,28 +1,15 @@
-import { ParagraphAPI } from "@paragraph-com/sdk";
-
-let paragraphClient: ParagraphAPI | null = null;
-let paragraphAuthClient: ParagraphAPI | null = null;
-
-export function getParagraphClient(): ParagraphAPI {
-  if (!paragraphClient) {
-    paragraphClient = new ParagraphAPI();
-  }
-  return paragraphClient;
-}
-
-export function getParagraphAuthClient(): ParagraphAPI {
-  if (!paragraphAuthClient) {
-    const apiKey = process.env.PARAGRAPH_API_KEY;
-    if (!apiKey) {
-      throw new Error("PARAGRAPH_API_KEY not configured");
-    }
-    paragraphAuthClient = new ParagraphAPI({ apiKey });
-  }
-  return paragraphAuthClient;
-}
+const PARAGRAPH_API_BASE = "https://api.paragraph.com/v1";
 
 export function hasApiKey(): boolean {
   return !!process.env.PARAGRAPH_API_KEY;
+}
+
+function getApiKey(): string {
+  const apiKey = process.env.PARAGRAPH_API_KEY;
+  if (!apiKey) {
+    throw new Error("PARAGRAPH_API_KEY not configured");
+  }
+  return apiKey;
 }
 
 export interface PublicationInfo {
@@ -46,14 +33,15 @@ export interface PostInfo {
 
 export async function getPublication(slug: string): Promise<PublicationInfo | null> {
   try {
-    const api = getParagraphClient();
-    const publication = await api.publications.get({ slug }).single();
+    const res = await fetch(`${PARAGRAPH_API_BASE}/publications/${slug}`);
+    if (!res.ok) return null;
+    const data = await res.json();
     return {
-      id: publication.id,
-      name: publication.name || slug,
-      slug: publication.slug || slug,
-      description: (publication as any).description,
-      avatar: (publication as any).avatar,
+      id: data.id,
+      name: data.name || slug,
+      slug: data.slug || slug,
+      description: data.description,
+      avatar: data.avatar,
     };
   } catch (error) {
     console.error("Error fetching publication:", error);
@@ -63,10 +51,11 @@ export async function getPublication(slug: string): Promise<PublicationInfo | nu
 
 export async function getPublicationPosts(publicationId: string, limit = 10): Promise<PostInfo[]> {
   try {
-    const api = getParagraphClient();
-    const { items } = await api.posts.get({ publicationId });
-    const limitedItems = items.slice(0, limit);
-    return limitedItems.map((post: any) => ({
+    const res = await fetch(`${PARAGRAPH_API_BASE}/publications/${publicationId}/posts?limit=${limit}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const items = data.items || [];
+    return items.map((post: any) => ({
       id: post.id,
       title: post.title || "Untitled",
       subtitle: post.subtitle,
@@ -84,17 +73,18 @@ export async function getPublicationPosts(publicationId: string, limit = 10): Pr
 
 export async function getPostBySlug(publicationId: string, slug: string): Promise<PostInfo | null> {
   try {
-    const api = getParagraphClient();
-    const post: any = await api.posts.get({ publicationId, slug } as any).single();
+    const res = await fetch(`${PARAGRAPH_API_BASE}/publications/${publicationId}/posts/${slug}`);
+    if (!res.ok) return null;
+    const data = await res.json();
     return {
-      id: post.id,
-      title: post.title || "Untitled",
-      subtitle: post.subtitle,
-      slug: post.slug,
-      markdown: post.markdown,
-      publishedAt: post.publishedAt,
-      updatedAt: post.updatedAt,
-      coinId: post.coinId,
+      id: data.id,
+      title: data.title || "Untitled",
+      subtitle: data.subtitle,
+      slug: data.slug,
+      markdown: data.markdown,
+      publishedAt: data.publishedAt,
+      updatedAt: data.updatedAt,
+      coinId: data.coinId,
     };
   } catch (error) {
     console.error("Error fetching post:", error);
@@ -104,9 +94,9 @@ export async function getPostBySlug(publicationId: string, slug: string): Promis
 
 export async function getUserByWallet(walletAddress: string): Promise<any | null> {
   try {
-    const api = getParagraphClient();
-    const user = await api.users.get({ wallet: walletAddress }).single();
-    return user;
+    const res = await fetch(`${PARAGRAPH_API_BASE}/users?wallet=${walletAddress}`);
+    if (!res.ok) return null;
+    return await res.json();
   } catch (error) {
     console.error("Error fetching user:", error);
     return null;
@@ -127,14 +117,29 @@ export interface CreatePostResult {
 }
 
 export async function createPost(input: CreatePostInput): Promise<CreatePostResult> {
-  const api = getParagraphAuthClient();
-  const result = await api.posts.create({
-    title: input.title,
-    markdown: input.markdown,
-    subtitle: input.subtitle,
-    slug: input.slug,
-    categories: input.categories,
-    sendNewsletter: input.sendNewsletter ?? false,
+  const apiKey = getApiKey();
+  
+  const res = await fetch(`${PARAGRAPH_API_BASE}/posts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      title: input.title,
+      markdown: input.markdown,
+      subtitle: input.subtitle,
+      slug: input.slug,
+      categories: input.categories,
+      sendNewsletter: input.sendNewsletter ?? false,
+    }),
   });
-  return { id: result.id };
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Paragraph API error: ${res.status} - ${errorText}`);
+  }
+
+  const data = await res.json();
+  return { id: data.id };
 }
