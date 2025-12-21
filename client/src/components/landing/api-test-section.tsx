@@ -41,10 +41,14 @@ export function ApiTestSection() {
   async function runFlowTest() {
     setFlowTest({ loading: true, result: null, error: false });
     try {
-      const res = await fetch("/api/profile/publish", { method: "POST" });
+      const res = await fetch("/api/profile/publish", { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ profileId: "djzs-test-profile" }),
+      });
       const data = await res.json();
       if (data.success) {
-        setFlowTest({ loading: false, result: `Published: ${data.receiptId}`, error: false });
+        setFlowTest({ loading: false, result: `Published: ${data.irys?.hash?.slice(0, 12)}...`, error: false });
       } else {
         setFlowTest({ loading: false, result: data.error || "Failed", error: true });
       }
