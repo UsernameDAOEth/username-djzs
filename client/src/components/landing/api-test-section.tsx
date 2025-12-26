@@ -82,7 +82,7 @@ export function ApiTestSection() {
   ];
 
   return (
-    <section className="px-6 py-16 lg:px-12 border-t border-lime-500/20 bg-slate-950/90">
+    <section className="px-6 py-16 lg:px-12 border-t border-lime-500/20 bg-slate-900/40 backdrop-blur-md">
       <div className="max-w-4xl mx-auto space-y-6">
         <div>
           <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
@@ -107,7 +107,7 @@ export function ApiTestSection() {
                 x: 5,
                 boxShadow: "0 5px 20px rgba(163,230,53,0.1)"
               }}
-              className="flex items-center justify-between rounded-lg border border-lime-500/40 bg-slate-950/80 px-4 py-3 cursor-pointer"
+              className="flex items-center justify-between rounded-lg border border-lime-500/40 bg-slate-900/30 backdrop-blur-sm px-4 py-3 cursor-pointer"
             >
               <div className="flex-1">
                 <div className="text-xs font-mono text-slate-200">
