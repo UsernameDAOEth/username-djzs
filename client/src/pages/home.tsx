@@ -288,7 +288,7 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
 }) => {
   return (
     <section className="px-6 pb-14 lg:px-10">
-      <div className="max-w-6xl mx-auto border border-lime-500/30 rounded-2xl bg-slate-950/90 p-6 md:p-8 space-y-6">
+      <div className="max-w-6xl mx-auto border border-lime-500/30 rounded-2xl bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
@@ -304,7 +304,7 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
 
         <div className="grid gap-6 md:grid-cols-3">
           <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-950/90 p-4 space-y-3"
+            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
@@ -352,7 +352,7 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
           </motion.div>
 
           <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-950/90 p-4 space-y-3"
+            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
@@ -380,7 +380,7 @@ const OnboardingSection: React.FC<OnboardingProps> = ({
           </motion.div>
 
           <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-950/90 p-4 space-y-3"
+            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
@@ -532,7 +532,7 @@ const AgentConsoleSection: React.FC<AgentConsoleProps> = ({
                   INPUT DIRECTIVE
                 </span>
                 <textarea
-                  className="w-full rounded-md border border-lime-500/40 bg-slate-950/70 p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
+                  className="w-full rounded-md border border-lime-500/40 bg-slate-900/30 backdrop-blur-sm p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
                   rows={6}
                   placeholder="Ask a question, write a journal reflection, or request research for this Zone…"
                   value={directive}
@@ -561,7 +561,7 @@ const AgentConsoleSection: React.FC<AgentConsoleProps> = ({
             </div>
 
             <div className="space-y-6">
-              <div className="rounded-lg border border-lime-500/40 bg-slate-950/80 p-4">
+              <div className="rounded-lg border border-lime-500/40 bg-slate-900/30 backdrop-blur-sm p-4">
                 <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
                   AGENT REPLY
                 </span>
@@ -575,7 +575,7 @@ const AgentConsoleSection: React.FC<AgentConsoleProps> = ({
                 )}
               </div>
 
-              <div className="rounded-lg border border-lime-500/30 bg-slate-950/60 p-4 space-y-2">
+              <div className="rounded-lg border border-lime-500/30 bg-slate-900/30 backdrop-blur-sm p-4 space-y-2">
                 <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
                   AGENT METADATA
                 </span>
@@ -615,10 +615,10 @@ const ZoneSelector: React.FC<ZoneSelectorProps> = ({ selected, onSelect }) => {
           <button
             key={zone.code}
             onClick={() => onSelect(zone)}
-            className={`p-2 rounded-md border text-center transition ${
+            className={`p-2 rounded-md border text-center transition backdrop-blur-sm ${
               selected.code === zone.code
-                ? "border-lime-400 bg-lime-950/80 text-lime-100"
-                : "border-lime-500/30 bg-slate-950/60 text-slate-300 hover:border-lime-400/60"
+                ? "border-lime-400 bg-lime-900/50 text-lime-100"
+                : "border-lime-500/30 bg-slate-900/30 text-slate-300 hover:border-lime-400/60"
             }`}
             title={zone.description}
             data-testid={`button-zone-${zone.code}`}
@@ -648,10 +648,10 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({ mode, setMode }) => {
           <button
             key={m.id}
             onClick={() => setMode(m.id)}
-            className={`px-3 py-1.5 rounded-md border text-xs font-mono transition ${
+            className={`px-3 py-1.5 rounded-md border text-xs font-mono transition backdrop-blur-sm ${
               mode === m.id
-                ? "border-lime-400 bg-lime-950/80 text-lime-100"
-                : "border-lime-500/30 bg-slate-950/60 text-slate-300 hover:border-lime-400/60"
+                ? "border-lime-400 bg-lime-900/50 text-lime-100"
+                : "border-lime-500/30 bg-slate-900/30 text-slate-300 hover:border-lime-400/60"
             }`}
             title={m.description}
             data-testid={`button-mode-${m.id}`}
@@ -690,7 +690,7 @@ const SystemArchitectureSection: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="border border-lime-500/30 rounded-lg bg-slate-950/80 p-4 space-y-2"
+              className="border border-lime-500/30 rounded-lg bg-slate-900/30 backdrop-blur-sm p-4 space-y-2"
             >
               <div className="flex items-center gap-2">
                 <div className="h-6 w-6 rounded-full border border-lime-400 bg-lime-950 flex items-center justify-center text-xs font-bold text-lime-300">
