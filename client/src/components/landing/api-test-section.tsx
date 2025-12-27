@@ -32,7 +32,15 @@ export function ApiTestSection() {
     try {
       const res = await fetch("/api/test-mcp", { method: "POST" });
       const data = await res.json();
-      setMcpTest({ loading: false, result: data.status || "Connected", error: !data.success });
+      if (data.offlineMode) {
+        setMcpTest({ 
+          loading: false, 
+          result: data.hint || "Anytype offline - using local storage", 
+          error: false 
+        });
+      } else {
+        setMcpTest({ loading: false, result: data.status || "Connected", error: !data.success });
+      }
     } catch (err) {
       setMcpTest({ loading: false, result: "MCP bridge unavailable", error: true });
     }

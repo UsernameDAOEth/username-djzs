@@ -117,57 +117,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Test endpoint for Anytype API (Direct OpenAPI)
-  app.post("/api/test-mcp", async (req, res) => {
+  app.post("/api/test-mcp", async (_req, res) => {
     try {
       const anytypeApiKey = process.env.ANYTYPE_API_KEY;
       
-      if (!anytypeApiKey) {
-        return res.status(500).json({
-          success: false,
-          error: "ANYTYPE_API_KEY not configured",
-          hint: "Generate API key in Anytype App Settings → API Keys",
-        });
-      }
-
-      // Anytype MCP is an AI assistant protocol server, not a REST API
-      // For backend integration, we use the Anytype OpenAPI directly
-      // The API endpoint depends on how Anytype exposes it (typically via local HTTP)
+      // Step 1: Check API key configuration
+      const apiKeyStatus = anytypeApiKey ? "configured" : "missing";
       
-      // For MVP, we'll just verify the API key format and document the proper integration
-      const apiKeyValid = anytypeApiKey && anytypeApiKey.length > 0;
-
-      if (!apiKeyValid) {
-        return res.status(400).json({
-          success: false,
-          error: "Invalid ANYTYPE_API_KEY format",
-        });
-      }
-
-      res.json({
-        success: true,
-        message: "Anytype API key is configured",
-        status: "ready",
-        integration: "Anytype MCP is an AI assistant protocol, not a REST API",
-        note: "For backend integration with Anytype, implement direct OpenAPI calls or use a bridge service",
-        nextSteps: [
-          "1. Anytype MCP Server is designed for AI assistants (Claude, Cursor) via Model Context Protocol",
-          "2. For Express backend integration, either:",
-          "   a) Use Anytype's direct OpenAPI if available",
-          "   b) Implement an Anytype HTTP bridge service",
-          "   c) Use user-initiated exports from Anytype UI"
-        ],
-        currentSetup: {
-          apiKey: "configured",
-          irysIntegration: "working",
-          userProfile: "ready for manual or Anytype export"
+      // Step 2: Try to connect to MCP server on localhost:31009
+      let mcpServerStatus = "offline";
+      
+      try {
+        const mcpResponse = await fetch("http://localhost:31009/health", {
+          method: "GET",
+          signal: AbortSignal.timeout(2000),
+        }).catch(() => null);
+        
+        if (mcpResponse?.ok) {
+          mcpServerStatus = "online";
         }
+      } catch {
+        mcpServerStatus = "offline";
+      }
+      
+      // Step 3: Try alternate endpoints if health check failed
+      if (mcpServerStatus === "offline") {
+        try {
+          const altResponse = await fetch("http://localhost:31009/", {
+            method: "GET",
+            signal: AbortSignal.timeout(2000),
+          }).catch(() => null);
+          
+          if (altResponse) {
+            mcpServerStatus = "responding";
+          }
+        } catch {
+          // Still offline
+        }
+      }
+      
+      const isOperational = mcpServerStatus !== "offline" && apiKeyStatus === "configured";
+      
+      res.json({
+        success: isOperational,
+        status: mcpServerStatus === "online" ? "connected" : mcpServerStatus === "responding" ? "partial" : "offline",
+        message: isOperational 
+          ? "Anytype MCP is connected and ready"
+          : mcpServerStatus === "offline"
+            ? "Anytype desktop app not running or MCP server not enabled"
+            : "API key not configured",
+        connection: {
+          mcpServer: mcpServerStatus,
+          apiKey: apiKeyStatus,
+          port: 31009,
+        },
+        offlineMode: !isOperational,
+        hint: mcpServerStatus === "offline"
+          ? "Start Anytype desktop app and enable MCP server in Settings → API"
+          : apiKeyStatus === "missing"
+            ? "Add ANYTYPE_API_KEY in Secrets panel"
+            : "Connection established",
+        capabilities: isOperational ? {
+          vaultSync: true,
+          profileExport: true,
+          journalWrite: true,
+        } : {
+          vaultSync: false,
+          profileExport: false,
+          journalWrite: false,
+          fallback: "Using local storage until Anytype is connected",
+        },
       });
     } catch (error: any) {
-      console.error("Anytype integration error:", error);
-      res.status(500).json({
+      console.error("Anytype MCP test error:", error);
+      res.json({
         success: false,
+        status: "error",
+        message: "Failed to test Anytype connection",
         error: error.message,
-        hint: "Check ANYTYPE_API_KEY configuration",
+        offlineMode: true,
+        hint: "App will continue in offline mode. Anytype sync unavailable.",
       });
     }
   });

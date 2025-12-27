@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import logoImage from "@assets/1b6b08c2244019f727791915b0c3fb41385d1c9b9769daea763eb6276f1b5_1765335205229.jpeg";
 import { ThreeDCard } from "@/components/3d-card";
 
@@ -26,12 +27,14 @@ export function HeroSection() {
             subscriptions. Pay per insight.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button 
-              data-testid="button-claim-username"
-              className="rounded-md bg-lime-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 transition"
-            >
-              CLAIM_USERNAME
-            </button>
+            <Link href="/claim">
+              <button 
+                data-testid="button-claim-username"
+                className="rounded-md bg-lime-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 transition"
+              >
+                CLAIM_USERNAME
+              </button>
+            </Link>
             <p className="text-xs sm:text-sm text-slate-300/80">
               Powered by <span className="font-semibold">DJZS Protocol v1.0</span>{" "}
               · Local-first AI

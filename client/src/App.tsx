@@ -8,11 +8,13 @@ import Home from "@/pages/home";
 import Profile from "@/pages/profile";
 import ApiTest from "@/pages/api-test";
 import Explorer from "@/pages/explorer";
+import Claim from "@/pages/claim";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/claim" component={Claim} />
       <Route path="/profile" component={Profile} />
       <Route path="/api-test" component={ApiTest} />
       <Route path="/explorer" component={Explorer} />
