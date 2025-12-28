@@ -116,6 +116,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Anytype API version header (per docs: https://developers.anytype.io/docs/guides/get-started/authentication)
+  const ANYTYPE_VERSION = "2025-11-08";
+  const ANYTYPE_BASE_URL = "http://localhost:31009";
+
   // Test endpoint for Anytype API (Direct OpenAPI)
   app.post("/api/test-mcp", async (_req, res) => {
     try {
@@ -124,59 +128,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Step 1: Check API key configuration
       const apiKeyStatus = anytypeApiKey ? "configured" : "missing";
       
-      // Step 2: Try to connect to MCP server on localhost:31009
+      // Step 2: Try to connect to Anytype API on localhost:31009
       let mcpServerStatus = "offline";
+      let spacesCount = 0;
       
-      try {
-        const mcpResponse = await fetch("http://localhost:31009/health", {
-          method: "GET",
-          signal: AbortSignal.timeout(2000),
-        }).catch(() => null);
-        
-        if (mcpResponse?.ok) {
-          mcpServerStatus = "online";
-        }
-      } catch {
-        mcpServerStatus = "offline";
-      }
-      
-      // Step 3: Try alternate endpoints if health check failed
-      if (mcpServerStatus === "offline") {
+      if (anytypeApiKey) {
         try {
-          const altResponse = await fetch("http://localhost:31009/", {
+          // Test authenticated endpoint - list spaces
+          const spacesResponse = await fetch(`${ANYTYPE_BASE_URL}/v1/spaces`, {
             method: "GET",
-            signal: AbortSignal.timeout(2000),
+            headers: {
+              "Authorization": `Bearer ${anytypeApiKey}`,
+              "Content-Type": "application/json",
+              "Anytype-Version": ANYTYPE_VERSION,
+            },
+            signal: AbortSignal.timeout(3000),
           }).catch(() => null);
           
-          if (altResponse) {
+          if (spacesResponse?.ok) {
+            mcpServerStatus = "online";
+            const spacesData = await spacesResponse.json().catch(() => ({}));
+            spacesCount = spacesData?.spaces?.length || 0;
+          } else if (spacesResponse?.status === 401) {
+            mcpServerStatus = "auth_failed";
+          } else {
             mcpServerStatus = "responding";
           }
         } catch {
-          // Still offline
+          mcpServerStatus = "offline";
+        }
+      } else {
+        // No API key - just check if port is responding
+        try {
+          const pingResponse = await fetch(`${ANYTYPE_BASE_URL}/v1/auth/challenges`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Anytype-Version": ANYTYPE_VERSION,
+            },
+            body: JSON.stringify({ app_name: "djzs-protocol-test" }),
+            signal: AbortSignal.timeout(2000),
+          }).catch(() => null);
+          
+          if (pingResponse) {
+            mcpServerStatus = "responding";
+          }
+        } catch {
+          mcpServerStatus = "offline";
         }
       }
       
-      const isOperational = mcpServerStatus !== "offline" && apiKeyStatus === "configured";
+      const isOperational = mcpServerStatus === "online" && apiKeyStatus === "configured";
       
       res.json({
         success: isOperational,
-        status: mcpServerStatus === "online" ? "connected" : mcpServerStatus === "responding" ? "partial" : "offline",
+        status: mcpServerStatus === "online" ? "connected" : mcpServerStatus === "responding" ? "needs_auth" : mcpServerStatus === "auth_failed" ? "invalid_key" : "offline",
         message: isOperational 
-          ? "Anytype MCP is connected and ready"
+          ? `Connected to Anytype (${spacesCount} spaces found)`
           : mcpServerStatus === "offline"
-            ? "Anytype desktop app not running or MCP server not enabled"
-            : "API key not configured",
+            ? "Anytype desktop app not running (requires v0.46.7+)"
+            : mcpServerStatus === "auth_failed"
+              ? "API key invalid or expired"
+              : mcpServerStatus === "responding"
+                ? "Anytype running but API key needed"
+                : "Connection failed",
         connection: {
           mcpServer: mcpServerStatus,
           apiKey: apiKeyStatus,
           port: 31009,
+          version: ANYTYPE_VERSION,
+          spacesFound: spacesCount,
         },
         offlineMode: !isOperational,
         hint: mcpServerStatus === "offline"
-          ? "Start Anytype desktop app and enable MCP server in Settings → API"
-          : apiKeyStatus === "missing"
-            ? "Add ANYTYPE_API_KEY in Secrets panel"
-            : "Connection established",
+          ? "Start Anytype desktop app (v0.46.7+) and enable API in Settings"
+          : mcpServerStatus === "auth_failed"
+            ? "Generate new API key in Anytype Settings → API Keys"
+            : apiKeyStatus === "missing"
+              ? "Add ANYTYPE_API_KEY secret (from Anytype Settings → API Keys)"
+              : "Connection established",
         capabilities: isOperational ? {
           vaultSync: true,
           profileExport: true,
@@ -189,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error: any) {
-      console.error("Anytype MCP test error:", error);
+      console.error("Anytype API test error:", error);
       res.json({
         success: false,
         status: "error",
@@ -197,6 +227,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error.message,
         offlineMode: true,
         hint: "App will continue in offline mode. Anytype sync unavailable.",
+      });
+    }
+  });
+
+  // Anytype Auth Challenge - Step 1 of programmatic auth flow
+  app.post("/api/anytype/auth/challenge", async (req, res) => {
+    try {
+      const { appName } = req.body;
+      
+      const response = await fetch(`${ANYTYPE_BASE_URL}/v1/auth/challenges`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Anytype-Version": ANYTYPE_VERSION,
+        },
+        body: JSON.stringify({ app_name: appName || "djzs-protocol" }),
+        signal: AbortSignal.timeout(5000),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Anytype responded with ${response.status}`);
+      }
+      
+      const data = await response.json();
+      res.json({
+        success: true,
+        challengeId: data.challenge_id,
+        message: "Check Anytype desktop app for 4-digit code",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        hint: "Make sure Anytype desktop app is running (v0.46.7+)",
+      });
+    }
+  });
+
+  // Anytype Auth Exchange - Step 2: exchange challenge + code for API key
+  app.post("/api/anytype/auth/exchange", async (req, res) => {
+    try {
+      const { challengeId, code } = req.body;
+      
+      if (!challengeId || !code) {
+        return res.status(400).json({
+          success: false,
+          error: "challengeId and code are required",
+        });
+      }
+      
+      const response = await fetch(`${ANYTYPE_BASE_URL}/v1/auth/api_keys`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Anytype-Version": ANYTYPE_VERSION,
+        },
+        body: JSON.stringify({ challenge_id: challengeId, code }),
+        signal: AbortSignal.timeout(5000),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Auth failed with ${response.status}`);
+      }
+      
+      const data = await response.json();
+      res.json({
+        success: true,
+        apiKey: data.api_key,
+        message: "API key generated! Add it to ANYTYPE_API_KEY secret.",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        error: error.message,
+        hint: "Check that the 4-digit code matches and hasn't expired",
       });
     }
   });
@@ -219,12 +325,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Step 1: Try to fetch UserProfile from Anytype MCP
       if (anytypeApiKey) {
         try {
-          const profileResponse = await fetch(`http://localhost:31009/v1/objects/${profileId}`, {
+          const profileResponse = await fetch(`${ANYTYPE_BASE_URL}/v1/objects/${profileId}`, {
             method: "GET",
             headers: {
               "Authorization": `Bearer ${anytypeApiKey}`,
               "Content-Type": "application/json",
-              "Anytype-Version": "2025-05-20",
+              "Anytype-Version": ANYTYPE_VERSION,
             },
             signal: AbortSignal.timeout(3000),
           });

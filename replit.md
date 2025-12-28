@@ -38,8 +38,16 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
   - Returns: Receipt ID, timestamp, gateway URL
   
 - **POST `/api/test-mcp`** - Verify Anytype API integration
-  - Status: ✅ **READY** (diagnostics endpoint available)
-  - Returns: API key config status, integration documentation
+  - Status: ✅ **READY** (uses Anytype-Version: 2025-11-08)
+  - Returns: Connection status, spaces count, offline mode fallback
+  
+- **POST `/api/anytype/auth/challenge`** - Initiate Anytype auth challenge
+  - Body: `{ appName?: string }`
+  - Returns: `challengeId` and displays 4-digit code in Anytype app
+
+- **POST `/api/anytype/auth/exchange`** - Exchange challenge for API key
+  - Body: `{ challengeId: string, code: string }`
+  - Returns: `apiKey` for use in ANYTYPE_API_KEY secret
   
 - **POST `/api/profile/publish`** - Full flow (Anytype → Irys → receipt)
   - Status: ✅ **BUILT** (awaits Anytype connection)
@@ -66,9 +74,10 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 
 ### 📱 ACTIVE PAGES
 - **`/` (Home)** - Landing page with system architecture diagram
+- **`/claim`** - Username claiming flow with wallet connect (NEW ✅)
 - **`/profile`** - User profile dashboard (accessible ✅)
 - **`/api-test`** - Integration testing interface with brutalist UI
-- **`/explorer`** - Agent discovery + Vana DataDAO hub (NEW ✅)
+- **`/explorer`** - Agent discovery + Vana DataDAO hub
 
 ## Architecture
 
@@ -77,6 +86,7 @@ Brutalist landing page and dApp for Username DAO × DJZS Protocol - a decentrali
 client/src/
 ├── pages/
 │   ├── home.tsx (landing page with zone-based UI)
+│   ├── claim.tsx (username claiming with wallet connect)
 │   ├── profile.tsx (user profile dashboard)
 │   ├── explorer.tsx (agent discovery + DataDAO)
 │   ├── api-test.tsx (integration testing UI)
