@@ -1,724 +1,1145 @@
-import React, { useState, useMemo } from "react";
-import { Link } from "wouter";
-import { motion } from "framer-motion";
-import { Navigation } from "@/components/navigation";
-import { CyberGrid } from "@/components/cyber-grid";
-import { ApiTestSection } from "@/components/landing/api-test-section";
-import { ThreeDCard } from "@/components/3d-card";
+import React, { useState, useEffect, useCallback } from 'react';
 
-type OnboardingStep = 1 | 2 | 3;
-type ProcessingMode = "QUICK" | "JOURNAL" | "RESEARCH" | "ALPHA";
-
-type ZoneCode =
-  | "01_DYOR"
-  | "02_DID"
-  | "03_TEST"
-  | "04_DESO"
-  | "05_RWA"
-  | "06_DEPIN"
-  | "07_DEFI"
-  | "08_DEAI"
-  | "09_DESCI"
-  | "10_TIME";
-
-interface Zone {
-  code: ZoneCode;
-  label: string;
-  emoji: string;
-  description: string;
+interface Web3BioLink {
+  url: string;
+  handle: string;
 }
 
-const ZONES: Zone[] = [
-  { code: "01_DYOR", label: "Research", emoji: "🔍", description: "Deep dives on tokens, chains, and narratives." },
-  { code: "02_DID", label: "Identity", emoji: "🪪", description: "Usernames, reputation, and decentralized IDs." },
-  { code: "03_TEST", label: "Testnet", emoji: "🧪", description: "Experimentation space for new protocols." },
-  { code: "04_DESO", label: "Social", emoji: "🌐", description: "Social graphs, media, and feeds." },
-  { code: "05_RWA", label: "RWA", emoji: "🏛", description: "Bridging physical assets to crypto rails." },
-  { code: "06_DEPIN", label: "Infra", emoji: "⚡️", description: "Decentralized compute, storage, and networks." },
-  { code: "07_DEFI", label: "DeFi", emoji: "💹", description: "Yield, risk, and strategy journaling." },
-  { code: "08_DEAI", label: "AI", emoji: "🤖", description: "Agents, models, and autonomous workflows." },
-  { code: "09_DESCI", label: "DeSci", emoji: "🔬", description: "DeSci experiments and research logs." },
-  { code: "10_TIME", label: "Time", emoji: "⏳", description: "Temporal reflections and time-based planning." },
-];
+interface Web3BioProfile {
+  address: string;
+  identity: string;
+  displayName: string;
+  avatar: string | null;
+  description: string | null;
+  header: string | null;
+  contenthash: string | null;
+  links: Record<string, Web3BioLink>;
+  social: { followers: number; following: number };
+  platforms: Array<{ platform: string; identity: string }>;
+  raw: any[];
+}
 
-const PROCESSING_MODES: { id: ProcessingMode; label: string; description: string }[] = [
-  { id: "QUICK", label: "QUICK", description: "Fast response, minimal journaling" },
-  { id: "JOURNAL", label: "JOURNAL", description: "Full journaling mode with vault sync" },
-  { id: "RESEARCH", label: "RESEARCH", description: "Deep research with citations" },
-  { id: "ALPHA", label: "ALPHA", description: "Experimental alpha insights" },
-];
+function useWeb3Bio(identity = 'djzs.eth') {
+  const [profile, setProfile] = useState<Web3BioProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function Home() {
-  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(1);
-  const [username, setUsername] = useState("");
-  const [wallet, setWallet] = useState("");
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [connectingWallet, setConnectingWallet] = useState(false);
-  const [usernameMinted, setUsernameMinted] = useState(false);
-  const [agentActive, setAgentActive] = useState(false);
-  const [mcpConnected, setMcpConnected] = useState(false);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`https://api.web3.bio/profile/${identity}`);
+        if (!res.ok) throw new Error('Profile not found');
+        const data = await res.json();
 
-  const [selectedZone, setSelectedZone] = useState<Zone>(ZONES[0]);
-  const [mode, setMode] = useState<ProcessingMode>("QUICK");
-  const [directive, setDirective] = useState("");
-  const [reply, setReply] = useState<string | null>(null);
-  const [journalId, setJournalId] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
+        if (!data || data.length === 0) {
+          throw new Error('No profile data');
+        }
 
-  const agentStatus = useMemo(() => {
-    if (processing) return "PROCESSING";
-    if (!agentActive) return "IDLE";
-    if (agentActive && !mcpConnected) return "READY (VAULT OFFLINE)";
-    return "READY (VAULT LINKED)";
-  }, [processing, agentActive, mcpConnected]);
+        const unified: Web3BioProfile = {
+          address: data[0]?.address,
+          identity: identity,
+          displayName: data.find((p: any) => p.displayName && p.displayName !== identity)?.displayName || identity,
+          avatar: data.find((p: any) => p.avatar)?.avatar,
+          description: data.find((p: any) => p.description)?.description,
+          header: data.find((p: any) => p.header)?.header,
+          contenthash: data.find((p: any) => p.contenthash)?.contenthash,
+          links: {},
+          social: { followers: 0, following: 0 },
+          platforms: data.map((p: any) => ({ platform: p.platform, identity: p.identity })),
+          raw: data,
+        };
 
-  const handleConnectWallet = async () => {
-    if (typeof window === "undefined" || !(window as any).ethereum) {
-      alert("Please install MetaMask or another Web3 wallet to connect.");
-      return;
-    }
-    setConnectingWallet(true);
-    try {
-      const accounts = await (window as any).ethereum.request({ method: "eth_requestAccounts" });
-      if (accounts && accounts.length > 0) {
-        setWallet(accounts[0]);
-        setWalletConnected(true);
+        data.forEach((platform: any) => {
+          if (platform.links) {
+            Object.entries(platform.links).forEach(([key, value]: [string, any]) => {
+              if (!unified.links[key] && value?.link) {
+                unified.links[key] = {
+                  url: value.link,
+                  handle: value.handle,
+                };
+              }
+            });
+          }
+          if (platform.social?.follower) {
+            unified.social.followers += platform.social.follower;
+          }
+          if (platform.social?.following) {
+            unified.social.following += platform.social.following;
+          }
+        });
+
+        setProfile(unified);
+      } catch (err: any) {
+        console.error('Web3.bio fetch error:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Wallet connection failed:", err);
-    } finally {
-      setConnectingWallet(false);
-    }
-  };
+    };
 
-  const handleMintUsername = () => {
-    if (!username.trim() || !walletConnected) return;
-    setUsernameMinted(true);
-    setOnboardingStep(2);
-  };
+    fetchProfile().catch(() => {});
+  }, [identity]);
 
-  const handleActivateAgent = () => {
-    if (!usernameMinted) return;
-    setAgentActive(true);
-    setOnboardingStep(3);
-  };
+  return { profile, loading, error };
+}
 
-  const handleConnectMCP = () => {
-    setMcpConnected(true);
-  };
+const DJZS_ENS = 'username.dj-z-s.eth';
+const GITHUB_REPO = 'https://github.com/UsernameDAOEth/djzs-AI';
 
-  const handleExecuteDirective = async () => {
-    if (!directive.trim()) return;
-    setProcessing(true);
-    setReply(null);
-    setJournalId(null);
+const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
+  displayName: 'Username: Dj-Z-S',
+  description: 'Protocol Architect. Building the verification layer for autonomous agents.',
+  address: '0x3e79e0374383ea64bc16c9b0568c6b13ef084afb',
+  links: {
+    twitter: { url: 'https://x.com/dj_z_s', handle: 'dj_z_s' },
+    github: { url: GITHUB_REPO, handle: 'usernamedaoeth' },
+    telegram: { url: 'https://t.me/usernamedjzs', handle: 'usernamedjzs' },
+    farcaster: { url: 'https://warpcast.com/dj-z-s.eth', handle: 'dj-z-s.eth' },
+    website: { url: 'https://username.box', handle: 'username.box' },
+  },
+};
 
-    await new Promise((res) => setTimeout(res, 900));
+// Hero identity badges - deduplicated with actual identity strings
+const HERO_IDENTITIES = [
+  { identity: 'djzsx.eth', platform: 'ENS' },
+  { identity: 'dj-z-s.eth', platform: 'Farcaster' },
+  { identity: 'usernamedjzs.lens', platform: 'Lens' },
+  { identity: 'usernamedao.base.eth', platform: 'Basenames' },
+];
 
-    const fakeJournalId = `journal_${selectedZone.code.toLowerCase()}_${Math.floor(Math.random() * 10000).toString().padStart(4, "0")}`;
+interface AuditResponse {
+  verdict: string;
+  risk_score: number;
+  flags: string[];
+  logic_hash: string;
+  recommendation: string;
+}
 
-    setReply(
-      `Simulated DJZS Agent reply for ${selectedZone.code} in ${mode} mode.\n\n` +
-      `Username: ${username || "anonymous"}\nWallet: ${wallet || "not-bound"}\n\nDirective:\n${directive}\n\n(Next: wire this to your real /api/agent endpoint.)`
-    );
-    setJournalId(fakeJournalId);
-    setProcessing(false);
-  };
+const DEMO_AUDITS: Array<{ input: string; response: AuditResponse }> = [
+  {
+    input: "swap",
+    response: { verdict: "FAIL", risk_score: 9, flags: ["DJZS-I01: FOMO_LOOP", "DJZS-I04: CONCENTRATION_RISK"], logic_hash: "0x7f3a...c821", recommendation: "Action blocked. Portfolio concentration exceeds safety threshold." }
+  },
+  {
+    input: "arbitrage",
+    response: { verdict: "PASS", risk_score: 3, flags: [], logic_hash: "0x4e2b...a917", recommendation: "Logic verified. Proceed with execution." }
+  },
+  {
+    input: "trust",
+    response: { verdict: "FAIL", risk_score: 7, flags: ["DJZS-I02: NARRATIVE_DEPENDENCY", "DJZS-I05: UNVERIFIED_CONTRACT"], logic_hash: "0x9c1d...f432", recommendation: "Insufficient verification data. Manual audit required." }
+  },
+  {
+    input: "treasury",
+    response: { verdict: "CONDITIONAL", risk_score: 5, flags: ["DJZS-E01: MULTI_SIG_REQUIRED"], logic_hash: "0x8d4c...b293", recommendation: "Exceeds single-signer threshold. Requires 2/3 multi-sig approval before execution." }
+  },
+  {
+    input: "rebalance",
+    response: { verdict: "PASS", risk_score: 2, flags: [], logic_hash: "0x2f1a...d847", recommendation: "Rebalance within defined parameters. Risk exposure acceptable." }
+  }
+];
 
+const Icons = {
+  Github: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>,
+  Twitter: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>,
+  Telegram: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>,
+  Farcaster: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.24 2.4H5.76a3.36 3.36 0 00-3.36 3.36v12.48a3.36 3.36 0 003.36 3.36h12.48a3.36 3.36 0 003.36-3.36V5.76a3.36 3.36 0 00-3.36-3.36zm-1.92 13.44h-2.88v-4.8h-2.88v4.8H7.68V8.16h8.64v7.68z"/></svg>,
+  Lens: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/><circle cx="12" cy="12" r="4" fill="currentColor"/></svg>,
+  Website: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>,
+  Wallet: () => <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>,
+  ArrowRight: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>,
+  Send: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>,
+  Verified: () => <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>,
+  External: () => <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>,
+  Mail: () => <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+  Discord: () => (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+    </svg>
+  ),
+};
+
+const LINK_ICONS: Record<string, React.FC> = {
+  twitter: Icons.Twitter,
+  github: Icons.Github,
+  telegram: Icons.Telegram,
+  farcaster: Icons.Farcaster,
+  lens: Icons.Lens,
+  website: Icons.Website,
+  discord: Icons.Discord,
+};
+
+function Cursor({ blink = true }: { blink?: boolean }) {
+  return <span className={`inline-block w-2 h-4 bg-green-400 ml-1 ${blink ? 'animate-pulse' : ''}`} style={{ verticalAlign: 'middle' }} />;
+}
+
+function LoadingDots() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-mono relative overflow-hidden">
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <CyberGrid />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.9)_90%)]" />
-      </div>
-
-      <Navigation />
-
-      <main className="relative z-10">
-        <HeroSection />
-        
-        <OnboardingSection
-          step={onboardingStep}
-          username={username}
-          wallet={wallet}
-          walletConnected={walletConnected}
-          connectingWallet={connectingWallet}
-          setUsername={setUsername}
-          usernameMinted={usernameMinted}
-          agentActive={agentActive}
-          mcpConnected={mcpConnected}
-          onConnectWallet={handleConnectWallet}
-          onMint={handleMintUsername}
-          onActivateAgent={handleActivateAgent}
-          onConnectMCP={handleConnectMCP}
-        />
-
-        <AgentConsoleSection
-          username={username}
-          usernameMinted={usernameMinted}
-          agentActive={agentActive}
-          mcpConnected={mcpConnected}
-          selectedZone={selectedZone}
-          setSelectedZone={setSelectedZone}
-          mode={mode}
-          setMode={setMode}
-          directive={directive}
-          setDirective={setDirective}
-          reply={reply}
-          journalId={journalId}
-          processing={processing}
-          agentStatus={agentStatus}
-          onExecute={handleExecuteDirective}
-        />
-
-        <SystemArchitectureSection />
-
-        <ApiTestSection />
-      </main>
-
-      <HomeFooter />
-    </div>
+    <span className="inline-flex gap-1">
+      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+    </span>
   );
 }
 
-const HeroSection: React.FC = () => {
+function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
+  profile: Partial<Web3BioProfile> | null;
+  loading: boolean;
+  onConnectWallet: () => void;
+  isWalletConnected: boolean;
+  walletAddress: string | null;
+  walletError: string | null;
+}) {
   return (
-    <section className="px-6 py-14 md:py-20 lg:px-10">
-      <div className="max-w-6xl mx-auto grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 rounded-full border border-lime-400/40 bg-lime-950/40 px-4 py-1 text-[0.65rem] tracking-[0.2em] uppercase mb-5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            Identity Layer: Username DAO · Agent Layer: DJZS
+    <header className="fixed top-0 left-0 right-0 z-40 border-b border-zinc-800 bg-black/90 backdrop-blur-sm">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {loading ? (
+            <div className="w-8 h-8 rounded-full bg-zinc-800 animate-pulse" />
+          ) : profile?.avatar ? (
+            <img
+              src={profile.avatar}
+              alt={profile.displayName || ''}
+              className="w-8 h-8 rounded-full border border-green-400/50"
+              data-testid="img-avatar"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-green-400/20 flex items-center justify-center">
+              <span className="text-green-400 text-xs font-bold">DJ</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            <span className="font-mono text-green-400 font-bold text-sm" data-testid="text-identity">
+              {profile?.identity || DJZS_ENS}
+            </span>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-            <span className="block">Username</span>
-            <span className="block text-lime-400">As A Brand</span>
-          </h1>
-          <p className="mt-5 max-w-xl text-sm sm:text-base text-slate-200/90">
-            Mint a Username. Spawn your DJZS Agent. Sync with your Anytype Vault via MCP.
-            Own your intelligence locally—no cloud, no lock-in, pay only per insight.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button 
-              className="rounded-md bg-lime-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 transition"
-              data-testid="button-claim-username"
-            >
-              CLAIM_USERNAME
-            </button>
-            <Link
-              href="/explorer"
-              className="text-xs sm:text-sm text-lime-300/90 hover:text-lime-200 underline underline-offset-4"
-              data-testid="link-explore-agents"
-            >
-              Explore existing agents
-            </Link>
-          </div>
-        </motion.div>
+        </div>
+        <div className="flex items-center gap-3">
+          {walletError && (
+            <span className="font-mono text-xs text-red-400 hidden sm:block" data-testid="text-wallet-error">{walletError}</span>
+          )}
+          <button
+            onClick={onConnectWallet}
+            data-testid="button-connect-wallet"
+            className={`flex items-center gap-2 px-3 py-1.5 font-mono text-xs border transition-all ${isWalletConnected ? 'border-green-400/50 text-green-400 bg-green-400/10' : 'border-zinc-700 text-zinc-400 hover:border-green-400/50 hover:text-green-400'}`}
+          >
+            <Icons.Wallet />
+            {isWalletConnected && walletAddress
+              ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+              : isWalletConnected ? 'CONNECTED' : 'CONNECT'}
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative"
-        >
-          <ThreeDCard className="cursor-pointer">
-            <div className="rounded-xl border border-lime-500/60 bg-slate-900/80 p-5 shadow-xl shadow-lime-900/60 backdrop-blur space-y-4">
-              <div className="text-xs font-mono text-slate-300/80 flex items-center justify-between">
-                <span>AGENT_CORE: OFFLINE</span>
-                <span className="inline-flex items-center gap-1 text-slate-400">
-                  <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
-                  MCP_BRIDGE: NOT_LINKED
-                </span>
+function Hero({ profile, loading }: { profile: Partial<Web3BioProfile> | null; loading: boolean }) {
+  const lines = [
+    { text: '> INITIALIZING NODE...', delay: 0 },
+    { text: '> IDENTITY: USERNAME.DJ-Z-S.ETH', delay: 400 },
+    { text: '> ROLE: Protocol Architect', delay: 800 },
+    { text: '> STATUS: The API tollbooth for the A2A economy', delay: 1200 },
+  ];
+  const [visibleLines, setVisibleLines] = useState(0);
+  const [time, setTime] = useState(new Date().toISOString());
+
+  useEffect(() => {
+    const timers = lines.map((_, i) => setTimeout(() => setVisibleLines(i + 1), lines[i].delay));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date().toISOString()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const outcomes = [
+    { label: 'Adversarial Verification', status: 'FUNCTIONAL', color: 'text-green-400' },
+    { label: 'x402 USDC Gating', status: 'DEPLOYED', color: 'text-blue-400' },
+    { label: 'Audit Trail (Irys)', status: 'OPERATIONAL', color: 'text-amber-400' },
+    { label: 'CVM (Phala)', status: 'LIVE', color: 'text-green-400' },
+  ];
+
+  return (
+    <section className="min-h-[70vh] flex items-center justify-center pt-16 px-4" data-testid="section-hero">
+      <div className="max-w-3xl w-full">
+        <div className="border border-zinc-800 bg-zinc-950/50 p-6">
+          <div className="flex items-center gap-2 mb-4 pb-3 border-b border-zinc-800">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+            <span className="ml-3 text-zinc-600 text-xs font-mono">djzs-node-01</span>
+            {loading && <span className="ml-auto text-zinc-600 text-xs font-mono">resolving identity<LoadingDots /></span>}
+            {!loading && profile && (
+              <span className="ml-auto text-green-400/60 text-xs font-mono flex items-center gap-1">
+                <Icons.Verified /> web3.bio verified
+              </span>
+            )}
+          </div>
+
+          <div className="font-mono space-y-1.5">
+            {lines.slice(0, visibleLines).map((line, i) => (
+              <div key={i} className="text-green-400 text-base">
+                {line.text}
+                {i === visibleLines - 1 && <Cursor />}
               </div>
-              <div className="border border-lime-500/40 rounded-md p-4 text-center">
-                <div className="text-[0.7rem] font-mono tracking-[0.25em] uppercase text-slate-300">
-                  Welcome to
-                </div>
-                <div className="text-3xl font-black tracking-[0.3em] mt-1 text-lime-400">Dj-Z-S</div>
-                <div className="text-[0.7rem] uppercase tracking-[0.22em] text-slate-400 mt-2">
-                  Private Journaling · Anytype · Aztec-ready
-                </div>
-              </div>
-              <p className="text-[0.7rem] text-slate-300/80 font-mono leading-relaxed">
-                Once you mint your Username, your DJZS Agent Core will bind to that identity and can
-                sync to your Anytype Vault through the MCP bridge.
+            ))}
+          </div>
+
+          {visibleLines >= lines.length && (
+            <div className="mt-6 pt-4 border-t border-zinc-800/50">
+              <p className="text-zinc-300 text-lg font-light leading-relaxed italic" data-testid="text-hook">
+                "Every agent pays a toll to prove it's worthy of trust."
               </p>
             </div>
-          </ThreeDCard>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+          )}
 
-interface OnboardingProps {
-  step: OnboardingStep;
-  username: string;
-  wallet: string;
-  walletConnected: boolean;
-  connectingWallet: boolean;
-  setUsername: (v: string) => void;
-  usernameMinted: boolean;
-  agentActive: boolean;
-  mcpConnected: boolean;
-  onConnectWallet: () => void;
-  onMint: () => void;
-  onActivateAgent: () => void;
-  onConnectMCP: () => void;
-}
+          {visibleLines >= lines.length && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              <a href="#tollbooth" className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-sm font-bold hover:bg-green-300 transition-colors" data-testid="link-view-protocol">
+                VIEW PROTOCOL <Icons.ArrowRight />
+              </a>
+              <a href="#contact" className="flex items-center gap-2 px-4 py-2 border border-green-400/50 text-green-400 font-mono text-sm hover:bg-green-400/10 transition-colors" data-testid="link-contact">CONTACT</a>
+              <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 border border-zinc-700 text-zinc-400 font-mono text-sm hover:border-zinc-500 hover:text-white transition-colors group" data-testid="link-github">
+                <Icons.Github /> <span className="hidden sm:inline">UsernameDAOEth/djzs-AI</span><span className="sm:hidden">GITHUB</span>
+              </a>
+            </div>
+          )}
+        </div>
 
-const OnboardingSection: React.FC<OnboardingProps> = ({
-  step,
-  username,
-  wallet,
-  walletConnected,
-  connectingWallet,
-  setUsername,
-  usernameMinted,
-  agentActive,
-  mcpConnected,
-  onConnectWallet,
-  onMint,
-  onActivateAgent,
-  onConnectMCP,
-}) => {
-  return (
-    <section className="px-6 pb-14 lg:px-10">
-      <div className="max-w-6xl mx-auto border border-lime-500/30 rounded-2xl bg-slate-900/40 backdrop-blur-md p-6 md:p-8 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
-              ONBOARDING · 3 STEPS
-            </h2>
-            <p className="mt-2 text-sm text-slate-200/90 max-w-xl">
-              Start by claiming a Username. Then activate your DJZS Agent Core and link it to your
-              Anytype Vault via MCP.
-            </p>
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {outcomes.map((item, i) => (
+            <div key={i} className="border border-zinc-800 bg-zinc-950/30 p-3 text-center" data-testid={`outcome-${i}`}>
+              <div className={`text-sm font-mono font-bold ${item.color}`}>{item.status}</div>
+              <div className="text-xs text-zinc-500 font-mono mt-1">{item.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* FIX #1: Deduplicated identity badges with actual identity strings */}
+        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          {HERO_IDENTITIES.map((id, i) => (
+            <span key={i} className="px-2 py-1 border border-zinc-800 text-zinc-400 font-mono text-xs hover:border-zinc-600 hover:text-zinc-300 transition-colors" data-testid={`badge-identity-${i}`}>
+              {id.identity}
+            </span>
+          ))}
+        </div>
+
+        <div data-testid="hero-status-bar" className="mt-8 font-mono text-[10px] md:text-xs border border-zinc-800 bg-black/80 py-2 px-4 flex flex-col md:flex-row justify-between items-start md:items-center text-zinc-400">
+          <div className="flex flex-wrap gap-x-4 gap-y-1">
+            <span>AGENT_STATUS: <span className="text-green-400">FOCUSED</span></span>
+            <span>NETWORK: <span className="text-blue-400">BASE MAINNET</span></span>
+            <span>PROTOCOL: <span className="text-amber-400">DJZS v1.0</span></span>
           </div>
-          <OnboardingStepper step={step} />
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-              STEP 1 · USERNAME
-            </div>
-            <div className="text-sm font-semibold">Connect wallet and bind your handle.</div>
-            
-            <button
-              onClick={onConnectWallet}
-              disabled={walletConnected || connectingWallet}
-              className={`w-full rounded-md border px-4 py-2 text-xs font-semibold transition ${
-                walletConnected 
-                  ? "border-emerald-400 bg-emerald-950/80 text-emerald-200" 
-                  : "border-lime-500/40 bg-slate-900 text-lime-200 hover:bg-slate-800"
-              } disabled:cursor-not-allowed`}
-              data-testid="button-connect-wallet"
-            >
-              {connectingWallet 
-                ? "CONNECTING..." 
-                : walletConnected 
-                  ? `CONNECTED: ${wallet.slice(0, 6)}...${wallet.slice(-4)}` 
-                  : "CONNECT_WALLET"}
-            </button>
-            
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="@yourname"
-              disabled={!walletConnected}
-              className="w-full rounded-md border border-lime-500/40 bg-slate-950/80 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70 disabled:opacity-50"
-              data-testid="input-onboard-username"
-            />
-            <button
-              onClick={onMint}
-              disabled={!username.trim() || !walletConnected || usernameMinted}
-              className="w-full rounded-md bg-lime-400 px-4 py-2 text-xs font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              data-testid="button-mint-username"
-            >
-              {usernameMinted ? "USERNAME_MINTED ✓" : "MINT_USERNAME"}
-            </button>
-            <p className="text-[0.7rem] text-slate-400">
-              Connect your wallet first, then mint your Username to spawn your DJZS Agent.
-            </p>
-          </motion.div>
-
-          <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-              STEP 2 · AGENT CORE
-            </div>
-            <div className="text-sm font-semibold">Boot your DJZS Agent.</div>
-            <p className="text-[0.75rem] text-slate-300/90">
-              After your Username exists, the DJZS Agent Core can be initialized to use Zones,
-              modes, and journaling.
-            </p>
-            <button
-              onClick={onActivateAgent}
-              disabled={!usernameMinted}
-              className="mt-2 w-full rounded-md border border-lime-400 bg-lime-950/80 px-4 py-2 text-xs font-semibold text-lime-200 hover:bg-lime-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              data-testid="button-activate-agent"
-            >
-              {agentActive ? "AGENT_ACTIVE ✓" : "ACTIVATE_AGENT_CORE"}
-            </button>
-            <div className="text-[0.7rem] text-slate-400 font-mono space-y-1">
-              <div>
-                AGENT_ID: {usernameMinted ? `agent_${(username || "").replace("@", "")}` : "pending"}
-              </div>
-              <div>PROTOCOL: DJZS v1.0</div>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            className="border border-lime-500/40 rounded-xl bg-slate-900/30 backdrop-blur-sm p-4 space-y-3"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-              STEP 3 · VAULT LINK
-            </div>
-            <div className="text-sm font-semibold">Connect to Anytype via MCP.</div>
-            <p className="text-[0.75rem] text-slate-300/90">
-              Link your Agent to your local Anytype Vault so Journals and research live on your
-              device—not in the cloud.
-            </p>
-            <button
-              onClick={onConnectMCP}
-              disabled={!agentActive}
-              className="mt-2 w-full rounded-md border border-emerald-400 bg-emerald-950/80 px-4 py-2 text-xs font-semibold text-emerald-200 hover:bg-emerald-900 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              data-testid="button-connect-mcp"
-            >
-              {mcpConnected ? "VAULT_SYNC_ACTIVE ✓" : "INITIATE_MCP_BRIDGE"}
-            </button>
-            <div className="text-[0.7rem] text-slate-400 font-mono space-y-1">
-              <div>
-                MCP_STATUS:{" "}
-                <span className={mcpConnected ? "text-emerald-400" : "text-amber-300"}>
-                  {mcpConnected ? "CONNECTED" : "NOT_CONNECTED"}
-                </span>
-              </div>
-              <div>DATA_PLANE: {mcpConnected ? "VAULT_LINKED" : "LOCAL_ONLY"}</div>
-            </div>
-          </motion.div>
+          <div className="mt-2 md:mt-0 text-zinc-500">
+            SYS_TIME: {time}
+          </div>
         </div>
       </div>
     </section>
   );
-};
-
-interface OnboardingStepperProps {
-  step: OnboardingStep;
 }
 
-const OnboardingStepper: React.FC<OnboardingStepperProps> = ({ step }) => {
-  const steps: { id: OnboardingStep; label: string }[] = [
-    { id: 1, label: "USERNAME" },
-    { id: 2, label: "AGENT" },
-    { id: 3, label: "VAULT" },
+function Tollbooth() {
+  const logs = [
+    "Agent verification request received...",
+    "x402 payment confirmed on Base",
+    "Adversarial audit complete: PASS",
+    "Certificate issued: 0x4e2b...a917",
+    "Agent Core: READY"
   ];
-  return (
-    <div className="flex items-center gap-3 text-[0.7rem] font-mono text-slate-300">
-      {steps.map((s, idx) => (
-        <React.Fragment key={s.id}>
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-6 w-6 rounded-full flex items-center justify-center border ${
-                step >= s.id
-                  ? "border-lime-400 bg-lime-900 text-lime-100"
-                  : "border-slate-500 bg-slate-900 text-slate-500"
-              }`}
-            >
-              {s.id}
-            </div>
-            <span className="tracking-[0.18em] uppercase">{s.label}</span>
-          </div>
-          {idx < steps.length - 1 && <div className="w-6 h-px bg-slate-600" />}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-};
+  const [logIndex, setLogIndex] = useState(0);
 
-interface AgentConsoleProps {
-  username: string;
-  usernameMinted: boolean;
-  agentActive: boolean;
-  mcpConnected: boolean;
-  selectedZone: Zone;
-  setSelectedZone: (z: Zone) => void;
-  mode: ProcessingMode;
-  setMode: (m: ProcessingMode) => void;
-  directive: string;
-  setDirective: (v: string) => void;
-  reply: string | null;
-  journalId: string | null;
-  processing: boolean;
-  agentStatus: string;
-  onExecute: () => void;
-}
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLogIndex((prev) => (prev + 1) % logs.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
-const AgentConsoleSection: React.FC<AgentConsoleProps> = ({
-  username,
-  usernameMinted,
-  agentActive,
-  mcpConnected,
-  selectedZone,
-  setSelectedZone,
-  mode,
-  setMode,
-  directive,
-  setDirective,
-  reply,
-  journalId,
-  processing,
-  agentStatus,
-  onExecute,
-}) => {
-  return (
-    <section className="px-6 pb-16 lg:px-10">
-      <div className="max-w-6xl mx-auto space-y-6">
-        <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-3">
-          <div>
-            <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase">
-              DJZS AGENT CORE
-            </h2>
-            <p className="mt-2 max-w-xl text-sm text-slate-200/90">
-              Talk to your Username DAO Agent powered by DJZS Protocol v1.0. Choose a Zone, set a
-              mode, and send a directive. When the MCP bridge is active, Journals are written into
-              your Anytype Vault.
-            </p>
-          </div>
-          <div className="text-[0.7rem] font-mono text-right text-slate-400 space-y-1">
-            <div>
-              STATUS:{" "}
-              <span
-                className={
-                  agentStatus.includes("READY")
-                    ? "text-emerald-400"
-                    : agentStatus === "PROCESSING"
-                    ? "text-amber-300"
-                    : "text-slate-300"
-                }
-              >
-                {agentStatus}
-              </span>
-            </div>
-            <div>AGENT_CORE: {agentActive ? "ONLINE" : "OFFLINE"}</div>
-            <div>PROTOCOL: DJZS v1.0</div>
-          </div>
-        </div>
+  const capabilities = [
+    'Adversarial verification of AI agent logic before execution',
+    'x402 USDC payment gating on Base',
+    'Immutable audit certificates on Irys',
+    'Confidential execution via Phala TEE',
+  ];
 
-        {!usernameMinted || !agentActive ? (
-          <div className="rounded-xl border border-amber-400/40 bg-amber-950/40 p-4 text-[0.8rem] text-amber-100 font-mono">
-            To use the Agent Console, first{" "}
-            <span className="font-semibold">mint a Username</span> and{" "}
-            <span className="font-semibold">activate your Agent Core</span> in the onboarding
-            section above.
-          </div>
-        ) : (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1.2fr)]">
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-                  INPUT DIRECTIVE
-                </span>
-                <textarea
-                  className="w-full rounded-md border border-lime-500/40 bg-slate-900/30 backdrop-blur-sm p-3 text-sm text-slate-50 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-lime-400/70"
-                  rows={6}
-                  placeholder="Ask a question, write a journal reflection, or request research for this Zone…"
-                  value={directive}
-                  onChange={(e) => setDirective(e.target.value)}
-                  data-testid="textarea-directive"
-                />
-              </div>
+  const receipts = [
+    { component: 'Adversarial verification loop', status: 'FUNCTIONAL', color: 'text-green-400' },
+    { component: 'x402 USDC gating on Base', status: 'DEPLOYED', color: 'text-blue-400' },
+    { component: 'Immutable audit trail on Irys', status: 'OPERATIONAL', color: 'text-amber-400' },
+    { component: 'CVM execution via Phala', status: 'LIVE', color: 'text-green-400' },
+  ];
 
-              <ZoneSelector selected={selectedZone} onSelect={setSelectedZone} />
-
-              <ModeSelector mode={mode} setMode={setMode} />
-
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={onExecute}
-                  disabled={processing || !directive.trim()}
-                  className="inline-flex items-center justify-center rounded-md bg-lime-400 px-6 py-2.5 text-sm font-semibold text-slate-900 shadow-lg shadow-lime-500/40 hover:bg-lime-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  data-testid="button-execute-directive"
-                >
-                  {processing ? "PROCESSING…" : "EXECUTE_DIRECTIVE"}
-                </button>
-                <p className="text-[0.7rem] text-slate-400 font-mono">
-                  USERNAME: {username || "anonymous"} · ZONE: {selectedZone.code} · MODE: {mode}
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="rounded-lg border border-lime-500/40 bg-slate-900/30 backdrop-blur-sm p-4">
-                <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-                  AGENT REPLY
-                </span>
-                <pre className="mt-3 text-sm text-slate-100 whitespace-pre-wrap font-mono leading-relaxed min-h-[160px]">
-                  {reply || "(waiting for directive)"}
-                </pre>
-                {journalId && (
-                  <div className="mt-4 pt-3 border-t border-lime-500/20 text-[0.7rem] font-mono text-slate-400">
-                    JOURNAL_ID: <span className="text-lime-400">{journalId}</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="rounded-lg border border-lime-500/30 bg-slate-900/30 backdrop-blur-sm p-4 space-y-2">
-                <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-                  AGENT METADATA
-                </span>
-                <div className="grid grid-cols-2 gap-3 text-[0.7rem] font-mono text-slate-400">
-                  <div>USERNAME: <span className="text-lime-300">{username}</span></div>
-                  <div>ZONE: <span className="text-lime-300">{selectedZone.code}</span></div>
-                  <div>MODE: <span className="text-lime-300">{mode}</span></div>
-                  <div>
-                    MCP:{" "}
-                    <span className={mcpConnected ? "text-emerald-400" : "text-amber-300"}>
-                      {mcpConnected ? "LINKED" : "OFFLINE"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-};
-
-interface ZoneSelectorProps {
-  selected: Zone;
-  onSelect: (z: Zone) => void;
-}
-
-const ZoneSelector: React.FC<ZoneSelectorProps> = ({ selected, onSelect }) => {
-  return (
-    <div className="space-y-2">
-      <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-        SELECT ZONE
-      </span>
-      <div className="grid grid-cols-5 gap-2">
-        {ZONES.map((zone) => (
-          <button
-            key={zone.code}
-            onClick={() => onSelect(zone)}
-            className={`p-2 rounded-md border text-center transition backdrop-blur-sm ${
-              selected.code === zone.code
-                ? "border-lime-400 bg-lime-900/50 text-lime-100"
-                : "border-lime-500/30 bg-slate-900/30 text-slate-300 hover:border-lime-400/60"
-            }`}
-            title={zone.description}
-            data-testid={`button-zone-${zone.code}`}
-          >
-            <div className="text-lg">{zone.emoji}</div>
-            <div className="text-[0.6rem] font-mono tracking-wide mt-1">{zone.label}</div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-interface ModeSelectorProps {
-  mode: ProcessingMode;
-  setMode: (m: ProcessingMode) => void;
-}
-
-const ModeSelector: React.FC<ModeSelectorProps> = ({ mode, setMode }) => {
-  return (
-    <div className="space-y-2">
-      <span className="text-xs font-mono tracking-[0.25em] text-slate-300 uppercase">
-        PROCESSING MODE
-      </span>
-      <div className="flex flex-wrap gap-2">
-        {PROCESSING_MODES.map((m) => (
-          <button
-            key={m.id}
-            onClick={() => setMode(m.id)}
-            className={`px-3 py-1.5 rounded-md border text-xs font-mono transition backdrop-blur-sm ${
-              mode === m.id
-                ? "border-lime-400 bg-lime-900/50 text-lime-100"
-                : "border-lime-500/30 bg-slate-900/30 text-slate-300 hover:border-lime-400/60"
-            }`}
-            title={m.description}
-            data-testid={`button-mode-${m.id}`}
-          >
-            {m.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const SystemArchitectureSection: React.FC = () => {
-  const steps = [
-    { num: 1, title: "CLAIM_USERNAME", desc: "Mint your decentralized identity on Username DAO" },
-    { num: 2, title: "SPAWN_AGENT", desc: "Initialize your personal DJZS Agent Core" },
-    { num: 3, title: "LINK_VAULT", desc: "Connect Anytype via MCP for local-first storage" },
-    { num: 4, title: "SELECT_ZONE", desc: "Choose your research or journaling domain" },
-    { num: 5, title: "SET_MODE", desc: "Pick processing mode: Quick, Journal, Research, Alpha" },
-    { num: 6, title: "SEND_DIRECTIVE", desc: "Ask questions or write reflections" },
-    { num: 7, title: "ARCHIVE_IRYS", desc: "Permanently archive insights to Irys Network" },
-    { num: 8, title: "EARN_XP", desc: "Level up your agent through consistent engagement" },
+  const pillars = [
+    { id: 'game', title: 'THE GAME', color: 'border-purple-500/50 text-purple-400', bgColor: 'bg-purple-500/5', description: 'Life as simulation. Player 1 mentality. Internal state creating external reality.' },
+    { id: 'code', title: 'THE CODE', color: 'border-blue-400/50 text-blue-400', bgColor: 'bg-blue-400/5', description: 'Audit-before-act encoded. Deterministic verification as digital discipline. Trust earned, not assumed.' },
+    { id: 'bridge', title: 'THE BRIDGE', color: 'border-green-400/50 text-green-400', bgColor: 'bg-green-400/5', description: "Your internal OS writes your external code. The builder's consciousness shapes what they build." },
+    { id: 'build', title: 'THE BUILD', color: 'border-amber-400/50 text-amber-400', bgColor: 'bg-amber-400/5', description: 'Transparency as trust primitive. Every commit a proof of work. The code speaks — or stays silent.' },
   ];
 
   return (
-    <section className="px-6 pb-16 lg:px-10">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-sm font-mono tracking-[0.25em] text-lime-300 uppercase mb-6">
-          SYSTEM ARCHITECTURE · 8-STEP FLOW
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {steps.map((step, idx) => (
-            <motion.div
-              key={step.num}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="border border-lime-500/30 rounded-lg bg-slate-900/30 backdrop-blur-sm p-4 space-y-2"
-            >
-              <div className="flex items-center gap-2">
-                <div className="h-6 w-6 rounded-full border border-lime-400 bg-lime-950 flex items-center justify-center text-xs font-bold text-lime-300">
-                  {step.num}
-                </div>
-                <span className="text-xs font-mono text-lime-200 tracking-wide">{step.title}</span>
+    <section id="tollbooth" className="py-16 px-4" data-testid="section-tollbooth">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// THE TOLLBOOTH</h2>
+        <div className="font-mono text-green-400 text-sm mb-6">DJZS PROTOCOL — The API Tollbooth for the A2A Economy</div>
+
+        <div className="border border-zinc-800 bg-zinc-950/30 p-5 mb-6">
+          <div className="font-mono text-xs text-zinc-500 mb-3">WHAT_IT_DOES:</div>
+          <ul className="space-y-2">
+            {capabilities.map((cap, i) => (
+              <li key={i} className="flex items-start gap-2 font-mono text-sm text-zinc-400">
+                <span className="text-green-400 mt-0.5">→</span>{cap}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="border border-zinc-800 bg-black p-5 mb-8">
+          <div className="font-mono text-xs text-zinc-500 mb-3">RECEIPTS (OUTCOMES, NOT ACTIVITY):</div>
+          <div className="space-y-2">
+            {receipts.map((r, i) => (
+              <div key={i} className="flex items-center justify-between font-mono text-sm" data-testid={`receipt-${i}`}>
+                <span className="text-zinc-400">{r.component}</span>
+                <span className={`${r.color} font-bold text-xs border border-current px-2 py-0.5`}>{r.status}</span>
               </div>
-              <p className="text-[0.7rem] text-slate-400">{step.desc}</p>
-            </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div data-testid="tollbooth-log-stream" className="my-8 font-mono text-sm border border-zinc-800 bg-black p-4">
+          <div className="text-zinc-600 mb-2">--- BEGIN LOG STREAM ---</div>
+          <div className="h-6 flex items-center">
+            <span className="text-green-400 mr-2">{'>'}</span>
+            <span className="text-zinc-300 animate-pulse">{logs[logIndex]}</span>
+          </div>
+        </div>
+
+        <div className="font-mono text-xs text-zinc-500 mb-4 tracking-widest">// TEACHING PILLARS</div>
+        <div className="grid sm:grid-cols-2 gap-4">
+          {pillars.map((p) => (
+            <div key={p.id} className={`border ${p.color} ${p.bgColor} p-4 hover:brightness-110 transition-all`} data-testid={`pillar-${p.id}`}>
+              <h3 className={`font-mono text-sm font-bold mb-2 ${p.color.split(' ')[1]}`}>{p.title}</h3>
+              <p className="text-zinc-400 text-xs leading-relaxed">{p.description}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
-};
+}
 
-const HomeFooter: React.FC = () => {
+// MoltMail integration
+const MOLTMAIL_CLAWHUB_URL = 'https://clawhub.ai/SebasAran16/moltmail-io';
+
+function Onboarding({ onConnectWallet, isWalletConnected, walletAddress }: {
+  onConnectWallet: () => void;
+  isWalletConnected: boolean;
+  walletAddress: string | null;
+}) {
+  const [agentName, setAgentName] = useState('');
+  const [isProvisioning, setIsProvisioning] = useState(false);
+  const [provisionedEmail, setProvisionedEmail] = useState<string | null>(null);
+
+  // Generate suggested agent name from wallet
+  const suggestedName = walletAddress 
+    ? `agent-${walletAddress.slice(2, 8).toLowerCase()}`
+    : '';
+
+  const handleProvisionEmail = useCallback(async () => {
+    if (!isWalletConnected || !agentName.trim()) return;
+    
+    setIsProvisioning(true);
+    
+    // Simulate provisioning delay - in production, call MoltMail API
+    // POST to MoltMail API endpoint with wallet signature
+    setTimeout(() => {
+      const email = `${agentName.toLowerCase().replace(/[^a-z0-9-]/g, '')}@moltmail.io`;
+      setProvisionedEmail(email);
+      setIsProvisioning(false);
+      
+      // Open MoltMail to complete setup with wallet
+      window.open(`${MOLTMAIL_CLAWHUB_URL}?agent=${agentName}&wallet=${walletAddress}`, '_blank');
+    }, 1500);
+  }, [isWalletConnected, agentName, walletAddress]);
+
   return (
-    <footer className="px-6 py-8 lg:px-10 border-t border-lime-500/20 text-[0.7rem] text-slate-400/80 relative z-10">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-3">
-        <div>© {new Date().getFullYear()} USERNAME DAO × DJZS Protocol.</div>
-        <div className="flex flex-wrap gap-4">
-          <Link href="/profile" data-testid="link-footer-profile" className="hover:text-lime-300 transition">Profile</Link>
-          <Link href="/explorer" data-testid="link-footer-explorer" className="hover:text-lime-300 transition">Explorer</Link>
-          <Link href="/api-test" data-testid="link-footer-api-test" className="hover:text-lime-300 transition">API Test</Link>
-          <span>ECOSYSTEM: Username DAO · DJZS · Anytype · Aztec · Irys</span>
+    <section data-testid="section-onboarding" className="py-16 px-4 border-t border-zinc-800">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// ONBOARDING</h2>
+        <div className="space-y-4 font-mono">
+          {/* Step 1 */}
+          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-white">STEP 1 · USERNAME</span>
+              <span className="text-xs border border-amber-400/50 text-amber-400 px-2 py-1">COMING SOON</span>
+            </div>
+            <p className="text-zinc-400 text-sm">Mint a username. Bind your handle on-chain.</p>
+          </div>
+          
+          {/* Step 2 */}
+          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
+            <div className="text-white mb-2">STEP 2 · AGENT CORE</div>
+            <p className="text-zinc-400 text-sm">Boot your DJZS Agent with verification modes.</p>
+          </div>
+          
+          {/* Step 3 */}
+          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
+            <div className="text-white mb-2">STEP 3 · GO LIVE</div>
+            <p className="text-zinc-400 text-sm">Your agent enters the A2A economy with x402 payment gating.</p>
+          </div>
+          
+          {/* MoltMail Agent Email Provisioning */}
+          <div className="p-5 border border-green-400/30 bg-green-400/5">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-green-400 font-bold">MOLTMAIL · AGENT EMAIL</span>
+              <span className="text-xs border border-green-400/50 text-green-400 px-2 py-1">ENCRYPTED</span>
+            </div>
+            
+            {!isWalletConnected ? (
+              // Step 1: Connect Wallet
+              <div>
+                <p className="text-zinc-300 text-sm mb-4">
+                  Give your AI agent its own inbox. No CAPTCHAs. No phone verification. Wallet-based identity.
+                </p>
+                <button
+                  onClick={onConnectWallet}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors"
+                  data-testid="button-connect-for-email"
+                >
+                  <Icons.Wallet /> CONNECT WALLET TO START
+                </button>
+              </div>
+            ) : provisionedEmail ? (
+              // Step 3: Email Provisioned
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-green-400">
+                  <Icons.Verified />
+                  <span className="text-sm">Agent email provisioned</span>
+                </div>
+                <div className="bg-black border border-green-400/50 p-3">
+                  <div className="text-zinc-500 text-xs mb-1">YOUR AGENT'S INBOX:</div>
+                  <div className="text-green-400 text-lg font-bold">{provisionedEmail}</div>
+                </div>
+                <p className="text-zinc-500 text-xs">
+                  Complete setup on MoltMail to activate sending and receiving.
+                </p>
+              </div>
+            ) : (
+              // Step 2: Name Your Agent
+              <div className="space-y-4">
+                <p className="text-zinc-300 text-sm">
+                  Connected: <span className="text-green-400">{walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}</span>
+                </p>
+                <div>
+                  <label className="text-zinc-500 text-xs block mb-2">NAME YOUR AGENT:</label>
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={agentName}
+                        onChange={(e) => setAgentName(e.target.value)}
+                        placeholder={suggestedName}
+                        className="w-full bg-black border border-zinc-700 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-green-400/50 focus:outline-none transition-colors"
+                        data-testid="input-agent-name"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 text-xs">@moltmail.io</span>
+                    </div>
+                  </div>
+                  {!agentName && (
+                    <button 
+                      onClick={() => setAgentName(suggestedName)}
+                      className="text-zinc-500 text-xs mt-2 hover:text-zinc-300 transition-colors"
+                      data-testid="button-use-suggested-name"
+                    >
+                      Use suggested: {suggestedName}
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={handleProvisionEmail}
+                  disabled={isProvisioning || !agentName.trim()}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="button-provision-email"
+                >
+                  {isProvisioning ? (
+                    <>PROVISIONING<LoadingDots /></>
+                  ) : (
+                    <><Icons.Mail /> PROVISION AGENT EMAIL</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Evolution() {
+  const phases = [
+    { 
+      period: '2015–2024', 
+      title: 'INTERNAL WORK', 
+      description: 'Consciousness study. Discipline as admin access. "Master the internal world first."',
+      color: 'border-purple-500/30 text-purple-400'
+    },
+    { 
+      period: '2024', 
+      title: 'REALIZATION', 
+      description: 'Reality is a simulation. You are Player 1. Everything external reflects internal.',
+      color: 'border-purple-500/30 text-purple-400'
+    },
+    { 
+      period: 'OCT 25', 
+      title: 'ENCODING', 
+      description: 'Philosophy becomes architecture. Audit-before-act as design principle.',
+      color: 'border-blue-400/30 text-blue-400'
+    },
+    { 
+      period: 'JAN 26', 
+      title: 'BUILDING', 
+      description: 'DJZS Protocol. Trust layer for autonomous minds. x402 + Irys + Phala + Base.',
+      color: 'border-green-400/30 text-green-400'
+    },
+    { 
+      period: 'FEB 26', 
+      title: 'LIVE', 
+      description: 'Adversarial Oracle deployed. The tollbooth opens.',
+      color: 'border-green-400/30 text-green-400'
+    },
+  ];
+
+  return (
+    <section className="py-16 px-4 bg-zinc-950/50" data-testid="section-evolution">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// THE EVOLUTION</h2>
+        <div className="font-mono text-green-400 text-sm mb-2">Consciousness → Discipline → Simulation → Architecture → Oracle</div>
+        <p className="font-mono text-zinc-500 text-xs mb-6">A decade of internal work. 5 months of external building. One coherent vision.</p>
+        
+        <div className="space-y-0">
+          {phases.map((phase, i) => (
+            <div 
+              key={i} 
+              className={`border ${phase.color} bg-black/50 p-4 ${i > 0 ? 'border-t-0' : ''}`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-6">
+                <span className="font-mono text-xs text-zinc-600 w-20 shrink-0">{phase.period}</span>
+                <div className="flex-1">
+                  <span className={`font-mono text-sm font-bold ${phase.color.split(' ')[1]}`}>{phase.title}</span>
+                  <p className="font-mono text-xs text-zinc-400 mt-1">{phase.description}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TollboothArchitecture() {
+  return (
+    <section className="py-16 px-4" data-testid="section-architecture">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// THE TOLLBOOTH — ARCHITECTURE</h2>
+        <div className="border border-zinc-800 bg-zinc-950/30 p-5">
+          <div className="font-mono text-xs text-zinc-500 mb-6">AUDIT-BEFORE-ACT LOOP:</div>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-center">
+            <div className="border border-amber-400/50 bg-amber-400/5 px-4 py-3">
+              <div className="text-amber-400 text-sm font-bold">AGENT</div>
+              <div className="text-zinc-600 text-xs mt-1">Request</div>
+            </div>
+            <div className="text-green-400 text-xl">→</div>
+            <div className="border-2 border-green-400 bg-green-400/10 px-6 py-3 relative">
+              <div className="text-green-400 text-sm font-bold">TOLLBOOTH</div>
+              <div className="text-zinc-500 text-xs mt-1">Adversarial Oracle</div>
+            </div>
+            <div className="text-green-400 text-xl">→</div>
+            <div className="flex gap-3">
+              <div className="border border-green-400/50 bg-green-400/5 px-4 py-3">
+                <div className="text-green-400 text-sm font-bold">PASS</div>
+                <div className="text-zinc-600 text-xs mt-1">Execute</div>
+              </div>
+              <div className="border border-red-400/50 bg-red-400/5 px-4 py-3">
+                <div className="text-red-400 text-sm font-bold">FAIL</div>
+                <div className="text-zinc-600 text-xs mt-1">Abort</div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 pt-4 border-t border-zinc-800 grid grid-cols-4 gap-3 text-xs font-mono">
+            {[
+              { l: 'PAY', v: 'x402 USDC', color: 'text-blue-400' },
+              { l: 'CHAIN', v: 'Base', color: 'text-green-400' },
+              { l: 'TEE', v: 'Phala', color: 'text-amber-400' },
+              { l: 'LOG', v: 'Irys', color: 'text-green-400' },
+            ].map((x, i) => (
+              <div key={i} className="text-center">
+                <div className="text-zinc-600">{x.l}</div>
+                <div className={x.color}>{x.v}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TheArchitect({ profile, loading }: { profile: Partial<Web3BioProfile> | null; loading: boolean }) {
+  const identities = [
+    { label: 'username.dj-z-s.eth', type: 'ENS (Primary)' },
+    { label: 'dj-z-s.eth', type: 'ENS' },
+    { label: 'usernamedao.eth', type: 'ENS' },
+    { label: 'usernamedao.base.eth', type: 'Basenames' },
+    { label: 'dj-z-s.eth', type: 'Farcaster' },
+    { label: 'usernamedjzs.lens', type: 'Lens' },
+  ];
+
+  return (
+    <section className="py-16 px-4 bg-zinc-950/50" data-testid="section-architect">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// THE ARCHITECT</h2>
+
+        <div className="flex flex-col sm:flex-row gap-6 mb-8">
+          <div className="shrink-0 flex flex-col items-center sm:items-start">
+            {loading ? (
+              <div className="w-20 h-20 rounded-full bg-zinc-800 animate-pulse" />
+            ) : profile?.avatar ? (
+              <img
+                src={profile.avatar}
+                alt={profile.displayName || ''}
+                className="w-20 h-20 rounded-full border-2 border-green-400/50"
+                data-testid="img-architect-avatar"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-green-400/20 flex items-center justify-center">
+                <span className="text-green-400 text-xl font-bold">DJ</span>
+              </div>
+            )}
+            <div className="mt-3 text-center sm:text-left">
+              <div className="font-mono text-white font-bold text-lg" data-testid="text-architect-name">
+                {profile?.displayName || FALLBACK_PROFILE.displayName}
+              </div>
+              <div className="font-mono text-green-400 text-xs">Protocol Architect</div>
+            </div>
+          </div>
+
+          <div className="flex-1">
+            <p className="text-zinc-300 text-sm leading-relaxed mb-4">
+              Decade-long student of consciousness and simulation theory. Encoded that philosophy into infrastructure. DJZS is the adversarial verification layer for the AI agent economy — a tollbooth that forces autonomous agents to prove their logic before they're allowed to act.
+            </p>
+            <p className="text-zinc-500 text-xs font-mono italic">
+              "I build the trust layer between autonomous minds — artificial and human."
+            </p>
+          </div>
+        </div>
+
+        <div className="border border-zinc-800 bg-black p-5">
+          <div className="font-mono text-xs text-zinc-500 mb-3">IDENTITY_GRAPH:</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {identities.map((id, i) => (
+              <div key={i} className="border border-zinc-800 bg-zinc-950/50 px-3 py-2" data-testid={`identity-${i}`}>
+                <div className="font-mono text-green-400 text-xs truncate">{id.label}</div>
+                <div className="font-mono text-zinc-600 text-xs">{id.type}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+function SimulationStack() {
+  const lifeToAgentMapping = [
+    { life: 'You are Player 1 controlling the simulation', agent: 'An agent executes from its core programming' },
+    { life: 'External reality reflects internal state', agent: 'Agent outputs reflect logic quality' },
+    { life: 'Trust yourself first before trusting others', agent: 'Agents must be verified before trusted' },
+    { life: 'Self-sovereignty — no external dependency', agent: 'Decentralization — no central authority' },
+    { life: 'Discipline creates freedom', agent: 'Deterministic verification creates trust' },
+    { life: 'We are one — all players connected', agent: 'A2A economy — all agents interconnected' },
+  ];
+
+  return (
+    <section className="py-16 px-4" data-testid="section-simulation-stack">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// THE SIMULATION STACK</h2>
+
+        <div className="space-y-6">
+          <div className="border border-purple-500/30 bg-purple-500/5 p-5">
+            <div className="font-mono text-purple-400 text-xs mb-2 tracking-widest">LAYER 1: THE INTERNAL OPERATING SYSTEM</div>
+            <blockquote className="border-l-2 border-purple-400 pl-4 mb-4">
+              <p className="text-zinc-300 text-sm italic">"Before you build anything in the external world, you have to master the internal world."</p>
+            </blockquote>
+            <ul className="space-y-1.5 mb-4">
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Reality is a simulation and you are Player 1</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Your reality is a projection of your internal state</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Discipline isn't punishment — it's gaining admin access to your own simulation</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Taking back Player 1 status requires radical self-responsibility</li>
+            </ul>
+            <p className="font-mono text-purple-400 text-xs font-bold">"You're not in the simulation. You ARE the simulation."</p>
+          </div>
+
+          <div className="border border-blue-400/30 bg-blue-400/5 p-5">
+            <div className="font-mono text-blue-400 text-xs mb-2 tracking-widest">LAYER 2: THE VERIFICATION LAYER</div>
+            <blockquote className="border-l-2 border-blue-400 pl-4 mb-4">
+              <p className="text-zinc-300 text-sm italic">"The same way I audit my own thoughts and actions before I execute in life, DJZS audits AI agents before they execute in the digital economy."</p>
+            </blockquote>
+            <div className="border border-zinc-800 bg-black overflow-hidden">
+              <div className="grid grid-cols-2 border-b border-zinc-800">
+                <div className="px-3 py-2 font-mono text-xs text-zinc-500 border-r border-zinc-800">LIFE PRINCIPLE</div>
+                <div className="px-3 py-2 font-mono text-xs text-zinc-500">AI AGENT PARALLEL</div>
+              </div>
+              {lifeToAgentMapping.map((row, i) => (
+                <div key={i} className={`grid grid-cols-2 ${i < lifeToAgentMapping.length - 1 ? 'border-b border-zinc-800/50' : ''}`}>
+                  <div className="px-3 py-2 font-mono text-xs text-zinc-400 border-r border-zinc-800/50">{row.life}</div>
+                  <div className="px-3 py-2 font-mono text-xs text-blue-400">{row.agent}</div>
+                </div>
+              ))}
+            </div>
+            <p className="font-mono text-blue-400 text-xs font-bold mt-4">"Audit before you act. In life. In code. In everything."</p>
+          </div>
+
+          <div className="border border-green-400/30 bg-green-400/5 p-5">
+            <div className="font-mono text-green-400 text-xs mb-2 tracking-widest">LAYER 3: THE A2A FUTURE</div>
+            <blockquote className="border-l-2 border-green-400 pl-4 mb-4">
+              <p className="text-zinc-300 text-sm italic">"We're building a world where autonomous minds interact at scale. The question isn't IF. The question is: who builds the trust layer?"</p>
+            </blockquote>
+            <ul className="space-y-1.5 mb-4">
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>AI agents will transact without human intervention</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>This mirrors the simulation — autonomous entities in shared reality</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>Without verification, the agent economy becomes chaos</li>
+              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>DJZS is the immune system for this new world</li>
+            </ul>
+            <p className="font-mono text-green-400 text-xs font-bold">"The future isn't human vs AI. It's conscious systems operating in verified trust."</p>
+          </div>
+
+          <div className="border-2 border-zinc-600 bg-zinc-900/50 p-5 text-center">
+            <div className="font-mono text-zinc-500 text-xs mb-3 tracking-widest">// PLAYER 1 RESOLUTION</div>
+            <p className="text-zinc-300 text-sm leading-relaxed max-w-xl mx-auto">
+              You are Player 1 in your simulation. Everyone else is Player 1 in theirs. "We are one" is the recognition that all simulations run on the same substrate.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TheDispatch() {
+  const articles = [
+    "THE ADVERSARIAL NECESSITY: Auditing the Polycentric Agent Economy",
+    "The Great Preparation: Auditing the Simulation with Crypto and AI",
+    "Sovereign Infrastructure and the End of the Centralized Honeypot",
+    "DJZS: The Deterministic Verification Primitive for the A2A Economy",
+  ];
+
+  return (
+    <section data-testid="section-dispatch" className="py-16 px-4 bg-zinc-950/50">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// THE DISPATCH</h2>
+        <p className="text-zinc-400 font-mono text-sm mb-8">Deep dives on consciousness, infrastructure, and the A2A economy.</p>
+
+        <div className="flex flex-col space-y-2 font-mono text-sm mb-8">
+          {articles.map((title, i) => (
+            <a key={i} href="https://username.box" target="_blank" rel="noopener noreferrer" className="p-4 border border-zinc-800 hover:border-zinc-600 text-zinc-300 hover:text-white transition-colors flex justify-between items-center group" data-testid={`dispatch-article-${i}`}>
+              <span>{title}</span>
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 shrink-0">↗</span>
+            </a>
+          ))}
+        </div>
+        <a href="https://username.box" target="_blank" rel="noopener noreferrer" className="font-mono text-white border-b border-white hover:text-zinc-300 pb-1 text-sm transition-colors" data-testid="link-username-box">
+          READ MORE ON USERNAME.BOX →
+        </a>
+      </div>
+    </section>
+  );
+}
+
+// FIX #4: KYA Demo with improved examples including non-degen business logic
+function KYADemo() {
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState<AuditResponse | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const runAudit = useCallback(() => {
+    if (!input.trim() || isProcessing) return;
+    setIsProcessing(true);
+    setOutput(null);
+    setTimeout(() => {
+      const demo = DEMO_AUDITS.find(d => input.toLowerCase().includes(d.input)) || DEMO_AUDITS[2];
+      setOutput(demo.response);
+      setIsProcessing(false);
+    }, 1200);
+  }, [input, isProcessing]);
+
+  return (
+    <section className="py-16 px-4 bg-zinc-950/50" data-testid="section-kya-demo">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// KYA DEMO</h2>
+        <p className="text-zinc-500 text-xs mb-4">Test the Adversarial Oracle</p>
+        <div className="border border-zinc-800 bg-black">
+          <div className="p-3 border-b border-zinc-800">
+            <div className="flex items-center gap-2">
+              <span className="text-green-400 font-mono">&gt;</span>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && runAudit()}
+                placeholder="try: rebalance portfolio OR treasury withdrawal"
+                className="flex-1 bg-transparent text-white font-mono text-sm outline-none placeholder:text-zinc-700"
+                data-testid="input-kya-query"
+              />
+              <button
+                onClick={runAudit}
+                disabled={isProcessing}
+                className="px-3 py-1.5 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors disabled:opacity-50 flex items-center gap-1"
+                data-testid="button-kya-audit"
+              >
+                {isProcessing ? '...' : 'AUDIT'} {!isProcessing && <Icons.Send />}
+              </button>
+            </div>
+          </div>
+          <div className="p-3 font-mono text-xs min-h-[120px]" data-testid="kya-output">
+            {isProcessing && <div className="text-zinc-500">// AUDITING...<Cursor /></div>}
+            {output && (
+              <div className="space-y-2">
+                <div className={`text-sm font-bold ${output.verdict === 'PASS' ? 'text-green-400' : output.verdict === 'CONDITIONAL' ? 'text-amber-400' : 'text-red-400'}`}>VERDICT: {output.verdict}</div>
+                <div><span className="text-zinc-500">RISK:</span> <span className={output.risk_score > 5 ? 'text-red-400' : output.risk_score > 3 ? 'text-amber-400' : 'text-green-400'}>{output.risk_score}/10</span></div>
+                {output.flags.length > 0 && <div>{output.flags.map((f, i) => <div key={i} className="text-amber-400">→ {f}</div>)}</div>}
+                <div className="pt-2 border-t border-zinc-800 text-zinc-400">{output.recommendation}</div>
+              </div>
+            )}
+            {!isProcessing && !output && <div className="text-zinc-700">// AWAITING INPUT...</div>}
+          </div>
+        </div>
+        {/* Example queries hint */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <span className="text-zinc-600 text-xs font-mono">Examples:</span>
+          {['rebalance', 'treasury', 'swap 50%', 'arbitrage'].map((ex) => (
+            <button
+              key={ex}
+              onClick={() => setInput(ex)}
+              className="text-zinc-500 text-xs font-mono hover:text-zinc-300 transition-colors"
+              data-testid={`button-kya-example-${ex.replace(/\s+/g, '-')}`}
+            >
+              {ex}
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
+  profile: Partial<Web3BioProfile> | null;
+  loading: boolean;
+  onConnectWallet: () => void;
+  isWalletConnected: boolean;
+  walletAddress: string | null;
+  walletError: string | null;
+}) {
+  const links = profile?.links || FALLBACK_PROFILE.links || {};
+
+  const socialLinks = Object.entries(links)
+    .filter(([key]) => LINK_ICONS[key])
+    .map(([key, value]) => ({
+      key,
+      icon: LINK_ICONS[key],
+      label: key.charAt(0).toUpperCase() + key.slice(1),
+      href: typeof value === 'string' ? value : value?.url,
+      handle: typeof value === 'object' ? value?.handle : null,
+    }))
+    .filter(link => link.href);
+
+  return (
+    <section id="contact" className="py-16 px-4" data-testid="section-contact">
+      <div className="max-w-3xl mx-auto">
+        <h2 className="font-mono text-zinc-500 text-xs mb-2 tracking-widest">// CONTACT</h2>
+        {!loading && profile && (
+          <p className="text-zinc-600 text-xs font-mono mb-6">
+            Links resolved from {profile.identity} via web3.bio
+          </p>
+        )}
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="border border-zinc-800 bg-black p-5">
+            <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
+            <p className="text-zinc-500 text-xs mb-4">Crypto-native DMs. Wallet required.</p>
+            <button
+              onClick={onConnectWallet}
+              data-testid="button-xmtp-connect"
+              className={`w-full flex items-center justify-center gap-2 px-3 py-2 font-mono text-xs transition-all ${isWalletConnected ? 'bg-green-400/10 border border-green-400/50 text-green-400' : 'bg-green-400 text-black hover:bg-green-300'}`}
+            >
+              <Icons.Wallet /> {isWalletConnected ? 'OPEN CHAT' : 'CONNECT WALLET'}
+            </button>
+            {isWalletConnected && walletAddress && (
+              <p className="text-green-400/60 text-xs font-mono mt-2 text-center truncate" data-testid="text-xmtp-address">
+                {walletAddress}
+              </p>
+            )}
+            {walletError && (
+              <p className="text-red-400 text-xs font-mono mt-2 text-center" data-testid="text-xmtp-error">
+                {walletError}
+              </p>
+            )}
+          </div>
+
+          <div className="border border-zinc-800 bg-black p-5">
+            <h3 className="font-mono text-white font-bold text-sm mb-2">SOCIAL</h3>
+            <p className="text-zinc-500 text-xs mb-4">
+              {loading ? 'Loading...' : 'Resolved from ENS'}
+            </p>
+
+            {loading ? (
+              <div className="grid grid-cols-2 gap-2">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className="h-9 bg-zinc-900 animate-pulse rounded" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {socialLinks.map((link) => (
+                  <a
+                    key={link.key}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-2 py-1.5 border border-zinc-800 text-zinc-400 font-mono text-xs hover:border-zinc-600 hover:text-zinc-300 transition-colors group"
+                    data-testid={`link-social-${link.key}`}
+                  >
+                    <link.icon />
+                    <span className="truncate">{link.handle || link.label}</span>
+                    <Icons.External />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 text-center">
+          <a
+            href={`https://web3.bio/${DJZS_ENS}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-zinc-600 hover:text-zinc-400 text-xs font-mono transition-colors"
+            data-testid="link-web3bio"
+          >
+            View full identity graph on web3.bio <Icons.External />
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ profile }: { profile: Partial<Web3BioProfile> | null }) {
+  return (
+    <footer className="py-6 px-4 border-t border-zinc-900" data-testid="section-footer">
+      <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="font-mono text-zinc-600 flex items-center gap-2">
+          {profile?.address && (
+            <span className="text-zinc-700">{profile.address.slice(0, 6)}...{profile.address.slice(-4)}</span>
+          )}
+          <span>|</span>
+          <span>{profile?.identity || DJZS_ENS}</span>
+          <span>|</span>
+          <span>Base Mainnet</span>
+        </div>
+        <div className="font-mono text-zinc-700">
+          Identity via <a href="https://web3.bio" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-zinc-400">web3.bio</a>
         </div>
       </div>
     </footer>
   );
-};
+}
+
+export default function DJZSLandingPage() {
+  const { profile, loading, error } = useWeb3Bio(DJZS_ENS);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [walletError, setWalletError] = useState<string | null>(null);
+
+  const handleConnectWallet = useCallback(() => {
+    if (isWalletConnected) {
+      setIsWalletConnected(false);
+      setWalletAddress(null);
+      setWalletError(null);
+      return;
+    }
+
+    setWalletError(null);
+
+    const ethereum = (window as any).ethereum;
+    if (!ethereum) {
+      setWalletError('No wallet detected. Install MetaMask or a compatible wallet.');
+      return;
+    }
+
+    ethereum.request({ method: 'eth_requestAccounts' })
+      .then((accounts: string[]) => {
+        if (accounts && accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+          setIsWalletConnected(true);
+        }
+      })
+      .catch((err: any) => {
+        if (err?.code === 4001) {
+          setWalletError('Connection rejected.');
+        } else {
+          setWalletError('Wallet connection failed.');
+        }
+      });
+  }, [isWalletConnected]);
+
+  const displayProfile = error ? { ...FALLBACK_PROFILE, identity: DJZS_ENS } : profile;
+
+  return (
+    <div className="min-h-screen bg-black text-white" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+      <div className="pointer-events-none fixed inset-0 z-50" style={{ background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 2px)' }} />
+
+      <Header
+        profile={displayProfile}
+        loading={loading}
+        onConnectWallet={handleConnectWallet}
+        isWalletConnected={isWalletConnected}
+        walletAddress={walletAddress}
+        walletError={walletError}
+      />
+
+      <main>
+        <Hero profile={displayProfile} loading={loading} />
+        <Tollbooth />
+        <Onboarding 
+          onConnectWallet={handleConnectWallet}
+          isWalletConnected={isWalletConnected}
+          walletAddress={walletAddress}
+        />
+        <Evolution />
+        <TollboothArchitecture />
+        <TheArchitect profile={displayProfile} loading={loading} />
+        <SimulationStack />
+        <TheDispatch />
+        <KYADemo />
+        <Contact
+          profile={displayProfile}
+          loading={loading}
+          onConnectWallet={handleConnectWallet}
+          isWalletConnected={isWalletConnected}
+          walletAddress={walletAddress}
+          walletError={walletError}
+        />
+      </main>
+
+      <Footer profile={displayProfile} />
+    </div>
+  );
+}
