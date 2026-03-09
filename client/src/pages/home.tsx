@@ -432,7 +432,7 @@ function Tollbooth() {
 
 // MoltMail + DJZS Agent Creation
 const MOLTMAIL_CLAWHUB_URL = 'https://clawhub.ai/SebasAran16/moltmail-io';
-const DJZS_APP_URL = 'https://djzs.ai';
+const IRONCLAW_APP_URL = 'https://ironclaw.app';
 
 type AgentType = 'founder' | 'trader' | 'researcher' | null;
 
@@ -511,14 +511,13 @@ function Onboarding({ onConnectWallet, isWalletConnected, walletAddress }: {
   }, [isWalletConnected, agentName, agentType]);
 
   const handleDeployAgent = useCallback(() => {
-    // Redirect to djzs.ai with agent config
     const params = new URLSearchParams({
       type: agentType || '',
       name: agentName,
       email: provisionedEmail || '',
       wallet: walletAddress || '',
     });
-    window.open(`${DJZS_APP_URL}/create?${params.toString()}`, '_blank');
+    window.open(`${IRONCLAW_APP_URL}?${params.toString()}`, '_blank');
   }, [agentType, agentName, provisionedEmail, walletAddress]);
 
   return (
@@ -650,10 +649,13 @@ function Onboarding({ onConnectWallet, isWalletConnected, walletAddress }: {
             )}
           </div>
           
-          {/* Step 4: Deploy to DJZS */}
+          {/* Step 4: Deploy via Ironclaw */}
           <div className={`p-5 border ${step === 4 ? 'border-green-400/50 bg-green-400/5' : 'border-zinc-800/50 bg-zinc-950/30'}`}>
             <div className="flex justify-between items-center mb-3">
               <span className={step >= 4 ? 'text-white' : 'text-zinc-600'}>STEP 4 · DEPLOY AGENT</span>
+              {step === 4 && (
+                <span className="text-xs border border-green-400/50 text-green-400 px-2 py-0.5">TEE-SECURED</span>
+              )}
             </div>
             {step === 4 ? (
               <div className="space-y-4">
@@ -670,20 +672,45 @@ function Onboarding({ onConnectWallet, isWalletConnected, walletAddress }: {
                     <div className="text-white">{walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}</div>
                     <div className="text-zinc-500">Verification:</div>
                     <div className="text-amber-400">DJZS Adversarial Oracle</div>
+                    <div className="text-zinc-500">Runtime:</div>
+                    <div className="text-cyan-400">Ironclaw TEE</div>
+                    <div className="text-zinc-500">Network:</div>
+                    <div className="text-cyan-400">NEAR AI Cloud</div>
                   </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: 'TEE-SECURED', color: 'border-green-400/40 text-green-400' },
+                    { label: 'WASM-SANDBOXED', color: 'border-blue-400/40 text-blue-400' },
+                    { label: 'AES-256', color: 'border-amber-400/40 text-amber-400' },
+                    { label: 'ZERO TELEMETRY', color: 'border-purple-400/40 text-purple-400' },
+                  ].map((badge) => (
+                    <span key={badge.label} className={`text-xs font-mono border px-2 py-0.5 ${badge.color}`} data-testid={`badge-${badge.label.toLowerCase()}`}>
+                      {badge.label}
+                    </span>
+                  ))}
                 </div>
                 <button
                   onClick={handleDeployAgent}
+                  data-testid="button-deploy-ironclaw"
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-400 text-black font-mono text-sm font-bold hover:bg-green-300 transition-colors"
                 >
-                  DEPLOY TO DJZS.AI <Icons.ArrowRight />
+                  DEPLOY VIA IRONCLAW <Icons.ArrowRight />
                 </button>
                 <p className="text-zinc-500 text-xs text-center">
-                  Your agent will be created with adversarial verification enabled by default.
+                  Deployed to Ironclaw's secure runtime with DJZS adversarial verification enabled.
                 </p>
+                <div className="flex items-center justify-center gap-2 pt-2 border-t border-zinc-800/50">
+                  <span className="text-zinc-600 text-xs font-mono">Powered by</span>
+                  <a href="https://ironclaw.com" target="_blank" rel="noopener noreferrer" className="text-cyan-400 text-xs font-mono font-bold hover:text-cyan-300 transition-colors" data-testid="link-ironclaw">
+                    IRONCLAW <Icons.External />
+                  </a>
+                  <span className="text-zinc-700 text-xs">×</span>
+                  <span className="text-green-400 text-xs font-mono font-bold">DJZS</span>
+                </div>
               </div>
             ) : (
-              <p className="text-zinc-600 text-sm">Deploy your verified agent to the A2A economy.</p>
+              <p className="text-zinc-600 text-sm">Deploy to Ironclaw's TEE-secured runtime.</p>
             )}
           </div>
         </div>
@@ -783,12 +810,13 @@ function TollboothArchitecture() {
               </div>
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-zinc-800 grid grid-cols-4 gap-3 text-xs font-mono">
+          <div className="mt-6 pt-4 border-t border-zinc-800 grid grid-cols-5 gap-3 text-xs font-mono">
             {[
               { l: 'PAY', v: 'x402 USDC', color: 'text-blue-400' },
               { l: 'CHAIN', v: 'Base', color: 'text-green-400' },
               { l: 'TEE', v: 'Phala', color: 'text-amber-400' },
               { l: 'LOG', v: 'Irys', color: 'text-green-400' },
+              { l: 'RUNTIME', v: 'Ironclaw', color: 'text-cyan-400' },
             ].map((x, i) => (
               <div key={i} className="text-center">
                 <div className="text-zinc-600">{x.l}</div>

@@ -57,7 +57,7 @@ drizzle.config.ts            — Drizzle Kit config
 1. **Header** — Fixed nav with web3.bio avatar, identity badge, wallet connect button
 2. **Hero** — Terminal boot sequence, identity resolution, outcome status cards
 3. **Tollbooth** — Protocol capabilities, receipts, log stream, teaching pillars
-4. **Onboarding** — 3-step flow (Username → Agent Core → Go Live) + MoltMail agent email
+4. **Onboarding** — 4-step agent creation (Connect Wallet → Select Type → Name & Email → Deploy via Ironclaw)
 5. **Evolution** — Timeline from consciousness study to protocol deployment
 6. **TollboothArchitecture** — Visual audit-before-act loop diagram
 7. **TheArchitect** — Builder profile with web3.bio-resolved avatar and identity graph
@@ -71,6 +71,7 @@ drizzle.config.ts            — Drizzle Kit config
 - **web3.bio API** — Called directly from frontend `useWeb3Bio` hook to resolve ENS identity (username.dj-z-s.eth)
 - **Wallet Connect** — Native `window.ethereum` MetaMask integration
 - **MoltMail** — Agent email provisioning via clawhub.ai
+- **Ironclaw** — TEE-secured agent runtime deployment via ironclaw.app (NEAR AI Cloud)
 
 ## API Endpoints
 - **GET `/health`** — Health check: `{ ok: true, service: "djzs-agent-backend", status: "UP" }`
