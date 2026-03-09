@@ -318,7 +318,6 @@ function Hero({ profile, loading }: { profile: Partial<Web3BioProfile> | null; l
           ))}
         </div>
 
-        {/* FIX #1: Deduplicated identity badges with actual identity strings */}
         <div className="mt-4 flex flex-wrap gap-2 justify-center">
           {HERO_IDENTITIES.map((id, i) => (
             <span key={i} className="px-2 py-1 border border-zinc-800 text-zinc-400 font-mono text-xs hover:border-zinc-600 hover:text-zinc-300 transition-colors" data-testid={`badge-identity-${i}`}>
@@ -431,146 +430,260 @@ function Tollbooth() {
   );
 }
 
-// MoltMail integration
+// MoltMail + DJZS Agent Creation
 const MOLTMAIL_CLAWHUB_URL = 'https://clawhub.ai/SebasAran16/moltmail-io';
+const DJZS_APP_URL = 'https://djzs.ai';
+
+type AgentType = 'founder' | 'trader' | 'researcher' | null;
+
+const AGENT_TYPES = [
+  {
+    id: 'founder' as AgentType,
+    title: 'FOUNDER',
+    icon: '🏗️',
+    description: 'Strategic decision-making. Fundraising logic. Cap table management.',
+    color: 'border-purple-500/50 text-purple-400 bg-purple-500/5',
+    activeColor: 'border-purple-400 bg-purple-400/20',
+  },
+  {
+    id: 'trader' as AgentType,
+    title: 'TRADER',
+    icon: '📈',
+    description: 'Market analysis. Position sizing. Risk management. Execution verification.',
+    color: 'border-blue-500/50 text-blue-400 bg-blue-500/5',
+    activeColor: 'border-blue-400 bg-blue-400/20',
+  },
+  {
+    id: 'researcher' as AgentType,
+    title: 'RESEARCHER',
+    icon: '🔬',
+    description: 'Data synthesis. Source verification. Knowledge graph construction.',
+    color: 'border-green-500/50 text-green-400 bg-green-500/5',
+    activeColor: 'border-green-400 bg-green-400/20',
+  },
+];
 
 function Onboarding({ onConnectWallet, isWalletConnected, walletAddress }: {
   onConnectWallet: () => void;
   isWalletConnected: boolean;
   walletAddress: string | null;
 }) {
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [agentType, setAgentType] = useState<AgentType>(null);
   const [agentName, setAgentName] = useState('');
   const [isProvisioning, setIsProvisioning] = useState(false);
   const [provisionedEmail, setProvisionedEmail] = useState<string | null>(null);
 
-  // Generate suggested agent name from wallet
-  const suggestedName = walletAddress 
+  // Generate suggested agent name from wallet + type
+  const suggestedName = walletAddress && agentType
+    ? `${agentType}-${walletAddress.slice(2, 8).toLowerCase()}`
+    : walletAddress 
     ? `agent-${walletAddress.slice(2, 8).toLowerCase()}`
     : '';
 
+  // Handle wallet connection
+  useEffect(() => {
+    if (isWalletConnected && step === 1) {
+      setStep(2);
+    }
+  }, [isWalletConnected, step]);
+
+  const handleSelectType = useCallback((type: AgentType) => {
+    setAgentType(type);
+    if (type && !agentName) {
+      setAgentName(`${type}-${walletAddress?.slice(2, 8).toLowerCase() || 'agent'}`);
+    }
+    setStep(3);
+  }, [agentName, walletAddress]);
+
   const handleProvisionEmail = useCallback(async () => {
-    if (!isWalletConnected || !agentName.trim()) return;
+    if (!isWalletConnected || !agentName.trim() || !agentType) return;
     
     setIsProvisioning(true);
     
-    // Simulate provisioning delay - in production, call MoltMail API
-    // POST to MoltMail API endpoint with wallet signature
+    // Simulate provisioning - in production, call MoltMail API
     setTimeout(() => {
       const email = `${agentName.toLowerCase().replace(/[^a-z0-9-]/g, '')}@moltmail.io`;
       setProvisionedEmail(email);
       setIsProvisioning(false);
-      
-      // Open MoltMail to complete setup with wallet
-      window.open(`${MOLTMAIL_CLAWHUB_URL}?agent=${agentName}&wallet=${walletAddress}`, '_blank');
+      setStep(4);
     }, 1500);
-  }, [isWalletConnected, agentName, walletAddress]);
+  }, [isWalletConnected, agentName, agentType]);
+
+  const handleDeployAgent = useCallback(() => {
+    // Redirect to djzs.ai with agent config
+    const params = new URLSearchParams({
+      type: agentType || '',
+      name: agentName,
+      email: provisionedEmail || '',
+      wallet: walletAddress || '',
+    });
+    window.open(`${DJZS_APP_URL}/create?${params.toString()}`, '_blank');
+  }, [agentType, agentName, provisionedEmail, walletAddress]);
 
   return (
     <section data-testid="section-onboarding" className="py-16 px-4 border-t border-zinc-800">
       <div className="max-w-4xl mx-auto">
-        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// ONBOARDING</h2>
+        <h2 className="font-mono text-zinc-500 text-xs mb-2 tracking-widest">// CREATE YOUR AGENT</h2>
+        <p className="font-mono text-zinc-400 text-sm mb-6">Deploy an AI agent with adversarial verification built in.</p>
+        
+        {/* Progress Indicator */}
+        <div className="flex items-center gap-2 mb-8 font-mono text-xs">
+          {[1, 2, 3, 4].map((s) => (
+            <React.Fragment key={s}>
+              <div className={`w-8 h-8 flex items-center justify-center border ${
+                step >= s ? 'border-green-400 text-green-400 bg-green-400/10' : 'border-zinc-700 text-zinc-600'
+              }`}>
+                {step > s ? '✓' : s}
+              </div>
+              {s < 4 && <div className={`flex-1 h-px ${step > s ? 'bg-green-400' : 'bg-zinc-700'}`} />}
+            </React.Fragment>
+          ))}
+        </div>
+
         <div className="space-y-4 font-mono">
-          {/* Step 1 */}
-          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-white">STEP 1 · USERNAME</span>
-              <span className="text-xs border border-amber-400/50 text-amber-400 px-2 py-1">COMING SOON</span>
+          {/* Step 1: Connect Wallet */}
+          <div className={`p-5 border ${step === 1 ? 'border-green-400/50 bg-green-400/5' : 'border-zinc-800 bg-zinc-950/50'}`}>
+            <div className="flex justify-between items-center mb-3">
+              <span className={step >= 1 ? 'text-white' : 'text-zinc-500'}>STEP 1 · CONNECT WALLET</span>
+              {step > 1 && <span className="text-xs text-green-400 flex items-center gap-1"><Icons.Verified /> CONNECTED</span>}
             </div>
-            <p className="text-zinc-400 text-sm">Mint a username. Bind your handle on-chain.</p>
-          </div>
-          
-          {/* Step 2 */}
-          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
-            <div className="text-white mb-2">STEP 2 · AGENT CORE</div>
-            <p className="text-zinc-400 text-sm">Boot your DJZS Agent with verification modes.</p>
-          </div>
-          
-          {/* Step 3 */}
-          <div className="p-4 border border-zinc-800 bg-zinc-950/50">
-            <div className="text-white mb-2">STEP 3 · GO LIVE</div>
-            <p className="text-zinc-400 text-sm">Your agent enters the A2A economy with x402 payment gating.</p>
-          </div>
-          
-          {/* MoltMail Agent Email Provisioning */}
-          <div className="p-5 border border-green-400/30 bg-green-400/5">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-green-400 font-bold">MOLTMAIL · AGENT EMAIL</span>
-              <span className="text-xs border border-green-400/50 text-green-400 px-2 py-1">ENCRYPTED</span>
-            </div>
-            
-            {!isWalletConnected ? (
-              // Step 1: Connect Wallet
+            {step === 1 ? (
               <div>
-                <p className="text-zinc-300 text-sm mb-4">
-                  Give your AI agent its own inbox. No CAPTCHAs. No phone verification. Wallet-based identity.
-                </p>
+                <p className="text-zinc-400 text-sm mb-4">Connect your wallet to create and manage your agent.</p>
                 <button
                   onClick={onConnectWallet}
                   className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors"
-                  data-testid="button-connect-for-email"
                 >
-                  <Icons.Wallet /> CONNECT WALLET TO START
+                  <Icons.Wallet /> CONNECT WALLET
                 </button>
               </div>
-            ) : provisionedEmail ? (
-              // Step 3: Email Provisioned
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-green-400">
-                  <Icons.Verified />
-                  <span className="text-sm">Agent email provisioned</span>
-                </div>
-                <div className="bg-black border border-green-400/50 p-3">
-                  <div className="text-zinc-500 text-xs mb-1">YOUR AGENT'S INBOX:</div>
-                  <div className="text-green-400 text-lg font-bold">{provisionedEmail}</div>
-                </div>
-                <p className="text-zinc-500 text-xs">
-                  Complete setup on MoltMail to activate sending and receiving.
-                </p>
+            ) : (
+              <p className="text-green-400 text-sm">{walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}</p>
+            )}
+          </div>
+          
+          {/* Step 2: Select Agent Type */}
+          <div className={`p-5 border ${step === 2 ? 'border-green-400/50 bg-green-400/5' : step > 2 ? 'border-zinc-800 bg-zinc-950/50' : 'border-zinc-800/50 bg-zinc-950/30'}`}>
+            <div className="flex justify-between items-center mb-3">
+              <span className={step >= 2 ? 'text-white' : 'text-zinc-600'}>STEP 2 · SELECT AGENT TYPE</span>
+              {step > 2 && agentType && (
+                <span className="text-xs text-green-400 flex items-center gap-1">
+                  <Icons.Verified /> {agentType.toUpperCase()}
+                </span>
+              )}
+            </div>
+            {step === 2 ? (
+              <div className="grid sm:grid-cols-3 gap-3 mt-4">
+                {AGENT_TYPES.map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => handleSelectType(type.id)}
+                    className={`p-4 border text-left transition-all hover:brightness-110 ${
+                      agentType === type.id ? type.activeColor : type.color
+                    }`}
+                  >
+                    <div className="text-2xl mb-2">{type.icon}</div>
+                    <div className={`text-sm font-bold mb-1 ${type.color.split(' ')[1]}`}>{type.title}</div>
+                    <p className="text-zinc-500 text-xs leading-relaxed">{type.description}</p>
+                  </button>
+                ))}
+              </div>
+            ) : step > 2 && agentType ? (
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{AGENT_TYPES.find(t => t.id === agentType)?.icon}</span>
+                <span className="text-zinc-300">{AGENT_TYPES.find(t => t.id === agentType)?.title}</span>
               </div>
             ) : (
-              // Step 2: Name Your Agent
+              <p className="text-zinc-600 text-sm">Choose your agent's specialization.</p>
+            )}
+          </div>
+          
+          {/* Step 3: Name + Provision Email */}
+          <div className={`p-5 border ${step === 3 ? 'border-green-400/50 bg-green-400/5' : step > 3 ? 'border-zinc-800 bg-zinc-950/50' : 'border-zinc-800/50 bg-zinc-950/30'}`}>
+            <div className="flex justify-between items-center mb-3">
+              <span className={step >= 3 ? 'text-white' : 'text-zinc-600'}>STEP 3 · NAME & EMAIL</span>
+              {step > 3 && <span className="text-xs text-green-400 flex items-center gap-1"><Icons.Verified /> PROVISIONED</span>}
+            </div>
+            {step === 3 ? (
               <div className="space-y-4">
-                <p className="text-zinc-300 text-sm">
-                  Connected: <span className="text-green-400">{walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}</span>
-                </p>
                 <div>
-                  <label className="text-zinc-500 text-xs block mb-2">NAME YOUR AGENT:</label>
+                  <label className="text-zinc-500 text-xs block mb-2">AGENT NAME:</label>
                   <div className="flex gap-2">
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        value={agentName}
-                        onChange={(e) => setAgentName(e.target.value)}
-                        placeholder={suggestedName}
-                        className="w-full bg-black border border-zinc-700 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-green-400/50 focus:outline-none transition-colors"
-                        data-testid="input-agent-name"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 text-xs">@moltmail.io</span>
-                    </div>
+                    <input
+                      type="text"
+                      value={agentName}
+                      onChange={(e) => setAgentName(e.target.value)}
+                      placeholder={suggestedName}
+                      className="flex-1 bg-black border border-zinc-700 px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:border-green-400/50 focus:outline-none transition-colors"
+                    />
                   </div>
-                  {!agentName && (
+                  {!agentName && suggestedName && (
                     <button 
                       onClick={() => setAgentName(suggestedName)}
                       className="text-zinc-500 text-xs mt-2 hover:text-zinc-300 transition-colors"
-                      data-testid="button-use-suggested-name"
                     >
                       Use suggested: {suggestedName}
                     </button>
                   )}
                 </div>
+                <div className="bg-black/50 border border-zinc-800 p-3">
+                  <div className="text-zinc-500 text-xs mb-1">AGENT EMAIL (via MoltMail):</div>
+                  <div className="text-green-400">{agentName || suggestedName || 'your-agent'}@moltmail.io</div>
+                </div>
                 <button
                   onClick={handleProvisionEmail}
                   disabled={isProvisioning || !agentName.trim()}
                   className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  data-testid="button-provision-email"
                 >
                   {isProvisioning ? (
                     <>PROVISIONING<LoadingDots /></>
                   ) : (
-                    <><Icons.Mail /> PROVISION AGENT EMAIL</>
+                    <><Icons.Mail /> PROVISION EMAIL</>
                   )}
                 </button>
               </div>
+            ) : step > 3 ? (
+              <div className="text-green-400 text-sm">{provisionedEmail}</div>
+            ) : (
+              <p className="text-zinc-600 text-sm">Name your agent and get a Web3-native inbox.</p>
+            )}
+          </div>
+          
+          {/* Step 4: Deploy to DJZS */}
+          <div className={`p-5 border ${step === 4 ? 'border-green-400/50 bg-green-400/5' : 'border-zinc-800/50 bg-zinc-950/30'}`}>
+            <div className="flex justify-between items-center mb-3">
+              <span className={step >= 4 ? 'text-white' : 'text-zinc-600'}>STEP 4 · DEPLOY AGENT</span>
+            </div>
+            {step === 4 ? (
+              <div className="space-y-4">
+                <div className="bg-black border border-zinc-800 p-4">
+                  <div className="text-zinc-500 text-xs mb-3">AGENT CONFIGURATION:</div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="text-zinc-500">Type:</div>
+                    <div className="text-white">{agentType?.toUpperCase()}</div>
+                    <div className="text-zinc-500">Name:</div>
+                    <div className="text-white">{agentName}</div>
+                    <div className="text-zinc-500">Email:</div>
+                    <div className="text-green-400">{provisionedEmail}</div>
+                    <div className="text-zinc-500">Wallet:</div>
+                    <div className="text-white">{walletAddress?.slice(0, 6)}...{walletAddress?.slice(-4)}</div>
+                    <div className="text-zinc-500">Verification:</div>
+                    <div className="text-amber-400">DJZS Adversarial Oracle</div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleDeployAgent}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-400 text-black font-mono text-sm font-bold hover:bg-green-300 transition-colors"
+                >
+                  DEPLOY TO DJZS.AI <Icons.ArrowRight />
+                </button>
+                <p className="text-zinc-500 text-xs text-center">
+                  Your agent will be created with adversarial verification enabled by default.
+                </p>
+              </div>
+            ) : (
+              <p className="text-zinc-600 text-sm">Deploy your verified agent to the A2A economy.</p>
             )}
           </div>
         </div>
@@ -861,7 +974,6 @@ function TheDispatch() {
   );
 }
 
-// FIX #4: KYA Demo with improved examples including non-degen business logic
 function KYADemo() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState<AuditResponse | null>(null);
@@ -919,7 +1031,6 @@ function KYADemo() {
             {!isProcessing && !output && <div className="text-zinc-700">// AWAITING INPUT...</div>}
           </div>
         </div>
-        {/* Example queries hint */}
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="text-zinc-600 text-xs font-mono">Examples:</span>
           {['rebalance', 'treasury', 'swap 50%', 'arbitrage'].map((ex) => (
@@ -927,7 +1038,6 @@ function KYADemo() {
               key={ex}
               onClick={() => setInput(ex)}
               className="text-zinc-500 text-xs font-mono hover:text-zinc-300 transition-colors"
-              data-testid={`button-kya-example-${ex.replace(/\s+/g, '-')}`}
             >
               {ex}
             </button>
