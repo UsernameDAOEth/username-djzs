@@ -53,19 +53,20 @@ vite-plugin-meta-images.ts   — Custom plugin for OG image meta tags
 drizzle.config.ts            — Drizzle Kit config
 ```
 
-## Home Page Sections (12)
+## Home Page Sections (13)
 1. **Header** — Fixed nav with web3.bio avatar, identity badge, wallet connect button
 2. **Hero** — Terminal boot sequence, identity resolution, outcome status cards
 3. **Tollbooth** — Protocol capabilities, receipts, log stream, teaching pillars
 4. **Onboarding** — 4-step agent creation (Connect Wallet → Select Type → Name & Email → Deploy via Ironclaw)
-5. **Evolution** — Timeline from consciousness study to protocol deployment
-6. **TollboothArchitecture** — Visual audit-before-act loop diagram
-7. **TheArchitect** — Builder profile with web3.bio-resolved avatar and identity graph
-8. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
-9. **TheDispatch** — Article links to username.box
-10. **KYADemo** — Interactive adversarial oracle demo (swap/arbitrage/treasury/rebalance)
-11. **Contact** — XMTP chat + social links resolved from ENS
-12. **Footer** — Address, identity, network info
+5. **ConnectToDJZS** — Post-deployment connection guide: REST API tiers (Micro/Founder/Treasury/Escrow) + XMTP dark channel prefix routing, curl examples, ProofOfLogic response format
+6. **Evolution** — Timeline from consciousness study to protocol deployment
+7. **TollboothArchitecture** — Visual audit-before-act loop diagram
+8. **TheArchitect** — Builder profile with web3.bio-resolved avatar and identity graph
+9. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
+10. **TheDispatch** — Article links to username.box
+11. **KYADemo** — Interactive adversarial oracle demo (swap/arbitrage/treasury/rebalance)
+12. **Contact** — XMTP chat + social links resolved from ENS
+13. **Footer** — Address, identity, network info
 
 ## Key Integrations
 - **web3.bio API** — Called directly from frontend `useWeb3Bio` hook to resolve ENS identity (username.dj-z-s.eth)
