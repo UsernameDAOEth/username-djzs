@@ -53,7 +53,7 @@ vite-plugin-meta-images.ts   — Custom plugin for OG image meta tags
 drizzle.config.ts            — Drizzle Kit config
 ```
 
-## Home Page Sections (13)
+## Home Page Sections (12)
 1. **Header** — Fixed nav with web3.bio avatar, identity badge, wallet connect button
 2. **Hero** — Terminal boot sequence, identity resolution, outcome status cards
 3. **Tollbooth** — Protocol capabilities, receipts, log stream, teaching pillars
@@ -64,9 +64,8 @@ drizzle.config.ts            — Drizzle Kit config
 8. **TheArchitect** — Builder profile with web3.bio-resolved avatar and identity graph
 9. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
 10. **TheDispatch** — Article links to username.box
-11. **KYADemo** — Interactive adversarial oracle demo (swap/arbitrage/treasury/rebalance)
-12. **Contact** — XMTP chat + social links resolved from ENS
-13. **Footer** — Address, identity, network info
+11. **Contact** — XMTP chat + social links resolved from ENS
+12. **Footer** — Address, identity, network info
 
 ## Key Integrations
 - **web3.bio API** — Called directly from frontend `useWeb3Bio` hook to resolve ENS identity (username.dj-z-s.eth)

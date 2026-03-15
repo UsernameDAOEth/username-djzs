@@ -107,36 +107,6 @@ const HERO_IDENTITIES = [
   { identity: 'usernamedao.base.eth', platform: 'Basenames' },
 ];
 
-interface AuditResponse {
-  verdict: string;
-  risk_score: number;
-  flags: string[];
-  logic_hash: string;
-  recommendation: string;
-}
-
-const DEMO_AUDITS: Array<{ input: string; response: AuditResponse }> = [
-  {
-    input: "swap",
-    response: { verdict: "FAIL", risk_score: 9, flags: ["DJZS-I01: FOMO_LOOP", "DJZS-I04: CONCENTRATION_RISK"], logic_hash: "0x7f3a...c821", recommendation: "Action blocked. Portfolio concentration exceeds safety threshold." }
-  },
-  {
-    input: "arbitrage",
-    response: { verdict: "PASS", risk_score: 3, flags: [], logic_hash: "0x4e2b...a917", recommendation: "Logic verified. Proceed with execution." }
-  },
-  {
-    input: "trust",
-    response: { verdict: "FAIL", risk_score: 7, flags: ["DJZS-I02: NARRATIVE_DEPENDENCY", "DJZS-I05: UNVERIFIED_CONTRACT"], logic_hash: "0x9c1d...f432", recommendation: "Insufficient verification data. Manual audit required." }
-  },
-  {
-    input: "treasury",
-    response: { verdict: "CONDITIONAL", risk_score: 5, flags: ["DJZS-E01: MULTI_SIG_REQUIRED"], logic_hash: "0x8d4c...b293", recommendation: "Exceeds single-signer threshold. Requires 2/3 multi-sig approval before execution." }
-  },
-  {
-    input: "rebalance",
-    response: { verdict: "PASS", risk_score: 2, flags: [], logic_hash: "0x2f1a...d847", recommendation: "Rebalance within defined parameters. Risk exposure acceptable." }
-  }
-];
 
 const Icons = {
   Github: () => <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>,
@@ -1271,79 +1241,6 @@ function TheDispatch() {
   );
 }
 
-function KYADemo() {
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState<AuditResponse | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const runAudit = useCallback(() => {
-    if (!input.trim() || isProcessing) return;
-    setIsProcessing(true);
-    setOutput(null);
-    setTimeout(() => {
-      const demo = DEMO_AUDITS.find(d => input.toLowerCase().includes(d.input)) || DEMO_AUDITS[2];
-      setOutput(demo.response);
-      setIsProcessing(false);
-    }, 1200);
-  }, [input, isProcessing]);
-
-  return (
-    <section className="py-16 px-4 bg-zinc-950/50" data-testid="section-kya-demo">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// KYA DEMO</h2>
-        <p className="text-zinc-500 text-xs mb-4">Test the Adversarial Oracle</p>
-        <div className="border border-zinc-800 bg-black">
-          <div className="p-3 border-b border-zinc-800">
-            <div className="flex items-center gap-2">
-              <span className="text-green-400 font-mono">&gt;</span>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && runAudit()}
-                placeholder="try: rebalance portfolio OR treasury withdrawal"
-                className="flex-1 bg-transparent text-white font-mono text-sm outline-none placeholder:text-zinc-700"
-                data-testid="input-kya-query"
-              />
-              <button
-                onClick={runAudit}
-                disabled={isProcessing}
-                className="px-3 py-1.5 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors disabled:opacity-50 flex items-center gap-1"
-                data-testid="button-kya-audit"
-              >
-                {isProcessing ? '...' : 'AUDIT'} {!isProcessing && <Icons.Send />}
-              </button>
-            </div>
-          </div>
-          <div className="p-3 font-mono text-xs min-h-[120px]" data-testid="kya-output">
-            {isProcessing && <div className="text-zinc-500">// AUDITING...<Cursor /></div>}
-            {output && (
-              <div className="space-y-2">
-                <div className={`text-sm font-bold ${output.verdict === 'PASS' ? 'text-green-400' : output.verdict === 'CONDITIONAL' ? 'text-amber-400' : 'text-red-400'}`}>VERDICT: {output.verdict}</div>
-                <div><span className="text-zinc-500">RISK:</span> <span className={output.risk_score > 5 ? 'text-red-400' : output.risk_score > 3 ? 'text-amber-400' : 'text-green-400'}>{output.risk_score}/10</span></div>
-                {output.flags.length > 0 && <div>{output.flags.map((f, i) => <div key={i} className="text-amber-400">→ {f}</div>)}</div>}
-                <div className="pt-2 border-t border-zinc-800 text-zinc-400">{output.recommendation}</div>
-              </div>
-            )}
-            {!isProcessing && !output && <div className="text-zinc-700">// AWAITING INPUT...</div>}
-          </div>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="text-zinc-600 text-xs font-mono">Examples:</span>
-          {['rebalance', 'treasury', 'swap 50%', 'arbitrage'].map((ex) => (
-            <button
-              key={ex}
-              onClick={() => setInput(ex)}
-              className="text-zinc-500 text-xs font-mono hover:text-zinc-300 transition-colors"
-            >
-              {ex}
-            </button>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
   profile: Partial<Web3BioProfile> | null;
@@ -1536,7 +1433,6 @@ export default function DJZSLandingPage() {
         <TheArchitect profile={displayProfile} loading={loading} />
         <SimulationStack />
         <TheDispatch />
-        <KYADemo />
         <Contact
           profile={displayProfile}
           loading={loading}
