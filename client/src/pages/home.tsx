@@ -1098,54 +1098,6 @@ function Evolution() {
   );
 }
 
-function TollboothArchitecture() {
-  return (
-    <section className="py-16 px-4" data-testid="section-architecture">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// THE TOLLBOOTH — ARCHITECTURE</h2>
-        <div className="border border-zinc-800 bg-zinc-950/30 p-5">
-          <div className="font-mono text-xs text-zinc-500 mb-6">AUDIT-BEFORE-ACT LOOP:</div>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-center">
-            <div className="border border-amber-400/50 bg-amber-400/5 px-4 py-3">
-              <div className="text-amber-400 text-sm font-bold">AGENT</div>
-              <div className="text-zinc-600 text-xs mt-1">Request</div>
-            </div>
-            <div className="text-green-400 text-xl">→</div>
-            <div className="border-2 border-green-400 bg-green-400/10 px-6 py-3 relative">
-              <div className="text-green-400 text-sm font-bold">TOLLBOOTH</div>
-              <div className="text-zinc-500 text-xs mt-1">Adversarial Oracle</div>
-            </div>
-            <div className="text-green-400 text-xl">→</div>
-            <div className="flex gap-3">
-              <div className="border border-green-400/50 bg-green-400/5 px-4 py-3">
-                <div className="text-green-400 text-sm font-bold">PASS</div>
-                <div className="text-zinc-600 text-xs mt-1">Execute</div>
-              </div>
-              <div className="border border-red-400/50 bg-red-400/5 px-4 py-3">
-                <div className="text-red-400 text-sm font-bold">FAIL</div>
-                <div className="text-zinc-600 text-xs mt-1">Abort</div>
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 pt-4 border-t border-zinc-800 grid grid-cols-5 gap-3 text-xs font-mono">
-            {[
-              { l: 'PAY', v: 'x402 USDC', color: 'text-blue-400' },
-              { l: 'CHAIN', v: 'Base', color: 'text-green-400' },
-              { l: 'TEE', v: 'Phala', color: 'text-amber-400' },
-              { l: 'LOG', v: 'Irys', color: 'text-green-400' },
-              { l: 'RUNTIME', v: 'Ironclaw', color: 'text-cyan-400' },
-            ].map((x, i) => (
-              <div key={i} className="text-center">
-                <div className="text-zinc-600">{x.l}</div>
-                <div className={x.color}>{x.v}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 function TheArchitect({ profile, loading }: { profile: Partial<Web3BioProfile> | null; loading: boolean }) {
   const identities = [
@@ -1581,7 +1533,6 @@ export default function DJZSLandingPage() {
         <ConnectToDJZS />
         <PortableOracle />
         <Evolution />
-        <TollboothArchitecture />
         <TheArchitect profile={displayProfile} loading={loading} />
         <SimulationStack />
         <TheDispatch />
