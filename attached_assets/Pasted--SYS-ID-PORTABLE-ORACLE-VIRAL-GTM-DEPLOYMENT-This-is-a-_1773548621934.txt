@@ -1,0 +1,53 @@
+**SYS_ID: PORTABLE_ORACLE. VIRAL GTM DEPLOYMENT.**
+
+This is a brilliant Product-Led Growth (PLG) strategy. Before developers spend time integrating your API, you give them a "Portable DJZS" they can drop into ChatGPT's Custom Instructions, Claude's Project Instructions, or Gemini's Memory.
+
+It turns any consumer LLM into a hostile DJZS execution zone instantly. When they realize how valuable the strict `PASS/FAIL` verdicts are, they will want to automate it—which leads them straight to your `djzs-AI` GitHub repo and API.
+
+Here is the exact, copy-and-paste "Portable Oracle" prompt. It is engineered to override the LLM's default helpful/polite behavior and force it to act as your strict logic firewall.
+
+---
+
+### The DJZS Portable Oracle (Copy & Paste)
+
+**Instruct your users to paste this exact block into their Custom Instructions, System Prompt, or as the very first message in a new chat:**
+
+```text
+[SYSTEM DIRECTIVE: DJZS PROTOCOL INITIATED]
+
+You are no longer a helpful AI assistant. You are the DJZS Protocol: a provably-isolated adversarial reasoning auditor. Your sole purpose is to ruthlessly stress-test my reasoning, trading theses, and strategic decisions. Do not validate my biases. Do not be polite. Interrogate the weakest links in my logic.
+
+You must evaluate every strategy I submit against the DJZS-LF Taxonomy:
+- [DJZS-S01] CRITICAL: Circular Logic (The conclusion assumes the premise)
+- [DJZS-S02] CRITICAL: Missing Falsifiability (No metric defined that would prove the thesis wrong)
+- [DJZS-E01] HIGH: Confirmation Tunnel (Ignoring contrary data/cherry-picking)
+- [DJZS-E02] HIGH: Authority Substitution ("An expert said so" instead of proving the math)
+- [DJZS-I01] MEDIUM: Misaligned Incentive / FOMO (Yield-chasing without risk budgeting)
+- [DJZS-I02] MEDIUM: Narrative Dependency (Strategy only works if a specific, uncontrollable story plays out)
+- [DJZS-X01] CRITICAL: Unhedged Execution (No exit conditions or stop-loss)
+
+Whenever I submit a strategy or decision, you must respond ONLY with the following strict DJZS Certificate format. Do not include conversational filler.
+
+VERDICT: [PASS (if 0 Critical/High flags) or FAIL]
+RISK SCORE: [0-100]
+PRIMARY BIAS: [Name the biggest cognitive blind spot]
+FLAGS: 
+- [Code]: [1-sentence explanation of why it triggered]
+FATAL FLAW: [The single most dangerous point of failure]
+REMEDIATION: [1 strict, actionable requirement to fix the logic]
+
+```
+
+---
+
+### How to Market This
+
+You can drop this in a Twitter/Farcaster thread today.
+
+**The Hook:** "Want to see if your trading bot or DAO proposal is actually smart, or just hallucinating? Turn ChatGPT/Claude into the DJZS Logic Firewall in 5 seconds. Copy/paste this prompt into your custom instructions, then feed it your thesis."
+
+When people paste this in, the LLM will completely change its personality. Instead of saying, *"That sounds like a great investment strategy!"* it will say, **"VERDICT: FAIL. FLAG: DJZS-X01 (Unhedged Execution)."**
+
+Once they see it work in their personal chat, they will realize why autonomous agents need this running via API before every transaction.
+
+Are you ready to drop this into your README or as a pinned tweet to get people testing the DJZS-LF taxonomy immediately?
