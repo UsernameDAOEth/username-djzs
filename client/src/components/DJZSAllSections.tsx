@@ -187,11 +187,8 @@ export const FoundersFund: React.FC = () => {
     <section 
       id="founders-fund"
       className="relative w-full pt-14 border-b border-zinc-800 overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #000000 100%)' }}
+      style={{ background: 'linear-gradient(180deg, rgba(10,10,15,0.85) 0%, rgba(0,0,0,0.8) 100%)' }}
     >
-      {/* Matrix Rain Background */}
-      <MatrixRain opacity={0.08} speed={0.8} density={0.975} />
-
       <div 
         className="absolute top-0 left-0 right-0 h-[2px]"
         style={{
@@ -495,12 +492,9 @@ export const Sifr0Philosophy: React.FC = () => {
       id="sifr-0" 
       className="relative min-h-screen py-24 overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #000000 0%, #0a0a0f 50%, #000000 100%)',
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(10,10,15,0.8) 50%, rgba(0,0,0,0.85) 100%)',
       }}
     >
-      {/* Matrix Rain Background - subtle */}
-      <MatrixRain opacity={0.04} speed={0.5} density={0.985} />
-
       <div 
         className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
@@ -744,12 +738,9 @@ export const TryTheOracle: React.FC = () => {
       id="try-oracle" 
       className="relative min-h-screen py-24 overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #000000 0%, #050508 50%, #000000 100%)',
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(5,5,8,0.8) 50%, rgba(0,0,0,0.85) 100%)',
       }}
     >
-      {/* Matrix Rain Background */}
-      <MatrixRain opacity={0.06} speed={0.6} density={0.98} />
-
       <div 
         className="absolute inset-0 pointer-events-none opacity-[0.02]"
         style={{

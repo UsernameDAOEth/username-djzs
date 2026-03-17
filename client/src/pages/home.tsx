@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { DJZSSections, FoundersFund } from '../components/DJZSAllSections';
+import { DJZSSections, FoundersFund, MatrixRain } from '../components/DJZSAllSections';
 
 interface Web3BioLink {
   url: string;
@@ -1262,9 +1262,13 @@ export default function DJZSLandingPage() {
   const displayProfile = error ? { ...FALLBACK_PROFILE, identity: DJZS_ENS } : profile;
 
   return (
-    <div className="min-h-screen bg-black text-white" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+    <div className="min-h-screen bg-black text-white relative" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <MatrixRain opacity={0.12} speed={0.6} density={0.98} />
+      </div>
       <div className="pointer-events-none fixed inset-0 z-50" style={{ background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.03) 0px, rgba(0,0,0,0.03) 1px, transparent 1px, transparent 2px)' }} />
 
+      <div className="relative z-10">
       <Header
         profile={displayProfile}
         loading={loading}
@@ -1300,6 +1304,7 @@ export default function DJZSLandingPage() {
       </main>
 
       <Footer profile={displayProfile} />
+      </div>
     </div>
   );
 }
