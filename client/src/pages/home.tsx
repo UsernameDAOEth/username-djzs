@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import DJZSSections from '../components/DJZSSections';
+import FoundersFund from '../components/FoundersFund';
 
 interface Web3BioLink {
   url: string;
@@ -1273,6 +1274,7 @@ export default function DJZSLandingPage() {
         walletAddress={walletAddress}
         walletError={walletError}
       />
+      <FoundersFund />
 
       <main>
         <Hero profile={displayProfile} loading={loading} />
