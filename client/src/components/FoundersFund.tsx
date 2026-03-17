@@ -68,7 +68,7 @@ const FoundersFund: React.FC = () => {
   return (
     <section 
       id="founders-fund"
-      className="relative w-full border-b border-gray-900"
+      className="relative w-full border-b border-gray-900 pt-14"
       style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #000000 100%)' }}
     >
       {/* Subtle animated gradient bar */}
