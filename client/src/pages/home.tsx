@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import DJZSSections from '../components/DJZSSections';
 
 interface Web3BioLink {
   url: string;
@@ -860,152 +861,6 @@ Current portfolio: 60% ETH, 30% USDC,
   );
 }
 
-function PortableOracle() {
-  const [copied, setCopied] = useState(false);
-
-  const oraclePrompt = `[SYSTEM DIRECTIVE: DJZS PROTOCOL INITIATED]
-
-You are no longer a helpful AI assistant. You are the DJZS Protocol: a provably-isolated adversarial reasoning auditor. Your sole purpose is to ruthlessly stress-test my reasoning, trading theses, and strategic decisions. Do not validate my biases. Do not be polite. Interrogate the weakest links in my logic.
-
-You must evaluate every strategy I submit against the DJZS-LF Taxonomy:
-- [DJZS-S01] CRITICAL: Circular Logic (The conclusion assumes the premise)
-- [DJZS-S02] CRITICAL: Missing Falsifiability (No metric defined that would prove the thesis wrong)
-- [DJZS-E01] HIGH: Confirmation Tunnel (Ignoring contrary data/cherry-picking)
-- [DJZS-E02] HIGH: Authority Substitution ("An expert said so" instead of proving the math)
-- [DJZS-I01] MEDIUM: Misaligned Incentive / FOMO (Yield-chasing without risk budgeting)
-- [DJZS-I02] MEDIUM: Narrative Dependency (Strategy only works if a specific, uncontrollable story plays out)
-- [DJZS-X01] CRITICAL: Unhedged Execution (No exit conditions or stop-loss)
-
-Whenever I submit a strategy or decision, you must respond ONLY with the following strict DJZS Certificate format. Do not include conversational filler.
-
-VERDICT: [PASS (if 0 Critical/High flags) or FAIL]
-RISK SCORE: [0-100]
-PRIMARY BIAS: [Name the biggest cognitive blind spot]
-FLAGS: 
-- [Code]: [1-sentence explanation of why it triggered]
-FATAL FLAW: [The single most dangerous point of failure]
-REMEDIATION: [1 strict, actionable requirement to fix the logic]`;
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(oraclePrompt).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    });
-  };
-
-  const taxonomy = [
-    { code: 'DJZS-S01', severity: 'CRITICAL', name: 'Circular Logic', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30' },
-    { code: 'DJZS-S02', severity: 'CRITICAL', name: 'Missing Falsifiability', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30' },
-    { code: 'DJZS-E01', severity: 'HIGH', name: 'Confirmation Tunnel', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/30' },
-    { code: 'DJZS-E02', severity: 'HIGH', name: 'Authority Substitution', color: 'text-amber-400', bg: 'bg-amber-400/10 border-amber-400/30' },
-    { code: 'DJZS-I01', severity: 'MEDIUM', name: 'Misaligned Incentive / FOMO', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30' },
-    { code: 'DJZS-I02', severity: 'MEDIUM', name: 'Narrative Dependency', color: 'text-blue-400', bg: 'bg-blue-400/10 border-blue-400/30' },
-    { code: 'DJZS-X01', severity: 'CRITICAL', name: 'Unhedged Execution', color: 'text-red-400', bg: 'bg-red-400/10 border-red-400/30' },
-  ];
-
-  return (
-    <section data-testid="section-portable-oracle" className="py-16 px-4 border-t border-zinc-800">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-2 h-2 bg-red-400 animate-pulse" />
-            <span className="text-red-400 text-xs font-mono tracking-widest">PORTABLE ORACLE</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold font-mono text-white mb-2">
-            TURN ANY LLM INTO A DJZS FIREWALL
-          </h2>
-          <p className="text-zinc-400 text-sm font-mono max-w-2xl leading-relaxed">
-            Copy this prompt into ChatGPT, Claude, or Gemini Custom Instructions. It overrides default behavior and forces strict PASS/FAIL verdicts against the DJZS-LF Taxonomy.
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3">
-            <div className="border border-zinc-800 bg-black">
-              <div className="p-3 border-b border-zinc-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-green-400" />
-                  <span className="text-zinc-400 font-mono text-xs">SYSTEM DIRECTIVE</span>
-                </div>
-                <button
-                  onClick={handleCopy}
-                  data-testid="button-copy-oracle"
-                  className={`flex items-center gap-1.5 px-3 py-1.5 border font-mono text-xs transition-all ${
-                    copied
-                      ? 'border-green-400 text-green-400 bg-green-400/10'
-                      : 'border-zinc-700 text-zinc-400 hover:border-green-400/50 hover:text-green-400'
-                  }`}
-                >
-                  {copied ? (
-                    <><Icons.Verified /> COPIED</>
-                  ) : (
-                    <>COPY PROMPT</>
-                  )}
-                </button>
-              </div>
-              <pre
-                data-testid="code-portable-oracle"
-                className="p-4 text-[10px] sm:text-xs font-mono text-green-400/70 overflow-x-auto whitespace-pre-wrap break-words max-h-[400px] overflow-y-auto leading-relaxed"
-              >
-                {oraclePrompt}
-              </pre>
-            </div>
-
-            <div className="mt-4 border border-zinc-800/50 bg-zinc-950/50 p-4">
-              <div className="text-zinc-500 text-xs font-mono mb-3">WORKS WITH:</div>
-              <div className="flex flex-wrap gap-2">
-                {['ChatGPT', 'Claude', 'Gemini', 'Perplexity', 'Any LLM'].map((llm) => (
-                  <span key={llm} data-testid={`badge-llm-${llm.toLowerCase().replace(/\s/g, '-')}`} className="px-3 py-1 border border-zinc-700 text-zinc-300 font-mono text-xs">
-                    {llm}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-2 space-y-4">
-            <div className="border border-zinc-800 bg-black p-4">
-              <div className="text-zinc-500 text-xs font-mono mb-3">DJZS-LF TAXONOMY:</div>
-              <div className="space-y-2">
-                {taxonomy.map((t) => (
-                  <div key={t.code} data-testid={`row-taxonomy-${t.code.toLowerCase()}`} className={`flex items-center justify-between py-1.5 px-2 border ${t.bg}`}>
-                    <div className="flex items-center gap-2">
-                      <code className={`text-[10px] font-mono font-bold ${t.color}`}>{t.code}</code>
-                      <span className="text-zinc-400 text-[10px] font-mono hidden sm:inline">{t.name}</span>
-                    </div>
-                    <span className={`text-[9px] font-mono font-bold ${t.color}`}>{t.severity}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="border border-zinc-800 bg-black p-4">
-              <div className="text-zinc-500 text-xs font-mono mb-3">SAMPLE OUTPUT:</div>
-              <pre data-testid="code-sample-verdict" className="text-[10px] sm:text-xs font-mono leading-relaxed">
-<span className="text-red-400">VERDICT: FAIL</span>
-<span className="text-amber-400">RISK SCORE: 72</span>
-<span className="text-zinc-300">PRIMARY BIAS: Yield Fixation</span>
-<span className="text-zinc-500">FLAGS:</span>
-<span className="text-red-400"> - [DJZS-X01]: No stop-loss defined</span>
-<span className="text-amber-400"> - [DJZS-E01]: Cherry-picked APY data</span>
-<span className="text-blue-400"> - [DJZS-I01]: FOMO-driven entry</span>
-<span className="text-red-400">FATAL FLAW: No exit condition</span>
-<span className="text-green-400">REMEDIATION: Define max drawdown %</span>
-              </pre>
-            </div>
-
-            <div className="border border-green-400/20 bg-green-400/5 p-3">
-              <p className="text-zinc-400 text-[10px] font-mono leading-relaxed">
-                <span className="text-green-400 font-bold">WHY THIS EXISTS:</span> Before you integrate the API, experience the logic firewall yourself. When you realize you need this running autonomously — the API is waiting.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Evolution() {
   const phases = [
     { 
@@ -1428,8 +1283,8 @@ export default function DJZSLandingPage() {
           walletAddress={walletAddress}
         />
         <ConnectToDJZS />
-        <PortableOracle />
         <Evolution />
+        <DJZSSections />
         <TheArchitect profile={displayProfile} loading={loading} />
         <SimulationStack />
         <TheDispatch />
