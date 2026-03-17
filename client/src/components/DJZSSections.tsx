@@ -1,13 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-/**
- * DJZS Protocol Landing Page Sections
- * Combined: Sifr0Philosophy + TryTheOracle
- * 
- * Usage: Import and add to your landing page after existing sections
- * <DJZSSections />
- */
-
 // =============================================================================
 // SIFR-0 PHILOSOPHY SECTION
 // =============================================================================
@@ -80,20 +72,20 @@ const TorusCanvas: React.FC = () => {
 
           ctx.beginPath();
           ctx.arc(projX, projY, 1.5 * scale, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(200, 220, 255, ${alpha})`;
+          ctx.fillStyle = `rgba(74, 222, 128, ${alpha})`;
           ctx.fill();
         }
       }
 
       const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 60);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-      gradient.addColorStop(0.5, 'rgba(180, 200, 255, 0.05)');
+      gradient.addColorStop(0, 'rgba(34, 197, 94, 0.15)');
+      gradient.addColorStop(0.5, 'rgba(34, 197, 94, 0.05)');
       gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      ctx.font = '24px serif';
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(time * 2) * 0.2})`;
+      ctx.font = '24px monospace';
+      ctx.fillStyle = `rgba(34, 197, 94, ${0.3 + Math.sin(time * 2) * 0.2})`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('٠', centerX, centerY);
@@ -110,6 +102,7 @@ const TorusCanvas: React.FC = () => {
     <canvas
       ref={canvasRef}
       className="w-full max-w-md mx-auto opacity-90"
+      data-testid="canvas-torus"
       style={{ background: 'transparent' }}
     />
   );
@@ -121,45 +114,23 @@ const Sifr0Philosophy: React.FC = () => {
   return (
     <section 
       id="sifr-0" 
-      className="relative min-h-screen py-24 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #000000 0%, #0a0a0f 50%, #000000 100%)',
-      }}
+      className="relative py-24 overflow-hidden bg-black"
+      data-testid="section-sifr0"
     >
-      <div 
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
-            <span 
-              className="text-xs tracking-[0.4em] text-gray-500 uppercase"
-              style={{ fontFamily: 'monospace' }}
-            >
+            <span className="text-xs tracking-[0.4em] text-zinc-500 uppercase font-mono">
               // PHILOSOPHICAL_FOUNDATION
             </span>
           </div>
           
-          <h2 
-            className="text-5xl md:text-7xl font-light tracking-tight text-white mb-6"
-            style={{ fontFamily: 'Georgia, serif' }}
-          >
-            SIFR <span className="text-gray-600">—</span> 0
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6 font-mono">
+            SIFR <span className="text-zinc-600">—</span> 0
           </h2>
           
-          <p 
-            className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'Georgia, serif' }}
-          >
+          <p className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed font-mono">
             The Spirit or Source Cypher
           </p>
         </div>
@@ -169,10 +140,7 @@ const Sifr0Philosophy: React.FC = () => {
           <div className="relative">
             <TorusCanvas />
             <div className="absolute bottom-4 left-0 right-0 text-center">
-              <span 
-                className="text-xs tracking-widest text-gray-600 uppercase"
-                style={{ fontFamily: 'monospace' }}
-              >
+              <span className="text-xs tracking-widest text-zinc-600 uppercase font-mono">
                 BREATH — SPIRIT — WATER
               </span>
             </div>
@@ -180,41 +148,29 @@ const Sifr0Philosophy: React.FC = () => {
 
           <div className="space-y-8">
             <div className="space-y-4">
-              <h3 
-                className="text-2xl text-white font-light"
-                style={{ fontFamily: 'Georgia, serif' }}
-              >
+              <h3 className="text-2xl text-white font-bold font-mono">
                 The Zero-Point Principle
               </h3>
-              <p className="text-gray-400 leading-relaxed">
-                <span className="text-white font-medium">SIFR</span> (صفر) — the Arabic root of both 
-                <em className="text-gray-300"> zero</em> and <em className="text-gray-300">cipher</em>. 
+              <p className="text-zinc-400 leading-relaxed font-mono text-sm">
+                <span className="text-green-400 font-bold">SIFR</span> (صفر) — the Arabic root of both 
+                <em className="text-zinc-300"> zero</em> and <em className="text-zinc-300">cipher</em>. 
                 Before computation, the void. Before execution, validation.
               </p>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-zinc-400 leading-relaxed font-mono text-sm">
                 Every agent action must pass through the constriction point — the central vortex where 
                 intent is audited before manifestation is permitted.
               </p>
             </div>
 
-            <div 
-              className="p-6 border border-gray-800 rounded-sm"
-              style={{ background: 'rgba(255,255,255,0.02)' }}
-            >
-              <div 
-                className="text-center text-lg tracking-wide text-gray-300"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="text-gray-500">INTENT</span>
-                <span className="mx-4 text-gray-700">→</span>
-                <span className="text-white font-medium">[SIFR-0 AUDIT]</span>
-                <span className="mx-4 text-gray-700">→</span>
-                <span className="text-gray-500">MANIFESTATION</span>
+            <div className="p-6 border border-zinc-800 bg-zinc-950/30">
+              <div className="text-center text-lg tracking-wide text-zinc-300 font-mono">
+                <span className="text-zinc-500">INTENT</span>
+                <span className="mx-4 text-green-400">→</span>
+                <span className="text-green-400 font-bold">[SIFR-0 AUDIT]</span>
+                <span className="mx-4 text-green-400">→</span>
+                <span className="text-zinc-500">MANIFESTATION</span>
               </div>
-              <p 
-                className="text-center text-xs text-gray-600 mt-4 tracking-wide"
-                style={{ fontFamily: 'monospace' }}
-              >
+              <p className="text-center text-xs text-zinc-600 mt-4 tracking-wide font-mono">
                 // AUDIT_BEFORE_ACT
               </p>
             </div>
@@ -227,23 +183,20 @@ const Sifr0Philosophy: React.FC = () => {
               ].map((item, i) => (
                 <div 
                   key={i}
-                  className="text-center p-4 border border-gray-900 rounded-sm"
-                  style={{ background: 'rgba(255,255,255,0.01)' }}
+                  className="text-center p-4 border border-zinc-800 bg-zinc-950/50"
+                  data-testid={`card-substrate-${i}`}
                 >
-                  <div className="text-xs text-gray-600 tracking-widest mb-1">{item.substrate}</div>
-                  <div className="text-sm text-white font-medium mb-1">{item.layer}</div>
-                  <div className="text-xs text-gray-500">{item.desc}</div>
+                  <div className="text-xs text-zinc-600 tracking-widest mb-1 font-mono">{item.substrate}</div>
+                  <div className="text-sm text-white font-bold mb-1 font-mono">{item.layer}</div>
+                  <div className="text-xs text-zinc-500 font-mono">{item.desc}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-900 pt-16">
-          <h3 
-            className="text-center text-sm tracking-[0.3em] text-gray-600 uppercase mb-12"
-            style={{ fontFamily: 'monospace' }}
-          >
+        <div className="border-t border-zinc-800 pt-16">
+          <h3 className="text-center text-sm tracking-[0.3em] text-zinc-500 uppercase mb-12 font-mono">
             Cross-Tradition Zero-State Mapping
           </h3>
           
@@ -252,26 +205,27 @@ const Sifr0Philosophy: React.FC = () => {
               <div
                 key={index}
                 className={`
-                  group cursor-pointer p-5 border rounded-sm transition-all duration-300
+                  group cursor-pointer p-5 border transition-all duration-300
                   ${activeMapping === index 
-                    ? 'border-gray-600 bg-white/5' 
-                    : 'border-gray-900 hover:border-gray-700'
+                    ? 'border-green-400/50 bg-green-400/5' 
+                    : 'border-zinc-800 hover:border-zinc-600'
                   }
                 `}
+                data-testid={`card-tradition-${index}`}
                 onClick={() => setActiveMapping(activeMapping === index ? null : index)}
               >
                 <div className="text-2xl mb-3 opacity-40 group-hover:opacity-70 transition-opacity">
                   {mapping.symbol}
                 </div>
-                <div className="text-xs text-gray-600 tracking-wider uppercase mb-1">
+                <div className="text-xs text-zinc-600 tracking-wider uppercase mb-1 font-mono">
                   {mapping.tradition}
                 </div>
-                <div className="text-sm text-white font-medium mb-2">
+                <div className="text-sm text-white font-bold mb-2 font-mono">
                   {mapping.concept}
                 </div>
                 <div 
                   className={`
-                    text-xs text-gray-500 transition-all duration-300
+                    text-xs text-green-400 transition-all duration-300 font-mono
                     ${activeMapping === index ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}
                   `}
                 >
@@ -283,16 +237,10 @@ const Sifr0Philosophy: React.FC = () => {
         </div>
 
         <div className="mt-24 text-center">
-          <blockquote 
-            className="text-2xl md:text-3xl text-gray-400 font-light italic max-w-3xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'Georgia, serif' }}
-          >
+          <blockquote className="text-2xl md:text-3xl text-zinc-400 font-bold italic max-w-3xl mx-auto leading-relaxed font-mono">
             "Nothing manifests without first passing through the void-state."
           </blockquote>
-          <div 
-            className="mt-6 text-xs text-gray-700 tracking-widest uppercase"
-            style={{ fontFamily: 'monospace' }}
-          >
+          <div className="mt-6 text-xs text-zinc-700 tracking-widest uppercase font-mono">
             — DJZS Protocol Axiom
           </div>
         </div>
@@ -330,13 +278,13 @@ REMEDIATION: [1 strict, actionable requirement to fix the logic]
 Acknowledge you understand this framework by replying ONLY with: "DJZS Protocol recognized. Awaiting your first strategy trace."`;
 
 const TAXONOMY_CODES = [
-  { code: 'S01', severity: 'CRITICAL', name: 'Circular Logic', color: '#ff4444' },
-  { code: 'S02', severity: 'CRITICAL', name: 'Missing Falsifiability', color: '#ff4444' },
-  { code: 'E01', severity: 'HIGH', name: 'Confirmation Tunnel', color: '#ff8800' },
-  { code: 'E02', severity: 'HIGH', name: 'Authority Substitution', color: '#ff8800' },
-  { code: 'I01', severity: 'MEDIUM', name: 'FOMO Loop', color: '#ffcc00' },
-  { code: 'I02', severity: 'MEDIUM', name: 'Narrative Dependency', color: '#ffcc00' },
-  { code: 'X01', severity: 'CRITICAL', name: 'Unhedged Execution', color: '#ff4444' },
+  { code: 'S01', severity: 'CRITICAL', name: 'Circular Logic', color: 'text-red-400' },
+  { code: 'S02', severity: 'CRITICAL', name: 'Missing Falsifiability', color: 'text-red-400' },
+  { code: 'E01', severity: 'HIGH', name: 'Confirmation Tunnel', color: 'text-amber-400' },
+  { code: 'E02', severity: 'HIGH', name: 'Authority Substitution', color: 'text-amber-400' },
+  { code: 'I01', severity: 'MEDIUM', name: 'FOMO Loop', color: 'text-blue-400' },
+  { code: 'I02', severity: 'MEDIUM', name: 'Narrative Dependency', color: 'text-blue-400' },
+  { code: 'X01', severity: 'CRITICAL', name: 'Unhedged Execution', color: 'text-red-400' },
 ];
 
 const TryTheOracle: React.FC = () => {
@@ -367,66 +315,45 @@ const TryTheOracle: React.FC = () => {
   return (
     <section 
       id="try-oracle" 
-      className="relative min-h-screen py-24 overflow-hidden"
-      style={{
-        background: 'linear-gradient(180deg, #000000 0%, #050508 50%, #000000 100%)',
-      }}
+      className="relative py-24 overflow-hidden bg-black"
+      data-testid="section-try-oracle"
     >
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.02]"
-        style={{
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
-        }}
-      />
-
       <div className="relative z-10 max-w-5xl mx-auto px-6">
         
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
-            <span 
-              className="text-xs tracking-[0.4em] text-gray-600 uppercase"
-              style={{ fontFamily: 'monospace' }}
-            >
+            <span className="text-xs tracking-[0.4em] text-zinc-500 uppercase font-mono">
               // SOFT_ORACLE_INIT
             </span>
           </div>
           
-          <h2 
-            className="text-4xl md:text-6xl font-light tracking-tight text-white mb-6"
-            style={{ fontFamily: 'Georgia, serif' }}
-          >
+          <h2 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 font-mono">
             Try the Oracle
           </h2>
           
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed mb-2">
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-mono mb-2">
             Zero infrastructure required. Paste into any AI chat.
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-zinc-600 font-mono">
             Become your own adversarial auditor.
           </p>
         </div>
 
         <div className="mb-12">
-          <div 
-            className="text-xs tracking-[0.2em] text-gray-600 uppercase mb-4 text-center"
-            style={{ fontFamily: 'monospace' }}
-          >
+          <div className="text-xs tracking-[0.2em] text-zinc-500 uppercase mb-4 text-center font-mono">
             DJZS-LF Taxonomy
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             {TAXONOMY_CODES.map((item) => (
               <div
                 key={item.code}
-                className="px-3 py-1.5 rounded-sm border border-gray-800 bg-black/50"
-                style={{ fontFamily: 'monospace' }}
+                className="px-3 py-1.5 border border-zinc-800 bg-zinc-950/50 font-mono"
+                data-testid={`badge-taxonomy-${item.code.toLowerCase()}`}
               >
-                <span 
-                  className="text-xs font-medium"
-                  style={{ color: item.color }}
-                >
+                <span className={`text-xs font-bold ${item.color}`}>
                   {item.code}
                 </span>
-                <span className="text-xs text-gray-600 ml-2">
+                <span className="text-xs text-zinc-500 ml-2">
                   {item.name}
                 </span>
               </div>
@@ -435,62 +362,49 @@ const TryTheOracle: React.FC = () => {
         </div>
 
         <div className="relative">
-          <div 
-            className="flex items-center justify-between px-4 py-3 border border-gray-800 border-b-0 rounded-t-sm"
-            style={{ background: 'rgba(20,20,25,0.9)' }}
-          >
+          <div className="flex items-center justify-between px-4 py-3 border border-zinc-800 border-b-0 bg-zinc-950/80">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500/60" />
-              <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
-              <div className="w-3 h-3 rounded-full bg-green-500/60" />
+              <div className="w-2 h-2 bg-green-400" />
+              <span className="text-zinc-400 font-mono text-xs">SYSTEM DIRECTIVE</span>
             </div>
-            <span 
-              className="text-xs text-gray-500"
-              style={{ fontFamily: 'monospace' }}
-            >
+            <span className="text-xs text-zinc-500 font-mono">
               djzs-oracle-prompt.txt
             </span>
             <button
               onClick={handleCopy}
+              data-testid="button-copy-oracle"
               className={`
                 px-4 py-1.5 text-xs tracking-wider uppercase transition-all duration-300
-                border rounded-sm
+                border font-mono font-bold
                 ${copied 
-                  ? 'bg-green-500/20 border-green-500/50 text-green-400' 
-                  : 'bg-white/5 border-gray-700 text-gray-400 hover:bg-white/10 hover:border-gray-600'
+                  ? 'bg-green-400/10 border-green-400 text-green-400' 
+                  : 'border-zinc-700 text-zinc-400 hover:border-green-400/50 hover:text-green-400'
                 }
               `}
-              style={{ fontFamily: 'monospace' }}
             >
               {copied ? '✓ COPIED' : 'COPY'}
             </button>
           </div>
 
-          <div 
-            className="relative border border-gray-800 rounded-b-sm overflow-hidden"
-            style={{ background: 'rgba(10,10,15,0.95)' }}
-          >
+          <div className="relative border border-zinc-800 overflow-hidden bg-black">
             <pre
               ref={textRef}
+              data-testid="code-oracle-prompt"
               className={`
-                p-6 text-sm leading-relaxed overflow-x-auto
-                transition-all duration-300
+                p-6 text-sm leading-relaxed overflow-x-auto font-mono
+                transition-all duration-300 text-green-400/70
                 ${showFullPrompt ? 'max-h-[600px]' : 'max-h-[280px]'}
               `}
-              style={{ 
-                fontFamily: 'monospace',
-                color: '#a0a0a0',
-              }}
             >
               <code>
                 {DJZS_PROMPT_TEMPLATE.split('\n').map((line, i) => {
                   if (line.includes('[DJZS-')) {
-                    const severity = line.includes('CRITICAL') ? '#ff4444' 
-                      : line.includes('HIGH') ? '#ff8800' 
-                      : '#ffcc00';
+                    const severity = line.includes('CRITICAL') ? 'text-red-400' 
+                      : line.includes('HIGH') ? 'text-amber-400' 
+                      : 'text-blue-400';
                     return (
                       <span key={i}>
-                        <span style={{ color: severity }}>{line}</span>
+                        <span className={severity}>{line}</span>
                         {'\n'}
                       </span>
                     );
@@ -500,7 +414,7 @@ const TryTheOracle: React.FC = () => {
                       line.startsWith('FATAL FLAW:') || line.startsWith('REMEDIATION:')) {
                     return (
                       <span key={i}>
-                        <span style={{ color: '#6699cc' }}>{line}</span>
+                        <span className="text-green-400">{line}</span>
                         {'\n'}
                       </span>
                     );
@@ -514,15 +428,15 @@ const TryTheOracle: React.FC = () => {
               <div 
                 className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
                 style={{
-                  background: 'linear-gradient(transparent, rgba(10,10,15,0.98))',
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.98))',
                 }}
               />
             )}
 
             <button
               onClick={() => setShowFullPrompt(!showFullPrompt)}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
-              style={{ fontFamily: 'monospace' }}
+              data-testid="button-toggle-prompt"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 text-xs text-zinc-500 hover:text-green-400 transition-colors font-mono"
             >
               {showFullPrompt ? '▲ COLLAPSE' : '▼ EXPAND FULL PROMPT'}
             </button>
@@ -537,41 +451,32 @@ const TryTheOracle: React.FC = () => {
           ].map((item) => (
             <div 
               key={item.step}
-              className="text-center p-6 border border-gray-900 rounded-sm"
-              style={{ background: 'rgba(255,255,255,0.01)' }}
+              className="text-center p-6 border border-zinc-800 bg-zinc-950/50"
+              data-testid={`card-step-${item.step}`}
             >
-              <div 
-                className="text-3xl font-light text-gray-700 mb-2"
-                style={{ fontFamily: 'Georgia, serif' }}
-              >
+              <div className="text-3xl font-bold text-zinc-700 mb-2 font-mono">
                 {item.step}
               </div>
-              <div className="text-white font-medium mb-1">{item.title}</div>
-              <div className="text-sm text-gray-500">{item.desc}</div>
+              <div className="text-white font-bold mb-1 font-mono">{item.title}</div>
+              <div className="text-sm text-zinc-500 font-mono">{item.desc}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-16 text-center">
-          <div 
-            className="inline-block p-6 border border-gray-800 rounded-sm"
-            style={{ background: 'rgba(255,255,255,0.02)' }}
-          >
-            <div 
-              className="text-xs tracking-[0.2em] text-gray-600 uppercase mb-3"
-              style={{ fontFamily: 'monospace' }}
-            >
+          <div className="inline-block p-6 border border-zinc-800 bg-zinc-950/50">
+            <div className="text-xs tracking-[0.2em] text-zinc-500 uppercase mb-3 font-mono">
               // UPGRADE_PATH
             </div>
-            <p className="text-gray-400 mb-4 max-w-md">
+            <p className="text-zinc-400 mb-4 max-w-md font-mono text-sm">
               Need immutable ProofOfLogic certificates on Irys? 
               <br />
               On-chain LogicTrustScore on Base?
             </p>
             <a 
               href="https://djzs.ai/api"
-              className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-gray-600 text-white hover:bg-white hover:text-black transition-all duration-300"
-              style={{ fontFamily: 'monospace' }}
+              data-testid="link-full-protocol"
+              className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition-all duration-300 font-mono font-bold"
             >
               ACCESS FULL PROTOCOL →
             </a>
@@ -579,10 +484,7 @@ const TryTheOracle: React.FC = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <p 
-            className="text-xs text-gray-700"
-            style={{ fontFamily: 'monospace' }}
-          >
+          <p className="text-xs text-zinc-700 font-mono">
             // SOFT_ORACLE: Zero-cost entry point. Full protocol at djzs.ai/api
           </p>
         </div>
