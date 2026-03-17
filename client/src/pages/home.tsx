@@ -1131,7 +1131,7 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="border border-zinc-800 bg-black p-5">
             <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
-            <p className="text-zinc-500 text-xs mb-4">Crypto-native DMs. Wallet required.</p>
+            <p className="text-zinc-500 text-xs mb-4">Quantum resistant end to end encryption chat.</p>
             <button
               onClick={onConnectWallet}
               data-testid="button-xmtp-connect"
