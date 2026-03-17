@@ -21,8 +21,7 @@ client/
     ├── App.tsx              — Router (wouter): / and 404
     ├── index.css            — Terminal Noir theme (Tailwind v4)
     ├── components/
-    │   ├── DJZSSections.tsx — Sifr-0 Philosophy + Try the Oracle sections
-    │   └── FoundersFund.tsx — Expandable funding bar (PayPal, Cash App, ETH)
+    │   └── DJZSAllSections.tsx — Combined: MatrixRain + FoundersFund + Sifr0Philosophy + TryTheOracle
     ├── lib/
     │   └── queryClient.ts   — React Query setup
     └── pages/

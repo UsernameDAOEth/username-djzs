@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import DJZSSections from '../components/DJZSSections';
-import FoundersFund from '../components/FoundersFund';
+import { DJZSSections, FoundersFund } from '../components/DJZSAllSections';
 
 interface Web3BioLink {
   url: string;
