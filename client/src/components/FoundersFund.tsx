@@ -145,14 +145,14 @@ const FoundersFund: React.FC = () => {
             {/* Expand button for mobile + details */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gray-700 hover:border-gray-500 transition-colors"
-              style={{ fontFamily: 'monospace' }}
+              className="flex items-center gap-2 px-4 py-2 rounded-sm border border-green-400 bg-green-400/10 text-green-400 hover:bg-green-400/20 transition-all duration-300 animate-pulse hover:animate-none"
+              style={{ fontFamily: 'monospace', boxShadow: '0 0 12px rgba(34,197,94,0.4), 0 0 24px rgba(34,197,94,0.15)' }}
             >
-              <span className="text-xs text-gray-300">
+              <span className="text-xs font-bold tracking-wider">
                 {isExpanded ? 'CLOSE' : 'FUND'}
               </span>
               <svg 
-                className={`w-3 h-3 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                className={`w-3 h-3 text-green-400 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
