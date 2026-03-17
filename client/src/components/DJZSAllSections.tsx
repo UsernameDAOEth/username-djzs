@@ -186,7 +186,7 @@ export const FoundersFund: React.FC = () => {
   return (
     <section 
       id="founders-fund"
-      className="relative w-full border-b border-gray-900 overflow-hidden"
+      className="relative w-full pt-14 border-b border-zinc-800 overflow-hidden"
       style={{ background: 'linear-gradient(180deg, #0a0a0f 0%, #000000 100%)' }}
     >
       {/* Matrix Rain Background */}
@@ -210,13 +210,13 @@ export const FoundersFund: React.FC = () => {
                 style={{ background: '#00D632' }}
               />
               <span 
-                className="text-xs tracking-[0.2em] text-gray-500 uppercase"
+                className="text-xs tracking-[0.2em] text-zinc-500 uppercase"
                 style={{ fontFamily: 'monospace' }}
               >
                 FOUNDERS_FUND
               </span>
             </div>
-            <span className="text-sm text-gray-400 hidden sm:inline">
+            <span className="text-sm text-zinc-400 hidden sm:inline">
               Support the DJZS Protocol
             </span>
           </div>
@@ -231,30 +231,30 @@ export const FoundersFund: React.FC = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`
-                      flex items-center gap-2 px-3 py-1.5 rounded-sm
-                      border border-gray-800 transition-all duration-200
-                      ${option.bgHover} hover:border-gray-600
+                      flex items-center gap-2 px-3 py-1.5 
+                      border border-zinc-800 transition-all duration-200
+                      ${option.bgHover} hover:border-zinc-600
                       backdrop-blur-sm bg-black/30
                     `}
                     style={{ fontFamily: 'monospace' }}
                   >
                     <span style={{ color: option.color }}>{option.icon}</span>
-                    <span className="text-xs text-gray-400">{option.name}</span>
+                    <span className="text-xs text-zinc-400">{option.name}</span>
                   </a>
                 ) : (
                   <button
                     key={option.id}
                     onClick={handleCopyAddress}
                     className={`
-                      flex items-center gap-2 px-3 py-1.5 rounded-sm
-                      border border-gray-800 transition-all duration-200
-                      ${option.bgHover} hover:border-gray-600
+                      flex items-center gap-2 px-3 py-1.5 
+                      border border-zinc-800 transition-all duration-200
+                      ${option.bgHover} hover:border-zinc-600
                       backdrop-blur-sm bg-black/30
                     `}
                     style={{ fontFamily: 'monospace' }}
                   >
                     <span style={{ color: option.color }}>{option.icon}</span>
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-zinc-400">
                       {copiedAddress ? '✓ Copied' : option.name}
                     </span>
                   </button>
@@ -264,14 +264,14 @@ export const FoundersFund: React.FC = () => {
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-sm border border-gray-700 hover:border-gray-500 transition-colors backdrop-blur-sm bg-black/30"
+              className="flex items-center gap-2 px-3 py-1.5  border border-zinc-700 hover:border-zinc-500 transition-colors backdrop-blur-sm bg-black/30"
               style={{ fontFamily: 'monospace' }}
             >
-              <span className="text-xs text-gray-300">
+              <span className="text-xs text-zinc-300">
                 {isExpanded ? 'CLOSE' : 'FUND'}
               </span>
               <svg 
-                className={`w-3 h-3 text-gray-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                className={`w-3 h-3 text-zinc-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
@@ -288,16 +288,16 @@ export const FoundersFund: React.FC = () => {
             ${isExpanded ? 'max-h-[500px] opacity-100 mt-6' : 'max-h-0 opacity-0'}
           `}
         >
-          <div className="border border-gray-800 rounded-sm p-6 backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.7)' }}>
+          <div className="border border-zinc-800  p-6 backdrop-blur-md" style={{ background: 'rgba(0,0,0,0.7)' }}>
             
             <div className="text-center mb-6">
               <h3 
                 className="text-2xl font-light text-white mb-2"
-                style={{ fontFamily: 'Georgia, serif' }}
+                style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
               >
                 Back the Tollbooth
               </h3>
-              <p className="text-sm text-gray-500 max-w-md mx-auto">
+              <p className="text-sm text-zinc-500 max-w-md mx-auto">
                 Fund adversarial verification infrastructure for the A2A economy. 
                 Every contribution accelerates the protocol.
               </p>
@@ -307,19 +307,19 @@ export const FoundersFund: React.FC = () => {
               {PAYMENT_OPTIONS.map((option) => (
                 <div
                   key={option.id}
-                  className="p-4 border border-gray-800 rounded-sm hover:border-gray-700 transition-colors"
+                  className="p-4 border border-zinc-800  hover:border-zinc-700 transition-colors"
                   style={{ background: 'rgba(0,0,0,0.5)' }}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div 
-                      className="w-10 h-10 rounded-sm flex items-center justify-center"
+                      className="w-10 h-10  flex items-center justify-center"
                       style={{ background: `${option.color}15`, color: option.color }}
                     >
                       {option.icon}
                     </div>
                     <div>
                       <div className="text-sm text-white font-medium">{option.name}</div>
-                      <div className="text-xs text-gray-500" style={{ fontFamily: 'monospace' }}>
+                      <div className="text-xs text-zinc-500" style={{ fontFamily: 'monospace' }}>
                         {option.handle}
                       </div>
                     </div>
@@ -330,7 +330,7 @@ export const FoundersFund: React.FC = () => {
                       href={option.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block w-full text-center py-2 text-xs tracking-wider uppercase border border-gray-700 text-gray-300 hover:bg-white hover:text-black hover:border-white transition-all duration-200 rounded-sm"
+                      className="block w-full text-center py-2 text-xs tracking-wider uppercase border border-zinc-700 text-zinc-300 hover:bg-white hover:text-black hover:border-white transition-all duration-200 "
                       style={{ fontFamily: 'monospace' }}
                     >
                       OPEN {option.name.toUpperCase()}
@@ -338,7 +338,7 @@ export const FoundersFund: React.FC = () => {
                   ) : (
                     <div className="space-y-2">
                       <div 
-                        className="text-xs text-gray-600 break-all p-2 rounded-sm"
+                        className="text-xs text-zinc-600 break-all p-2 "
                         style={{ background: 'rgba(255,255,255,0.03)', fontFamily: 'monospace' }}
                       >
                         {option.address}
@@ -347,10 +347,10 @@ export const FoundersFund: React.FC = () => {
                         onClick={handleCopyAddress}
                         className={`
                           block w-full text-center py-2 text-xs tracking-wider uppercase 
-                          border rounded-sm transition-all duration-200
+                          border  transition-all duration-200
                           ${copiedAddress 
                             ? 'border-green-500/50 text-green-400 bg-green-500/10' 
-                            : 'border-gray-700 text-gray-300 hover:bg-white hover:text-black hover:border-white'
+                            : 'border-zinc-700 text-zinc-300 hover:bg-white hover:text-black hover:border-white'
                           }
                         `}
                         style={{ fontFamily: 'monospace' }}
@@ -365,7 +365,7 @@ export const FoundersFund: React.FC = () => {
 
             <div className="mt-6 text-center">
               <p 
-                className="text-xs text-gray-700"
+                className="text-xs text-zinc-700"
                 style={{ fontFamily: 'monospace' }}
               >
                 // ALL_FUNDS → PROTOCOL_DEVELOPMENT + INFRASTRUCTURE
@@ -464,7 +464,7 @@ const TorusCanvas: React.FC = () => {
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      ctx.font = '24px serif';
+      ctx.font = '24px monospace';
       ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(time * 2) * 0.2})`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -517,7 +517,7 @@ export const Sifr0Philosophy: React.FC = () => {
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
             <span 
-              className="text-xs tracking-[0.4em] text-gray-500 uppercase"
+              className="text-xs tracking-[0.4em] text-zinc-500 uppercase"
               style={{ fontFamily: 'monospace' }}
             >
               // PHILOSOPHICAL_FOUNDATION
@@ -526,14 +526,14 @@ export const Sifr0Philosophy: React.FC = () => {
           
           <h2 
             className="text-5xl md:text-7xl font-light tracking-tight text-white mb-6"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
           >
-            SIFR <span className="text-gray-600">—</span> 0
+            SIFR <span className="text-zinc-600">—</span> 0
           </h2>
           
           <p 
-            className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'Georgia, serif' }}
+            className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed"
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
           >
             The Spirit or Source Cypher
           </p>
@@ -545,7 +545,7 @@ export const Sifr0Philosophy: React.FC = () => {
             <TorusCanvas />
             <div className="absolute bottom-4 left-0 right-0 text-center">
               <span 
-                className="text-xs tracking-widest text-gray-600 uppercase"
+                className="text-xs tracking-widest text-zinc-600 uppercase"
                 style={{ fontFamily: 'monospace' }}
               >
                 BREATH — SPIRIT — WATER
@@ -557,37 +557,37 @@ export const Sifr0Philosophy: React.FC = () => {
             <div className="space-y-4">
               <h3 
                 className="text-2xl text-white font-light"
-                style={{ fontFamily: 'Georgia, serif' }}
+                style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
               >
                 The Zero-Point Principle
               </h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-zinc-400 leading-relaxed">
                 <span className="text-white font-medium">SIFR</span> (صفر) — the Arabic root of both 
-                <em className="text-gray-300"> zero</em> and <em className="text-gray-300">cipher</em>. 
+                <em className="text-zinc-300"> zero</em> and <em className="text-zinc-300">cipher</em>. 
                 Before computation, the void. Before execution, validation.
               </p>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-zinc-400 leading-relaxed">
                 Every agent action must pass through the constriction point — the central vortex where 
                 intent is audited before manifestation is permitted.
               </p>
             </div>
 
             <div 
-              className="p-6 border border-gray-800 rounded-sm backdrop-blur-sm"
+              className="p-6 border border-zinc-800  backdrop-blur-sm"
               style={{ background: 'rgba(0,0,0,0.5)' }}
             >
               <div 
-                className="text-center text-lg tracking-wide text-gray-300"
+                className="text-center text-lg tracking-wide text-zinc-300"
                 style={{ fontFamily: 'monospace' }}
               >
-                <span className="text-gray-500">INTENT</span>
-                <span className="mx-4 text-gray-700">→</span>
+                <span className="text-zinc-500">INTENT</span>
+                <span className="mx-4 text-zinc-700">→</span>
                 <span className="text-white font-medium">[SIFR-0 AUDIT]</span>
-                <span className="mx-4 text-gray-700">→</span>
-                <span className="text-gray-500">MANIFESTATION</span>
+                <span className="mx-4 text-zinc-700">→</span>
+                <span className="text-zinc-500">MANIFESTATION</span>
               </div>
               <p 
-                className="text-center text-xs text-gray-600 mt-4 tracking-wide"
+                className="text-center text-xs text-zinc-600 mt-4 tracking-wide"
                 style={{ fontFamily: 'monospace' }}
               >
                 // AUDIT_BEFORE_ACT
@@ -602,21 +602,21 @@ export const Sifr0Philosophy: React.FC = () => {
               ].map((item, i) => (
                 <div 
                   key={i}
-                  className="text-center p-4 border border-gray-900 rounded-sm backdrop-blur-sm"
+                  className="text-center p-4 border border-zinc-900  backdrop-blur-sm"
                   style={{ background: 'rgba(0,0,0,0.3)' }}
                 >
-                  <div className="text-xs text-gray-600 tracking-widest mb-1">{item.substrate}</div>
+                  <div className="text-xs text-zinc-600 tracking-widest mb-1">{item.substrate}</div>
                   <div className="text-sm text-white font-medium mb-1">{item.layer}</div>
-                  <div className="text-xs text-gray-500">{item.desc}</div>
+                  <div className="text-xs text-zinc-500">{item.desc}</div>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-900 pt-16">
+        <div className="border-t border-zinc-900 pt-16">
           <h3 
-            className="text-center text-sm tracking-[0.3em] text-gray-600 uppercase mb-12"
+            className="text-center text-sm tracking-[0.3em] text-zinc-600 uppercase mb-12"
             style={{ fontFamily: 'monospace' }}
           >
             Cross-Tradition Zero-State Mapping
@@ -627,10 +627,10 @@ export const Sifr0Philosophy: React.FC = () => {
               <div
                 key={index}
                 className={`
-                  group cursor-pointer p-5 border rounded-sm transition-all duration-300 backdrop-blur-sm
+                  group cursor-pointer p-5 border  transition-all duration-300 backdrop-blur-sm
                   ${activeMapping === index 
-                    ? 'border-gray-600 bg-white/5' 
-                    : 'border-gray-900 hover:border-gray-700 bg-black/30'
+                    ? 'border-zinc-600 bg-white/5' 
+                    : 'border-zinc-900 hover:border-zinc-700 bg-black/30'
                   }
                 `}
                 onClick={() => setActiveMapping(activeMapping === index ? null : index)}
@@ -638,7 +638,7 @@ export const Sifr0Philosophy: React.FC = () => {
                 <div className="text-2xl mb-3 opacity-40 group-hover:opacity-70 transition-opacity">
                   {mapping.symbol}
                 </div>
-                <div className="text-xs text-gray-600 tracking-wider uppercase mb-1">
+                <div className="text-xs text-zinc-600 tracking-wider uppercase mb-1">
                   {mapping.tradition}
                 </div>
                 <div className="text-sm text-white font-medium mb-2">
@@ -646,7 +646,7 @@ export const Sifr0Philosophy: React.FC = () => {
                 </div>
                 <div 
                   className={`
-                    text-xs text-gray-500 transition-all duration-300
+                    text-xs text-zinc-500 transition-all duration-300
                     ${activeMapping === index ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}
                   `}
                 >
@@ -659,13 +659,13 @@ export const Sifr0Philosophy: React.FC = () => {
 
         <div className="mt-24 text-center">
           <blockquote 
-            className="text-2xl md:text-3xl text-gray-400 font-light italic max-w-3xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'Georgia, serif' }}
+            className="text-2xl md:text-3xl text-zinc-400 font-light italic max-w-3xl mx-auto leading-relaxed"
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
           >
             "Nothing manifests without first passing through the void-state."
           </blockquote>
           <div 
-            className="mt-6 text-xs text-gray-700 tracking-widest uppercase"
+            className="mt-6 text-xs text-zinc-700 tracking-widest uppercase"
             style={{ fontFamily: 'monospace' }}
           >
             — DJZS Protocol Axiom
@@ -762,7 +762,7 @@ export const TryTheOracle: React.FC = () => {
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
             <span 
-              className="text-xs tracking-[0.4em] text-gray-600 uppercase"
+              className="text-xs tracking-[0.4em] text-zinc-600 uppercase"
               style={{ fontFamily: 'monospace' }}
             >
               // SOFT_ORACLE_INIT
@@ -771,22 +771,22 @@ export const TryTheOracle: React.FC = () => {
           
           <h2 
             className="text-4xl md:text-6xl font-light tracking-tight text-white mb-6"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
           >
             Try the Oracle
           </h2>
           
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed mb-2">
+          <p className="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-2">
             Zero infrastructure required. Paste into any AI chat.
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-zinc-600">
             Become your own adversarial auditor.
           </p>
         </div>
 
         <div className="mb-12">
           <div 
-            className="text-xs tracking-[0.2em] text-gray-600 uppercase mb-4 text-center"
+            className="text-xs tracking-[0.2em] text-zinc-600 uppercase mb-4 text-center"
             style={{ fontFamily: 'monospace' }}
           >
             DJZS-LF Taxonomy
@@ -795,7 +795,7 @@ export const TryTheOracle: React.FC = () => {
             {TAXONOMY_CODES.map((item) => (
               <div
                 key={item.code}
-                className="px-3 py-1.5 rounded-sm border border-gray-800 bg-black/50 backdrop-blur-sm"
+                className="px-3 py-1.5  border border-zinc-800 bg-black/50 backdrop-blur-sm"
                 style={{ fontFamily: 'monospace' }}
               >
                 <span 
@@ -804,7 +804,7 @@ export const TryTheOracle: React.FC = () => {
                 >
                   {item.code}
                 </span>
-                <span className="text-xs text-gray-600 ml-2">
+                <span className="text-xs text-zinc-600 ml-2">
                   {item.name}
                 </span>
               </div>
@@ -814,7 +814,7 @@ export const TryTheOracle: React.FC = () => {
 
         <div className="relative">
           <div 
-            className="flex items-center justify-between px-4 py-3 border border-gray-800 border-b-0 rounded-t-sm backdrop-blur-md"
+            className="flex items-center justify-between px-4 py-3 border border-zinc-800 border-b-0  backdrop-blur-md"
             style={{ background: 'rgba(20,20,25,0.9)' }}
           >
             <div className="flex items-center gap-2">
@@ -823,7 +823,7 @@ export const TryTheOracle: React.FC = () => {
               <div className="w-3 h-3 rounded-full bg-green-500/60" />
             </div>
             <span 
-              className="text-xs text-gray-500"
+              className="text-xs text-zinc-500"
               style={{ fontFamily: 'monospace' }}
             >
               djzs-oracle-prompt.txt
@@ -832,10 +832,10 @@ export const TryTheOracle: React.FC = () => {
               onClick={handleCopy}
               className={`
                 px-4 py-1.5 text-xs tracking-wider uppercase transition-all duration-300
-                border rounded-sm
+                border 
                 ${copied 
                   ? 'bg-green-500/20 border-green-500/50 text-green-400' 
-                  : 'bg-white/5 border-gray-700 text-gray-400 hover:bg-white/10 hover:border-gray-600'
+                  : 'bg-white/5 border-zinc-700 text-zinc-400 hover:bg-white/10 hover:border-zinc-600'
                 }
               `}
               style={{ fontFamily: 'monospace' }}
@@ -845,7 +845,7 @@ export const TryTheOracle: React.FC = () => {
           </div>
 
           <div 
-            className="relative border border-gray-800 rounded-b-sm overflow-hidden backdrop-blur-md"
+            className="relative border border-zinc-800  overflow-hidden backdrop-blur-md"
             style={{ background: 'rgba(10,10,15,0.95)' }}
           >
             <pre
@@ -899,7 +899,7 @@ export const TryTheOracle: React.FC = () => {
 
             <button
               onClick={() => setShowFullPrompt(!showFullPrompt)}
-              className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 text-xs text-gray-500 hover:text-gray-300 transition-colors"
+              className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
               style={{ fontFamily: 'monospace' }}
             >
               {showFullPrompt ? '▲ COLLAPSE' : '▼ EXPAND FULL PROMPT'}
@@ -915,40 +915,40 @@ export const TryTheOracle: React.FC = () => {
           ].map((item) => (
             <div 
               key={item.step}
-              className="text-center p-6 border border-gray-900 rounded-sm backdrop-blur-sm"
+              className="text-center p-6 border border-zinc-900  backdrop-blur-sm"
               style={{ background: 'rgba(0,0,0,0.3)' }}
             >
               <div 
-                className="text-3xl font-light text-gray-700 mb-2"
-                style={{ fontFamily: 'Georgia, serif' }}
+                className="text-3xl font-light text-zinc-700 mb-2"
+                style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
               >
                 {item.step}
               </div>
               <div className="text-white font-medium mb-1">{item.title}</div>
-              <div className="text-sm text-gray-500">{item.desc}</div>
+              <div className="text-sm text-zinc-500">{item.desc}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-16 text-center">
           <div 
-            className="inline-block p-6 border border-gray-800 rounded-sm backdrop-blur-sm"
+            className="inline-block p-6 border border-zinc-800  backdrop-blur-sm"
             style={{ background: 'rgba(0,0,0,0.5)' }}
           >
             <div 
-              className="text-xs tracking-[0.2em] text-gray-600 uppercase mb-3"
+              className="text-xs tracking-[0.2em] text-zinc-600 uppercase mb-3"
               style={{ fontFamily: 'monospace' }}
             >
               // UPGRADE_PATH
             </div>
-            <p className="text-gray-400 mb-4 max-w-md">
+            <p className="text-zinc-400 mb-4 max-w-md">
               Need immutable ProofOfLogic certificates on Irys? 
               <br />
               On-chain LogicTrustScore on Base?
             </p>
             <a 
               href="https://djzs.ai/api"
-              className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-gray-600 text-white hover:bg-white hover:text-black transition-all duration-300"
+              className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-zinc-600 text-white hover:bg-white hover:text-black transition-all duration-300"
               style={{ fontFamily: 'monospace' }}
             >
               ACCESS FULL PROTOCOL →
@@ -958,7 +958,7 @@ export const TryTheOracle: React.FC = () => {
 
         <div className="mt-16 text-center">
           <p 
-            className="text-xs text-gray-700"
+            className="text-xs text-zinc-700"
             style={{ fontFamily: 'monospace' }}
           >
             // SOFT_ORACLE: Zero-cost entry point. Full protocol at djzs.ai/api
