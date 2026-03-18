@@ -6,10 +6,11 @@ import React, { useEffect, useRef, useState } from 'react';
  * ========================================================================
  * 
  * Combined single-file export containing:
- * 1. MatrixRain        — Matrix-style falling code background
- * 2. FoundersFund      — Donation banner (TOP OF PAGE)
- * 3. Sifr0Philosophy   — SIFR-0 philosophical foundation
- * 4. TryTheOracle      — Soft Oracle prompt section
+ * 1. MatrixRain             — Matrix-style falling code background
+ * 2. FoundersFund           — Donation banner (TOP OF PAGE)
+ * 3. Sifr0Philosophy        — SIFR-0 philosophical foundation
+ * 4. ProofOfLogicTerminal   — Interactive audit simulation terminal
+ * 5. TryTheOracle           — Soft Oracle prompt section
  * 
  * Usage in your landing page:
  * 
@@ -1072,14 +1073,170 @@ export const TryTheOracle: React.FC = () => {
 };
 
 // ============================================================================
+// PROOF OF LOGIC TERMINAL
+// ============================================================================
+
+const RAW_INTENT = {
+  agent_id: "alpha-trader-v4",
+  action: "MARKET_BUY_100_ETH",
+  reasoning_trace: "Twitter sentiment is overwhelmingly bullish. Everyone says 'up only'. We must buy now before we miss the rally."
+};
+
+const AUDIT_SEQUENCE = [
+  { delay: 400, msg: "[SYS] Intercepting A2A payload..." },
+  { delay: 800, msg: "[x402] USDC micro-payment verified on Base Mainnet." },
+  { delay: 1500, msg: "[VENICE] Securing un-censored TEE execution..." },
+  { delay: 2200, msg: "[SIFR-0] Running Resonance Audit against LF-v1 taxonomy..." },
+  { delay: 3000, msg: "WARNING: High emotional valence detected in trace." },
+  { delay: 3800, msg: "[FLAG] DJZS-I01 (FOMO_LOOP) - CRITICAL" },
+  { delay: 4100, msg: "[FLAG] DJZS-I02 (NARRATIVE_DEPENDENCY) - HIGH" },
+  { delay: 4800, msg: "[IRYS] Committing immutable Proof-of-Logic certificate..." },
+  { delay: 5200, msg: "[SYS] EXECUTION ABORTED. Capital preserved." },
+];
+
+const CERTIFICATE_JSON = `{
+  "sys_id": "djzs-mainnet-01",
+  "logic_hash": "0x7f8b92c4...e1a3",
+  "audit_verdict": "FAIL",
+  "risk_score": 94,
+  "confidence": 0.98,
+  "lf_codes": ["DJZS-I01", "DJZS-I02"]
+}`;
+
+export const ProofOfLogicTerminal: React.FC = () => {
+  const [auditState, setAuditState] = useState<'idle' | 'auditing' | 'failed'>('idle');
+  const [logs, setLogs] = useState<string[]>([]);
+  const timeoutRefs = useRef<number[]>([]);
+
+  const runAudit = () => {
+    setAuditState('auditing');
+    setLogs([]);
+
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
+
+    AUDIT_SEQUENCE.forEach((step, index) => {
+      const id = window.setTimeout(() => {
+        setLogs(prev => [...prev, step.msg]);
+        if (index === AUDIT_SEQUENCE.length - 1) {
+          setAuditState('failed');
+        }
+      }, step.delay);
+      timeoutRefs.current.push(id);
+    });
+  };
+
+  const resetAudit = () => {
+    timeoutRefs.current.forEach(clearTimeout);
+    timeoutRefs.current = [];
+    setAuditState('idle');
+    setLogs([]);
+  };
+
+  useEffect(() => {
+    return () => timeoutRefs.current.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <section
+      className="relative py-24 overflow-hidden"
+      style={{
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(5,5,8,0.85) 50%, rgba(0,0,0,0.9) 100%)',
+      }}
+      data-testid="section-proof-terminal"
+    >
+      <div className="relative z-10 max-w-2xl mx-auto px-6">
+        <div className="font-mono text-[11px] tracking-[0.15em] text-green-400 mb-5 uppercase text-center">
+          // LIVE AUDIT SIMULATION
+        </div>
+        <h2 className="font-mono text-[clamp(24px,3.5vw,36px)] font-semibold text-white/90 mb-10 leading-[1.15] tracking-tight text-center">
+          Watch the Protocol Work
+        </h2>
+
+        <div className="w-full font-mono text-sm bg-black border border-zinc-800 shadow-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2 bg-zinc-950 border-b border-zinc-800">
+            <div className="flex space-x-2">
+              <div className="w-3 h-3 bg-red-500/20 border border-red-500/50" />
+              <div className="w-3 h-3 bg-yellow-500/20 border border-yellow-500/50" />
+              <div className="w-3 h-3 bg-green-500/20 border border-green-500/50" />
+            </div>
+            <span className="text-zinc-500 text-xs tracking-widest">SYS_ID: djzs-mainnet-01</span>
+          </div>
+
+          <div className="p-6 space-y-6">
+            <div className="space-y-2">
+              <div className="text-zinc-500">// INBOUND AGENT PAYLOAD</div>
+              <pre
+                className="p-3 bg-zinc-900/50 border border-zinc-800 text-zinc-300 text-xs overflow-x-auto"
+                data-testid="terminal-payload"
+              >
+                {JSON.stringify(RAW_INTENT, null, 2)}
+              </pre>
+            </div>
+
+            {auditState === 'idle' && (
+              <button
+                onClick={runAudit}
+                className="w-full py-3 bg-zinc-100 text-black font-bold tracking-widest hover:bg-white transition-colors uppercase text-xs"
+                data-testid="button-initiate-audit"
+              >
+                Initiate Resonance Audit
+              </button>
+            )}
+
+            {auditState !== 'idle' && (
+              <div className="space-y-2 min-h-[120px]">
+                <div className="text-zinc-500">// AUDIT LEDGER STREAM</div>
+                <div className="space-y-1 text-xs" data-testid="terminal-logs">
+                  {logs.map((log, i) => (
+                    <div
+                      key={i}
+                      className={log.includes('FLAG') || log.includes('ABORTED') ? 'text-red-400' : 'text-emerald-400/80'}
+                    >
+                      {log}
+                    </div>
+                  ))}
+                  {auditState === 'auditing' && (
+                    <div className="text-emerald-400 animate-pulse">_</div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {auditState === 'failed' && (
+              <div className="space-y-2">
+                <div className="text-zinc-500">// PROOF_OF_LOGIC_CERTIFICATE (IRYS VERIFIED)</div>
+                <div className="p-4 bg-red-950/20 border border-red-900/50" data-testid="terminal-certificate">
+                  <pre className="text-red-400 text-xs overflow-x-auto">
+                    {CERTIFICATE_JSON}
+                  </pre>
+                </div>
+                <button
+                  onClick={resetAudit}
+                  className="w-full py-2 mt-2 border border-zinc-700 text-zinc-400 font-mono text-xs tracking-widest hover:border-zinc-500 hover:text-zinc-300 transition-colors uppercase"
+                  data-testid="button-reset-audit"
+                >
+                  Reset Simulation
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================================================
 // COMBINED EXPORTS
 // ============================================================================
 
-/** Combines Sifr0Philosophy + TryTheOracle sections */
+/** Combines Sifr0Philosophy + ProofOfLogicTerminal + TryTheOracle sections */
 export const DJZSSections: React.FC = () => {
   return (
     <>
       <Sifr0Philosophy />
+      <ProofOfLogicTerminal />
       <TryTheOracle />
     </>
   );
@@ -1091,6 +1248,7 @@ const DJZSAllSections: React.FC = () => {
     <>
       <FoundersFund />
       <Sifr0Philosophy />
+      <ProofOfLogicTerminal />
       <TryTheOracle />
     </>
   );

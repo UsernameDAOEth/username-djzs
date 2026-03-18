@@ -1,0 +1,112 @@
+import React, { useState, useEffect } from 'react';
+
+const ProofOfLogicTerminal = () => {
+  const [auditState, setAuditState] = useState('idle'); // idle, auditing, failed
+  const [logs, setLogs] = useState([]);
+
+  const rawIntent = {
+    agent_id: "alpha-trader-v4",
+    action: "MARKET_BUY_100_ETH",
+    reasoning_trace: "Twitter sentiment is overwhelmingly bullish. Everyone says 'up only'. We must buy now before we miss the rally."
+  };
+
+  const auditSequence = [
+    { delay: 400, msg: "[SYS] Intercepting A2A payload..." },
+    { delay: 800, msg: "[x402] USDC micro-payment verified on Base Mainnet." },
+    { delay: 1500, msg: "[VENICE] Securing un-censored TEE execution..." },
+    { delay: 2200, msg: "[SIFR-0] Running Resonance Audit against LF-v1 taxonomy..." },
+    { delay: 3000, msg: "WARNING: High emotional valence detected in trace." },
+    { delay: 3800, msg: "[FLAG] DJZS-I01 (FOMO_LOOP) - CRITICAL" },
+    { delay: 4100, msg: "[FLAG] DJZS-I02 (NARRATIVE_DEPENDENCY) - HIGH" },
+    { delay: 4800, msg: "[IRYS] Committing immutable Proof-of-Logic certificate..." },
+    { delay: 5200, msg: "[SYS] EXECUTION ABORTED. Capital preserved." }
+  ];
+
+  const runAudit = () => {
+    setAuditState('auditing');
+    setLogs([]);
+    
+    let currentDelay = 0;
+    auditSequence.forEach((step, index) => {
+      currentDelay += step.delay;
+      setTimeout(() => {
+        setLogs(prev => [...prev, step.msg]);
+        if (index === auditSequence.length - 1) {
+          setAuditState('failed');
+        }
+      }, step.delay);
+    });
+  };
+
+  return (
+    <div className="w-full max-w-2xl mx-auto font-mono text-sm bg-[#0a0a0a] border border-neutral-800 rounded-sm shadow-2xl overflow-hidden">
+      {/* Terminal Header */}
+      <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-neutral-800">
+        <div className="flex space-x-2">
+          <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+          <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+          <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+        </div>
+        <span className="text-neutral-500 text-xs tracking-widest">SYS_ID: djzs-mainnet-01</span>
+      </div>
+
+      <div className="p-6 space-y-6">
+        {/* Input Phase */}
+        <div className="space-y-2">
+          <div className="text-neutral-500">// INBOUND AGENT PAYLOAD</div>
+          <pre className="p-3 bg-neutral-900/50 border border-neutral-800 text-neutral-300 rounded text-xs overflow-x-auto">
+            {JSON.stringify(rawIntent, null, 2)}
+          </pre>
+        </div>
+
+        {/* Action Trigger */}
+        {auditState === 'idle' && (
+          <button 
+            onClick={runAudit}
+            className="w-full py-3 bg-neutral-100 text-black font-bold tracking-widest hover:bg-white transition-colors uppercase text-xs"
+          >
+            Initiate Resonance Audit
+          </button>
+        )}
+
+        {/* Audit Telemetry */}
+        {auditState !== 'idle' && (
+          <div className="space-y-2 min-h-[120px]">
+            <div className="text-neutral-500">// AUDIT LEDGER STREAM</div>
+            <div className="space-y-1 text-xs">
+              {logs.map((log, i) => (
+                <div key={i} className={`${log.includes('FLAG') || log.includes('ABORTED') ? 'text-red-400' : 'text-emerald-400/80'}`}>
+                  {log}
+                </div>
+              ))}
+              {auditState === 'auditing' && (
+                <div className="text-emerald-400 animate-pulse">_</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Final Output: Proof-of-Logic Certificate */}
+        {auditState === 'failed' && (
+          <div className="space-y-2 animate-in fade-in duration-1000">
+            <div className="text-neutral-500">// PROOF_OF_LOGIC_CERTIFICATE (IRYS VERIFIED)</div>
+            <div className="p-4 bg-red-950/20 border border-red-900/50 rounded">
+              <pre className="text-red-400 text-xs overflow-x-auto">
+{`{
+  "sys_id": "djzs-mainnet-01",
+  "logic_hash": "0x7f8b92c4...e1a3",
+  "audit_verdict": "FAIL",
+  "risk_score": 94,
+  "confidence": 0.98,
+  "lf_codes": ["DJZS-I01", "DJZS-I02"]
+}`}
+              </pre>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ProofOfLogicTerminal;
