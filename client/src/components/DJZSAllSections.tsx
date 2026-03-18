@@ -261,14 +261,14 @@ export const FoundersFund: React.FC = () => {
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-2 px-3 py-1.5  border border-zinc-700 hover:border-zinc-500 transition-colors backdrop-blur-sm bg-black/30"
-              style={{ fontFamily: 'monospace' }}
+              className={`flex items-center gap-2 px-3 py-1.5 border transition-all backdrop-blur-sm ${isExpanded ? 'border-zinc-700 bg-black/30' : 'border-green-400 bg-green-400/10 hover:bg-green-400/20 animate-pulse'}`}
+              style={{ fontFamily: 'monospace', boxShadow: isExpanded ? 'none' : '0 0 12px rgba(34,197,94,0.4), 0 0 4px rgba(34,197,94,0.2)' }}
             >
-              <span className="text-xs text-zinc-300">
+              <span className={`text-xs font-bold ${isExpanded ? 'text-zinc-300' : 'text-green-400'}`}>
                 {isExpanded ? 'CLOSE' : 'FUND'}
               </span>
               <svg 
-                className={`w-3 h-3 text-zinc-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? 'text-zinc-500 rotate-180' : 'text-green-400'}`}
                 fill="none" 
                 viewBox="0 0 24 24" 
                 stroke="currentColor"
