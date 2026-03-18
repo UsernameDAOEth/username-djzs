@@ -381,20 +381,224 @@ export const FoundersFund: React.FC = () => {
 // SIFR-0 PHILOSOPHY SECTION
 // ============================================================================
 
-interface TraditionMapping {
-  tradition: string;
-  concept: string;
-  djzsEquivalent: string;
-  symbol: string;
+interface Axiom {
+  id: string;
+  code: string;
+  title: string;
+  subtitle: string;
+  mechanic: string;
+  glyph: string;
 }
 
-const TRADITION_MAPPINGS: TraditionMapping[] = [
-  { tradition: 'Yoruba', concept: 'Ori', djzsEquivalent: 'Agent Intent Layer', symbol: '◯' },
-  { tradition: 'Egyptian', concept: 'Ogdoad', djzsEquivalent: 'Audit Validators', symbol: '𓂀' },
-  { tradition: 'Sanskrit', concept: 'Ojas', djzsEquivalent: 'LogicTrustScore', symbol: 'ॐ' },
-  { tradition: 'Greek', concept: 'Ousia', djzsEquivalent: 'ProofOfLogic', symbol: 'Ω' },
-  { tradition: 'Arabic', concept: 'Sifr', djzsEquivalent: 'Audit Gateway', symbol: '٠' },
+const AXIOMS: Axiom[] = [
+  {
+    id: 'ground-state',
+    code: 'AX-00',
+    title: 'Ground State',
+    subtitle: 'The audit begins at zero.',
+    mechanic: 'Every agent request enters the pipeline with no inherited trust. No cached reputation. No shortcut. SIFR-0 resets the evaluation frame on every call — the same principle that makes zero the foundation of computation makes it the foundation of verification.',
+    glyph: '∅',
+  },
+  {
+    id: 'toroidal-fold',
+    code: 'AX-01',
+    title: 'Toroidal Fold',
+    subtitle: 'Output feeds back through input.',
+    mechanic: 'The audit pipeline is not linear — it\'s a closed loop. ProofOfLogic certificates emitted at Output feed the LogicTrustScore at Input. Agent reputation is never static; it decays, regenerates, and re-earns through continuous verification. The torus is the topology of sustained trust.',
+    glyph: '◎',
+  },
+  {
+    id: 'resonance-audit',
+    code: 'AX-02',
+    title: 'Resonance Audit',
+    subtitle: 'Intent must survive the constriction point.',
+    mechanic: 'At the center of the torus is the narrowest passage — the SIFR-0 constriction point. Venice AI applies the 11-code DJZS-LF taxonomy here. If the agent\'s intent resonates (scores below threshold), it passes. If it doesn\'t, it\'s blocked. No appeals. No overrides. The geometry enforces the gate.',
+    glyph: '⦿',
+  },
+  {
+    id: 'scale-invariance',
+    code: 'AX-03',
+    title: 'Scale Invariance',
+    subtitle: 'Same logic at every layer.',
+    mechanic: 'The audit architecture is fractal. A single agent call, a multi-agent orchestration, or a cross-protocol pipeline — the verification primitive is identical. SIFR-0 doesn\'t care about scale. The same LF-code taxonomy, the same deterministic scoring, the same immutable certificate. One pattern. Every scale.',
+    glyph: '∞',
+  },
 ];
+
+interface TriadLayer {
+  zone: string;
+  label: string;
+  function: string;
+  detail: string;
+  code: string;
+}
+
+const TRIAD: TriadLayer[] = [
+  {
+    zone: 'INPUT',
+    label: 'Breath',
+    function: 'Agent Intent Injection',
+    detail: 'Raw agent request enters. Prompt injection defense (20+ pattern categories) + credential leak scan. The breath before the word.',
+    code: '// LAYER_0: INTAKE',
+  },
+  {
+    zone: 'LOGIC',
+    label: 'Spirit',
+    function: 'DJZS-LF Taxonomy',
+    detail: 'Venice AI (llama-3.3-70b, temp 0) returns detected_codes only. All severity weights, risk scoring, and verdict computation are deterministic TypeScript. The spirit is the law.',
+    code: '// LAYER_1: ADJUDICATE',
+  },
+  {
+    zone: 'OUTPUT',
+    label: 'Water',
+    function: 'ProofOfLogic Certificate',
+    detail: 'Immutable certificate written to Irys Datachain. Includes LF codes, risk score, timestamp, agent ID. Irys failure is non-fatal — agent always returns AgentOutput. The water carries the proof.',
+    code: '// LAYER_2: CERTIFY',
+  },
+];
+
+function useInView(options: IntersectionObserverInit = {}): [React.RefObject<HTMLDivElement | null>, boolean] {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.15, ...options });
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return [ref, isVisible];
+}
+
+const AxiomCard: React.FC<{ axiom: Axiom; index: number; isVisible: boolean }> = ({ axiom, index, isVisible }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      data-testid={`axiom-card-${axiom.id}`}
+      onClick={() => setExpanded(!expanded)}
+      className={`p-6 border transition-all duration-[600ms] select-none cursor-pointer outline-none focus-visible:border-green-400/40 ${
+        expanded ? 'border-green-400/30 bg-white/[0.02]' : 'border-white/[0.06] bg-white/[0.02]'
+      }`}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(24px)',
+        transitionDelay: `${index * 120}ms`,
+        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setExpanded(!expanded))}
+    >
+      <div className="flex items-start gap-3 mb-2">
+        <span className="font-mono text-xl text-green-400 opacity-70 leading-none mt-0.5 shrink-0 w-6 text-center">
+          {axiom.glyph}
+        </span>
+        <div className="flex-1">
+          <div className="font-mono text-[10px] tracking-[0.15em] text-zinc-600 mb-1">{axiom.code}</div>
+          <div className="font-mono text-[15px] font-semibold text-white/90 tracking-wide">{axiom.title}</div>
+        </div>
+        <span
+          className="font-mono text-lg text-zinc-600 shrink-0 leading-none transition-transform duration-300"
+          style={{ transform: expanded ? 'rotate(45deg)' : 'rotate(0deg)' }}
+        >
+          +
+        </span>
+      </div>
+
+      <div className="font-mono text-[13px] text-zinc-500 ml-9 leading-relaxed">{axiom.subtitle}</div>
+
+      <div
+        className="font-mono text-[13px] text-zinc-500 leading-[1.7] overflow-hidden ml-9 transition-all duration-[400ms]"
+        style={{
+          maxHeight: expanded ? '300px' : '0px',
+          opacity: expanded ? 1 : 0,
+          marginTop: expanded ? '16px' : '0px',
+          paddingTop: expanded ? '16px' : '0px',
+          borderTop: expanded ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+          transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        {axiom.mechanic}
+      </div>
+    </div>
+  );
+};
+
+const TriadCard: React.FC<{ layer: TriadLayer; index: number; isVisible: boolean }> = ({ layer, index, isVisible }) => {
+  const [active, setActive] = useState(false);
+
+  return (
+    <div
+      data-testid={`triad-card-${layer.zone.toLowerCase()}`}
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={() => setActive(false)}
+      role="button"
+      tabIndex={0}
+      className={`p-7 text-center border transition-all duration-[600ms] bg-white/[0.02] outline-none focus-visible:border-green-400/40 ${
+        active ? 'border-green-400/25' : 'border-white/[0.06]'
+      }`}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
+        transitionDelay: `${index * 150}ms`,
+        transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+    >
+      <div className="font-mono text-[10px] tracking-[0.12em] text-zinc-600 mb-3">{layer.code}</div>
+      <div className="font-mono text-[11px] tracking-[0.2em] text-green-400 mb-1 uppercase">{layer.zone}</div>
+      <div className="font-mono text-lg font-semibold text-white/90 mb-2">{layer.label}</div>
+      <div className="font-mono text-[13px] text-zinc-500 leading-relaxed">{layer.function}</div>
+
+      <div
+        className="font-mono text-xs text-zinc-500 leading-[1.7] overflow-hidden text-left transition-all duration-[400ms]"
+        style={{
+          maxHeight: active ? '200px' : '0px',
+          opacity: active ? 1 : 0,
+          marginTop: active ? '12px' : '0px',
+          transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        {layer.detail}
+      </div>
+    </div>
+  );
+};
+
+const FlowDiagram: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
+  return (
+    <div
+      data-testid="flow-diagram"
+      className="bg-white/[0.02] border border-white/[0.06] p-8 mb-20 text-center"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+        transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+      }}
+    >
+      <div className="flex items-center justify-center gap-4 flex-wrap mb-3">
+        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-white/[0.06]">INTENT</span>
+        <span className="font-mono text-lg text-zinc-600">→</span>
+        <span className="font-mono text-sm tracking-[0.15em] text-green-400 px-4 py-2 border border-green-400/30 bg-green-400/[0.15]">[SIFR-0 AUDIT]</span>
+        <span className="font-mono text-lg text-zinc-600">→</span>
+        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-white/[0.06]">MANIFESTATION</span>
+      </div>
+      <div className="font-mono text-[11px] text-zinc-600 tracking-[0.12em] mb-2">// AUDIT_BEFORE_ACT</div>
+      <div className="font-mono text-[13px] text-zinc-500 italic">
+        Every agent action gets a ProofOfLogic certificate before it touches the network.
+      </div>
+    </div>
+  );
+};
 
 const TorusCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -485,17 +689,20 @@ const TorusCanvas: React.FC = () => {
 };
 
 export const Sifr0Philosophy: React.FC = () => {
-  const [activeMapping, setActiveMapping] = useState<number | null>(null);
+  const [headerRef, headerVisible] = useInView();
+  const [flowRef, flowVisible] = useInView();
+  const [axiomRef, axiomVisible] = useInView();
+  const [triadRef, triadVisible] = useInView();
 
   return (
-    <section 
-      id="sifr-0" 
-      className="relative min-h-screen py-24 overflow-hidden"
+    <section
+      id="sifr-0"
+      className="relative py-24 overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(10,10,15,0.8) 50%, rgba(0,0,0,0.85) 100%)',
       }}
     >
-      <div 
+      <div
         className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
           backgroundImage: `
@@ -506,166 +713,69 @@ export const Sifr0Philosophy: React.FC = () => {
         }}
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6">
-        
-        <div className="text-center mb-16">
-          <div className="inline-block mb-4">
-            <span 
-              className="text-xs tracking-[0.4em] text-zinc-500 uppercase"
-              style={{ fontFamily: 'monospace' }}
-            >
-              // PHILOSOPHICAL_FOUNDATION
-            </span>
+      <div className="relative z-10 max-w-[960px] mx-auto px-6">
+        <div
+          ref={headerRef}
+          className="mb-16"
+          style={{
+            opacity: headerVisible ? 1 : 0,
+            transform: headerVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          <div className="font-mono text-[11px] tracking-[0.15em] text-green-400 mb-5 uppercase">
+            // SIFR-0 FRAMEWORK
           </div>
-          
-          <h2 
-            className="text-5xl md:text-7xl font-light tracking-tight text-white mb-6"
-            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
-          >
-            SIFR <span className="text-zinc-600">—</span> 0
+          <h2 className="font-mono text-[clamp(28px,4vw,42px)] font-semibold text-white/90 mb-6 leading-[1.15] tracking-tight">
+            The Verification Primitive
           </h2>
-          
-          <p 
-            className="text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed"
-            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
-          >
-            The Spirit or Source Cypher
+          <p className="font-mono text-base leading-[1.7] text-zinc-500 max-w-[640px]">
+            <span className="font-mono font-bold text-white/90 tracking-wide">SIFR</span> (صفر) — the Arabic root of both{' '}
+            <em className="text-zinc-300">zero</em> and <em className="text-zinc-300">cipher</em>. The void before computation. The
+            gate before execution. Every autonomous agent action passes through the SIFR-0 constriction point — where intent is audited before
+            manifestation is permitted.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
-          
+        <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
           <div className="relative">
             <TorusCanvas />
             <div className="absolute bottom-4 left-0 right-0 text-center">
-              <span 
-                className="text-xs tracking-widest text-zinc-600 uppercase"
-                style={{ fontFamily: 'monospace' }}
-              >
+              <span className="font-mono text-xs tracking-widest text-zinc-600 uppercase">
                 BREATH — SPIRIT — WATER
               </span>
             </div>
           </div>
-
-          <div className="space-y-8">
-            <div className="space-y-4">
-              <h3 
-                className="text-2xl text-white font-light"
-                style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
-              >
-                The Zero-Point Principle
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                <span className="text-white font-medium">SIFR</span> (صفر) — the Arabic root of both 
-                <em className="text-zinc-300"> zero</em> and <em className="text-zinc-300">cipher</em>. 
-                Before computation, the void. Before execution, validation.
-              </p>
-              <p className="text-zinc-400 leading-relaxed">
-                Every agent action must pass through the constriction point — the central vortex where 
-                intent is audited before manifestation is permitted.
-              </p>
-            </div>
-
-            <div 
-              className="p-6 border border-zinc-800  backdrop-blur-sm"
-              style={{ background: 'rgba(0,0,0,0.5)' }}
-            >
-              <div 
-                className="text-center text-lg tracking-wide text-zinc-300"
-                style={{ fontFamily: 'monospace' }}
-              >
-                <span className="text-zinc-500">INTENT</span>
-                <span className="mx-4 text-zinc-700">→</span>
-                <span className="text-white font-medium">[SIFR-0 AUDIT]</span>
-                <span className="mx-4 text-zinc-700">→</span>
-                <span className="text-zinc-500">MANIFESTATION</span>
-              </div>
-              <p 
-                className="text-center text-xs text-zinc-600 mt-4 tracking-wide"
-                style={{ fontFamily: 'monospace' }}
-              >
-                // AUDIT_BEFORE_ACT
-              </p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 pt-4">
-              {[
-                { substrate: 'BREATH', layer: 'Input', desc: 'Agent intent injection' },
-                { substrate: 'SPIRIT', layer: 'Logic', desc: 'DJZS-LF taxonomy' },
-                { substrate: 'WATER', layer: 'Output', desc: 'ProofOfLogic certificate' },
-              ].map((item, i) => (
-                <div 
-                  key={i}
-                  className="text-center p-4 border border-zinc-900  backdrop-blur-sm"
-                  style={{ background: 'rgba(0,0,0,0.3)' }}
-                >
-                  <div className="text-xs text-zinc-600 tracking-widest mb-1">{item.substrate}</div>
-                  <div className="text-sm text-white font-medium mb-1">{item.layer}</div>
-                  <div className="text-xs text-zinc-500">{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
-        <div className="border-t border-zinc-900 pt-16">
-          <h3 
-            className="text-center text-sm tracking-[0.3em] text-zinc-600 uppercase mb-12"
-            style={{ fontFamily: 'monospace' }}
-          >
-            Cross-Tradition Zero-State Mapping
-          </h3>
-          
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {TRADITION_MAPPINGS.map((mapping, index) => (
-              <div
-                key={index}
-                className={`
-                  group cursor-pointer p-5 border  transition-all duration-300 backdrop-blur-sm
-                  ${activeMapping === index 
-                    ? 'border-zinc-600 bg-white/5' 
-                    : 'border-zinc-900 hover:border-zinc-700 bg-black/30'
-                  }
-                `}
-                onClick={() => setActiveMapping(activeMapping === index ? null : index)}
-              >
-                <div className="text-2xl mb-3 opacity-40 group-hover:opacity-70 transition-opacity">
-                  {mapping.symbol}
-                </div>
-                <div className="text-xs text-zinc-600 tracking-wider uppercase mb-1">
-                  {mapping.tradition}
-                </div>
-                <div className="text-sm text-white font-medium mb-2">
-                  {mapping.concept}
-                </div>
-                <div 
-                  className={`
-                    text-xs text-zinc-500 transition-all duration-300
-                    ${activeMapping === index ? 'opacity-100 max-h-20' : 'opacity-0 max-h-0 overflow-hidden'}
-                  `}
-                >
-                  → {mapping.djzsEquivalent}
-                </div>
-              </div>
+        <div ref={flowRef}>
+          <FlowDiagram isVisible={flowVisible} />
+        </div>
+
+        <div ref={axiomRef} className="mb-20">
+          <div className="font-mono text-[11px] tracking-[0.2em] text-zinc-600 mb-6">AXIOMS</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {AXIOMS.map((axiom, i) => (
+              <AxiomCard key={axiom.id} axiom={axiom} index={i} isVisible={axiomVisible} />
             ))}
           </div>
         </div>
 
-        <div className="mt-24 text-center">
-          <blockquote 
-            className="text-2xl md:text-3xl text-zinc-400 font-light italic max-w-3xl mx-auto leading-relaxed"
-            style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}
-          >
-            "Nothing manifests without first passing through the void-state."
-          </blockquote>
-          <div 
-            className="mt-6 text-xs text-zinc-700 tracking-widest uppercase"
-            style={{ fontFamily: 'monospace' }}
-          >
-            — DJZS Protocol Axiom
+        <div ref={triadRef} className="relative">
+          <div className="font-mono text-[11px] tracking-[0.2em] text-zinc-600 mb-6">TRIADIC PIPELINE</div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-[2px]">
+            {TRIAD.map((layer, i) => (
+              <TriadCard key={layer.zone} layer={layer} index={i} isVisible={triadVisible} />
+            ))}
+          </div>
+          <div className="hidden md:flex items-center justify-center absolute -bottom-7 left-0 right-0 pointer-events-none opacity-30">
+            <span className="flex-1" />
+            <span className="font-mono text-base text-green-400">→</span>
+            <span className="flex-1" />
+            <span className="font-mono text-base text-green-400">→</span>
+            <span className="flex-1" />
           </div>
         </div>
-
       </div>
     </section>
   );
