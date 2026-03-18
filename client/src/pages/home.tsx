@@ -96,7 +96,7 @@ const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
     github: { url: GITHUB_REPO, handle: 'usernamedaoeth' },
     telegram: { url: 'https://t.me/usernamedjzs', handle: 'usernamedjzs' },
     farcaster: { url: 'https://warpcast.com/dj-z-s.eth', handle: 'dj-z-s.eth' },
-    website: { url: 'https://username.box', handle: 'username.box' },
+    website: { url: 'https://djzs.ai/', handle: 'djzs.ai' },
     discord: { url: 'https://discord.gg/WKYQTBgW', handle: 'DJZS' },
   },
 };
@@ -1107,7 +1107,7 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
   walletError: string | null;
 }) {
   const links = profile?.links || FALLBACK_PROFILE.links || {};
-  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord };
+  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, website: FALLBACK_PROFILE.links?.website };
 
   const socialLinks = Object.entries(mergedLinks)
     .filter(([key]) => LINK_ICONS[key])
