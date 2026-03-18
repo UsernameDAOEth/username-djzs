@@ -55,21 +55,20 @@ vite-plugin-meta-images.ts   — Custom plugin for OG image meta tags
 drizzle.config.ts            — Drizzle Kit config
 ```
 
-## Home Page Sections (14)
+## Home Page Sections (12)
 1. **Header** — Fixed nav with web3.bio avatar, identity badge, wallet connect button
 2. **FoundersFund** — Expandable funding bar with PayPal (DecentralizedDaemon), Cash App ($DJZS), ETH/Base (username.dj-z-s.eth) payment options; collapsible detail view with copy-address for crypto
 3. **Hero** — Terminal boot sequence, identity resolution, outcome status cards
 4. **Tollbooth** — Protocol capabilities, receipts, log stream, teaching pillars
-5. **Onboarding** — 4-step agent creation (Connect Wallet → Select Type → Name & Email → Deploy via Ironclaw)
-6. **ConnectToDJZS** — Post-deployment connection guide: REST API tiers (Micro/Founder/Treasury/Escrow) + XMTP dark channel prefix routing, curl examples, ProofOfLogic response format
-7. **Evolution** — Timeline from consciousness study to protocol deployment
-8. **Sifr0Philosophy** — SIFR-0 zero-point philosophy with animated 3D torus, cross-tradition mapping (Yoruba/Egyptian/Sanskrit/Greek/Arabic), INTENT → SIFR-0 AUDIT → MANIFESTATION flow
-9. **TryTheOracle** — Copy-paste DJZS oracle prompt with syntax highlighting, expandable code block, DJZS-LF taxonomy badges, 3-step instructions (Copy → Paste → Audit), upgrade path CTA
-10. **TheArchitect** — Builder profile with web3.bio-resolved avatar and identity graph
-11. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
-12. **TheDispatch** — Article links to username.box
-13. **Contact** — XMTP chat + social links resolved from ENS
-14. **Footer** — Address, identity, network info
+5. **Philosophy** — Protocol Axioms accordion: Ground State Baseline, Toroidal Fold, Resonance Audit, Scale Invariance; IntersectionObserver fade-in animation
+6. **Evolution** — Timeline from consciousness study to protocol deployment
+7. **Sifr0Philosophy** — SIFR-0 zero-point philosophy with animated 3D torus, cross-tradition mapping (Yoruba/Egyptian/Sanskrit/Greek/Arabic), INTENT → SIFR-0 AUDIT → MANIFESTATION flow
+8. **TryTheOracle** — Copy-paste DJZS oracle prompt with syntax highlighting, expandable code block, DJZS-LF taxonomy badges, 3-step instructions (Copy → Paste → Audit), upgrade path CTA
+9. **TheArchitect** — Builder profile with web3.bio-resolved avatar
+10. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
+11. **TheDispatch** — Article links to username.box
+12. **Contact** — XMTP chat + social links resolved from ENS
+13. **Footer** — Address, identity, network info
 
 ## Key Integrations
 - **web3.bio API** — Called directly from frontend `useWeb3Bio` hook to resolve ENS identity (username.dj-z-s.eth)

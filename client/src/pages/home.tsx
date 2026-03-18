@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DJZSSections, FoundersFund, MatrixRain } from '../components/DJZSAllSections';
 
 interface Web3BioLink {
@@ -383,6 +383,128 @@ function Tollbooth() {
             </div>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+const PROTOCOL_AXIOMS = [
+  {
+    code: 'AXIOM-01',
+    label: 'Ground State Baseline',
+    body: 'Every agent begins from zero. Not empty — calibrated. The ground state is the reference point against which all logic is measured. Deviation from ground state is not error. It is signal.',
+  },
+  {
+    code: 'AXIOM-02',
+    label: 'Toroidal Fold',
+    body: 'Logic does not travel in a line. It folds back on itself before it executes. The audit layer is the fold — the interior pass where intent and action are forced into contact. What survives the fold is verified. What collapses was never coherent.',
+  },
+  {
+    code: 'AXIOM-03',
+    label: 'Resonance Audit',
+    body: "An agent's declared intent and its actual execution generate separate frequencies. When they are in phase: execution proceeds. When they are out of phase: the protocol detects the dissonance before the action manifests. Adversarial logic is pattern-matching on frequency drift.",
+  },
+  {
+    code: 'AXIOM-04',
+    label: 'Scale Invariance',
+    body: 'The same failure modes that corrupt a single agent corrupt a swarm. The same audit that clears a transaction clears a protocol. Logic failures do not change shape at scale — they amplify. The taxonomy holds at every layer.',
+  },
+];
+
+function Philosophy() {
+  const [active, setActive] = useState<number | null>(null);
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.15 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      ref={sectionRef}
+      id="philosophy"
+      className="py-24 px-6 max-w-3xl mx-auto transition-all duration-700 ease-out"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
+      }}
+      data-testid="section-philosophy"
+    >
+      <div className="mb-14">
+        <div className="font-mono text-[11px] text-green-400 tracking-[0.15em] mb-4">
+          // PROTOCOL_AXIOMS
+        </div>
+        <h2 className="font-mono text-[clamp(22px,4vw,32px)] font-bold text-white tracking-tight leading-tight mb-5">
+          The Mechanics of Verification
+        </h2>
+        <p className="font-mono text-[13px] text-zinc-500 leading-[1.8] max-w-[560px]">
+          DJZS is not a monitor. It is a fold in the pipeline — a mandatory interior pass that logic must survive before it reaches execution. These are the four axioms that define the fold.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-0.5">
+        {PROTOCOL_AXIOMS.map((axiom, i) => {
+          const isActive = active === i;
+          return (
+            <div
+              key={axiom.code}
+              onClick={() => setActive(isActive ? null : i)}
+              className={`border py-6 px-7 cursor-pointer transition-all duration-[250ms] ${
+                isActive
+                  ? 'border-green-400 bg-green-400/[0.04]'
+                  : 'border-zinc-900 bg-zinc-950'
+              }`}
+              style={{
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'translateX(0)' : 'translateX(-12px)',
+                transition: `opacity 0.7s ease ${0.1 + i * 0.08}s, transform 0.7s ease ${0.1 + i * 0.08}s, border-color 0.25s ease, background-color 0.25s ease`,
+              }}
+              data-testid={`axiom-${axiom.code.toLowerCase()}`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <span className={`font-mono text-[10px] tracking-[0.12em] min-w-[80px] transition-colors duration-200 ${
+                    isActive ? 'text-green-400' : 'text-zinc-700'
+                  }`}>
+                    {axiom.code}
+                  </span>
+                  <span className={`font-mono text-[13px] font-semibold transition-colors duration-200 ${
+                    isActive ? 'text-white' : 'text-zinc-400'
+                  }`}>
+                    {axiom.label}
+                  </span>
+                </div>
+                <span className={`font-mono text-base transition-all duration-200 inline-block ${
+                  isActive ? 'text-green-400 rotate-45' : 'text-zinc-800'
+                }`}>
+                  +
+                </span>
+              </div>
+
+              <div
+                className="overflow-hidden transition-all duration-[350ms] ease-out"
+                style={{ maxHeight: isActive ? '200px' : '0px' }}
+              >
+                <p className="font-mono text-xs text-zinc-500 leading-[1.9] mt-5 pl-24 border-l border-zinc-900 pr-2">
+                  {axiom.body}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-12 pt-6 border-t border-zinc-900 flex items-center gap-3">
+        <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
+        <span className="font-mono text-[11px] text-zinc-700 tracking-[0.1em]">
+          AUDIT_BEFORE_ACT // DJZS_PROTOCOL_v1.0 // BASE_MAINNET
+        </span>
       </div>
     </section>
   );
@@ -789,6 +911,7 @@ export default function DJZSLandingPage() {
       <main>
         <Hero profile={displayProfile} loading={loading} />
         <Tollbooth />
+        <Philosophy />
         <Evolution />
         <DJZSSections />
         <TheArchitect profile={displayProfile} loading={loading} />
