@@ -98,6 +98,7 @@ const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
     farcaster: { url: 'https://warpcast.com/dj-z-s.eth', handle: 'dj-z-s.eth' },
     website: { url: 'https://djzs.ai/', handle: 'djzs.ai' },
     discord: { url: 'https://discord.gg/WKYQTBgW', handle: 'DJZS' },
+    email: { url: 'mailto:0x3e79e0374383ea64bc16c9b0568c6b13ef084afb@ethermail.io', handle: 'EtherMail' },
   },
 };
 
@@ -138,6 +139,7 @@ const LINK_ICONS: Record<string, React.FC> = {
   lens: Icons.Lens,
   website: Icons.Website,
   discord: Icons.Discord,
+  email: Icons.Mail,
 };
 
 function Cursor({ blink = true }: { blink?: boolean }) {
@@ -1107,7 +1109,7 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
   walletError: string | null;
 }) {
   const links = profile?.links || FALLBACK_PROFILE.links || {};
-  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, website: FALLBACK_PROFILE.links?.website };
+  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, website: FALLBACK_PROFILE.links?.website, email: FALLBACK_PROFILE.links?.email };
 
   const socialLinks = Object.entries(mergedLinks)
     .filter(([key]) => LINK_ICONS[key])
