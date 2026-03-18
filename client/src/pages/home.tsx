@@ -267,7 +267,7 @@ function Hero({ profile, loading }: { profile: Partial<Web3BioProfile> | null; l
               <a href="#tollbooth" className="flex items-center gap-2 px-4 py-2 bg-green-400 text-black font-mono text-sm font-bold hover:bg-green-300 transition-colors" data-testid="link-view-protocol">
                 VIEW PROTOCOL <Icons.ArrowRight />
               </a>
-              <a href="#contact" className="flex items-center gap-2 px-4 py-2 border border-green-400/50 text-green-400 font-mono text-sm hover:bg-green-400/10 transition-colors" data-testid="link-contact">CONTACT</a>
+              <a href="#contact" className="flex items-center gap-2 px-4 py-2 border border-green-400 bg-green-400/10 text-green-400 font-mono text-sm font-bold hover:bg-green-400/20 animate-pulse transition-colors" style={{ boxShadow: '0 0 12px rgba(34,197,94,0.4), 0 0 4px rgba(34,197,94,0.2)' }} data-testid="link-contact">CONTACT</a>
               <a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-4 py-2 border border-zinc-700 text-zinc-400 font-mono text-sm hover:border-zinc-500 hover:text-white transition-colors group" data-testid="link-github">
                 <Icons.Github /> <span className="hidden sm:inline">UsernameDAOEth/djzs-AI</span><span className="sm:hidden">GITHUB</span>
               </a>
