@@ -104,7 +104,6 @@ const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
 
 // Hero identity badges - deduplicated with actual identity strings
 const HERO_IDENTITIES = [
-  { identity: 'djzsx.eth', platform: 'ENS' },
   { identity: 'dj-z-s.eth', platform: 'Farcaster' },
   { identity: 'usernamedjzs.lens', platform: 'Lens' },
   { identity: 'usernamedao.base.eth', platform: 'Basenames' },
