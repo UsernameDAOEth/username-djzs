@@ -98,7 +98,7 @@ const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
     farcaster: { url: 'https://warpcast.com/dj-z-s.eth', handle: 'dj-z-s.eth' },
     website: { url: 'https://djzs.ai/', handle: 'djzs.ai' },
     discord: { url: 'https://discord.gg/WKYQTBgW', handle: 'DJZS' },
-    email: { url: 'mailto:0x3e79e0374383ea64bc16c9b0568c6b13ef084afb@ethermail.io', handle: 'EtherMail' },
+    email: { url: 'mailto:djzs@username.box', handle: 'djzs@username.box' },
   },
 };
 
