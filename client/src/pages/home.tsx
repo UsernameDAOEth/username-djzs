@@ -452,15 +452,6 @@ function Evolution() {
 
 
 function TheArchitect({ profile, loading }: { profile: Partial<Web3BioProfile> | null; loading: boolean }) {
-  const identities = [
-    { label: 'username.dj-z-s.eth', type: 'ENS (Primary)' },
-    { label: 'dj-z-s.eth', type: 'ENS' },
-    { label: 'usernamedao.eth', type: 'ENS' },
-    { label: 'usernamedao.base.eth', type: 'Basenames' },
-    { label: 'dj-z-s.eth', type: 'Farcaster' },
-    { label: 'usernamedjzs.lens', type: 'Lens' },
-  ];
-
   return (
     <section className="py-16 px-4 bg-zinc-950/50" data-testid="section-architect">
       <div className="max-w-3xl mx-auto">
@@ -497,18 +488,6 @@ function TheArchitect({ profile, loading }: { profile: Partial<Web3BioProfile> |
             <p className="text-zinc-500 text-xs font-mono italic">
               "I build the trust layer between autonomous minds — artificial and human."
             </p>
-          </div>
-        </div>
-
-        <div className="border border-zinc-800 bg-black p-5">
-          <div className="font-mono text-xs text-zinc-500 mb-3">IDENTITY_GRAPH:</div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {identities.map((id, i) => (
-              <div key={i} className="border border-zinc-800 bg-zinc-950/50 px-3 py-2" data-testid={`identity-${i}`}>
-                <div className="font-mono text-green-400 text-xs truncate">{id.label}</div>
-                <div className="font-mono text-zinc-600 text-xs">{id.type}</div>
-              </div>
-            ))}
           </div>
         </div>
 
