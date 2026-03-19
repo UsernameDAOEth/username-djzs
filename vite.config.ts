@@ -40,6 +40,10 @@ export default defineConfig({
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
   },
+  optimizeDeps: {
+    exclude: ["@xmtp/browser-sdk", "@xmtp/wasm-bindings"],
+    include: ["protobufjs/minimal"],
+  },
   server: {
     host: "0.0.0.0",
     allowedHosts: true,

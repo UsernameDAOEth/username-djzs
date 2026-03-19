@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DJZSSections, FoundersFund, MatrixRain } from '../components/DJZSAllSections';
+import { useXmtp } from '../hooks/useXmtp';
 
 interface Web3BioLink {
   url: string;
@@ -725,6 +726,172 @@ function TheDispatch() {
 }
 
 
+function XmtpChat({ walletAddress, onConnectWallet, isWalletConnected, walletError }: {
+  walletAddress: string | null;
+  onConnectWallet: () => void;
+  isWalletConnected: boolean;
+  walletError: string | null;
+}) {
+  const { state, error: xmtpError, messages, connect, sendMessage, disconnect } = useXmtp(walletAddress);
+  const [input, setInput] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!input.trim()) return;
+    const text = input.trim();
+    setInput('');
+    const success = await sendMessage(text);
+    if (!success) {
+      setInput(text);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  if (!isWalletConnected) {
+    return (
+      <div className="border border-zinc-800 bg-black p-5" data-testid="xmtp-card">
+        <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
+        <p className="text-zinc-500 text-xs mb-4">Quantum resistant end-to-end encrypted chat.</p>
+        <button
+          onClick={onConnectWallet}
+          data-testid="button-xmtp-connect"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 font-mono text-xs transition-all bg-green-400 text-black hover:bg-green-300"
+        >
+          <Icons.Wallet /> CONNECT WALLET
+        </button>
+        {walletError && (
+          <p className="text-red-400 text-xs font-mono mt-2 text-center" data-testid="text-xmtp-error">
+            {walletError}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  if (state === 'disconnected') {
+    return (
+      <div className="border border-zinc-800 bg-black p-5" data-testid="xmtp-card">
+        <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
+        <p className="text-zinc-500 text-xs mb-4">Quantum resistant end-to-end encrypted chat.</p>
+        <button
+          onClick={connect}
+          data-testid="button-xmtp-open"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 font-mono text-xs transition-all bg-green-400/10 border border-green-400/50 text-green-400 hover:bg-green-400/20"
+        >
+          <Icons.Send /> OPEN ENCRYPTED CHAT
+        </button>
+        <p className="text-green-400/60 text-xs font-mono mt-2 text-center truncate" data-testid="text-xmtp-address">
+          {walletAddress}
+        </p>
+      </div>
+    );
+  }
+
+  if (state === 'connecting') {
+    return (
+      <div className="border border-zinc-800 bg-black p-5" data-testid="xmtp-card">
+        <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
+        <div className="flex items-center gap-2 text-green-400 font-mono text-xs py-4 justify-center">
+          <div className="w-1.5 h-1.5 bg-green-400 animate-pulse" />
+          CONNECTING TO XMTP NETWORK...
+        </div>
+        <p className="text-zinc-600 text-xs font-mono text-center">Sign the message in your wallet to authenticate.</p>
+      </div>
+    );
+  }
+
+  if (state === 'error') {
+    return (
+      <div className="border border-zinc-800 bg-black p-5" data-testid="xmtp-card">
+        <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
+        <p className="text-red-400 text-xs font-mono mb-3" data-testid="text-xmtp-error">{xmtpError}</p>
+        <button
+          onClick={connect}
+          data-testid="button-xmtp-retry"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 font-mono text-xs transition-all border border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:text-zinc-300"
+        >
+          RETRY CONNECTION
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-zinc-800 bg-black p-0 flex flex-col" data-testid="xmtp-card">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-800 bg-zinc-950">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 bg-green-400 animate-pulse" />
+          <span className="font-mono text-xs text-green-400">XMTP ENCRYPTED</span>
+        </div>
+        <button
+          onClick={disconnect}
+          data-testid="button-xmtp-disconnect"
+          className="font-mono text-[10px] text-zinc-600 hover:text-zinc-400 transition-colors"
+        >
+          DISCONNECT
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 max-h-[280px] min-h-[140px]" data-testid="xmtp-messages">
+        {messages.length === 0 && (
+          <div className="text-center py-6">
+            <p className="text-zinc-600 text-xs font-mono">No messages yet.</p>
+            <p className="text-zinc-700 text-[10px] font-mono mt-1">Send a message to djzs.eth</p>
+          </div>
+        )}
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`flex ${msg.isSelf ? 'justify-end' : 'justify-start'}`}
+            data-testid={`xmtp-msg-${msg.id}`}
+          >
+            <div
+              className={`max-w-[85%] px-3 py-2 font-mono text-xs ${
+                msg.isSelf
+                  ? 'bg-green-400/10 border border-green-400/30 text-green-400'
+                  : 'bg-zinc-900 border border-zinc-800 text-zinc-300'
+              }`}
+            >
+              <p className="break-words">{msg.content}</p>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="border-t border-zinc-800 p-2 flex gap-2">
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message..."
+          data-testid="input-xmtp-message"
+          className="flex-1 bg-zinc-950 border border-zinc-800 px-3 py-2 font-mono text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-green-400/50 transition-colors"
+        />
+        <button
+          onClick={handleSend}
+          disabled={!input.trim()}
+          data-testid="button-xmtp-send"
+          className="px-3 py-2 bg-green-400 text-black font-mono text-xs font-bold hover:bg-green-300 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Icons.Send />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
   profile: Partial<Web3BioProfile> | null;
   loading: boolean;
@@ -758,27 +925,12 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
         )}
 
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="border border-zinc-800 bg-black p-5">
-            <h3 className="font-mono text-white font-bold text-sm mb-2">XMTP CHAT</h3>
-            <p className="text-zinc-500 text-xs mb-4">Quantum resistant end to end encryption chat.</p>
-            <button
-              onClick={onConnectWallet}
-              data-testid="button-xmtp-connect"
-              className={`w-full flex items-center justify-center gap-2 px-3 py-2 font-mono text-xs transition-all ${isWalletConnected ? 'bg-green-400/10 border border-green-400/50 text-green-400' : 'bg-green-400 text-black hover:bg-green-300'}`}
-            >
-              <Icons.Wallet /> {isWalletConnected ? 'OPEN CHAT' : 'CONNECT WALLET'}
-            </button>
-            {isWalletConnected && walletAddress && (
-              <p className="text-green-400/60 text-xs font-mono mt-2 text-center truncate" data-testid="text-xmtp-address">
-                {walletAddress}
-              </p>
-            )}
-            {walletError && (
-              <p className="text-red-400 text-xs font-mono mt-2 text-center" data-testid="text-xmtp-error">
-                {walletError}
-              </p>
-            )}
-          </div>
+          <XmtpChat
+            walletAddress={walletAddress}
+            onConnectWallet={onConnectWallet}
+            isWalletConnected={isWalletConnected}
+            walletError={walletError}
+          />
 
           <div className="border border-zinc-800 bg-black p-5">
             <h3 className="font-mono text-white font-bold text-sm mb-2">SOCIALS</h3>
@@ -857,12 +1009,7 @@ export default function DJZSLandingPage() {
   const [walletError, setWalletError] = useState<string | null>(null);
 
   const handleConnectWallet = useCallback(() => {
-    if (isWalletConnected) {
-      setIsWalletConnected(false);
-      setWalletAddress(null);
-      setWalletError(null);
-      return;
-    }
+    if (isWalletConnected) return;
 
     setWalletError(null);
 

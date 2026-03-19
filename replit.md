@@ -22,6 +22,8 @@ client/
     ├── index.css            — Terminal Noir theme (Tailwind v4)
     ├── components/
     │   └── DJZSAllSections.tsx — Combined: MatrixRain + FoundersFund + Sifr0Philosophy + TryTheOracle
+    ├── hooks/
+    │   └── useXmtp.ts       — XMTP SDK hook: connect, sendMessage, stream, disconnect
     ├── lib/
     │   └── queryClient.ts   — React Query setup
     └── pages/
@@ -67,11 +69,12 @@ drizzle.config.ts            — Drizzle Kit config
 9. **TheArchitect** — Builder profile with web3.bio-resolved avatar
 10. **SimulationStack** — Three-layer philosophy (Internal OS → Verification → A2A Future)
 11. **TheDispatch** — Article links to username.box
-12. **Contact** — XMTP chat + social links resolved from ENS
+12. **Contact** — XMTP encrypted chat (via @xmtp/browser-sdk) + social links resolved from ENS
 13. **Footer** — Address, identity, network info
 
 ## Key Integrations
 - **web3.bio API** — Called directly from frontend `useWeb3Bio` hook to resolve ENS identity (username.dj-z-s.eth)
+- **XMTP** — `@xmtp/browser-sdk` for encrypted DMs to DJZS team address (0x3e79...4afb). Dynamically imported (WASM). Vite config excludes `@xmtp/browser-sdk` and `@xmtp/wasm-bindings` from dep optimization.
 - **Wallet Connect** — Native `window.ethereum` MetaMask integration
 - **MoltMail** — Agent email provisioning via clawhub.ai
 - **Ironclaw** — TEE-secured agent runtime deployment via ironclaw.app (NEAR AI Cloud)
