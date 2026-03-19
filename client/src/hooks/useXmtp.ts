@@ -12,11 +12,26 @@ type XmtpState = 'disconnected' | 'connecting' | 'ready' | 'error';
 
 const DJZS_ADDRESS = '0x3e79e0374383ea64bc16c9b0568c6b13ef084afb';
 
-function cleanupResources(streamCloserRef: React.MutableRefObject<any>, clientRef: React.MutableRefObject<any>) {
-  try { streamCloserRef.current?.return?.(); } catch {}
-  try { streamCloserRef.current?.end?.(); } catch {}
-  try { clientRef.current?.close?.(); } catch {}
-  streamCloserRef.current = null;
+type SdkTypes = Awaited<typeof import('@xmtp/browser-sdk')>;
+type XmtpClient = InstanceType<SdkTypes['Client']>;
+type XmtpConversation = Awaited<ReturnType<XmtpClient['conversations']['newDmWithIdentifier']>>;
+
+interface StreamProxy {
+  return(): Promise<unknown>;
+  isDone: boolean;
+  [Symbol.asyncIterator](): AsyncIterableIterator<{ id: string; content: unknown; senderInboxId: string; sentAtNs: bigint }>;
+}
+
+function cleanupStream(streamRef: React.MutableRefObject<StreamProxy | null>) {
+  if (streamRef.current && !streamRef.current.isDone) {
+    streamRef.current.return().catch((err: unknown) => {
+      console.warn('XMTP stream cleanup error:', err);
+    });
+  }
+  streamRef.current = null;
+}
+
+function cleanupClient(clientRef: React.MutableRefObject<XmtpClient | null>) {
   clientRef.current = null;
 }
 
@@ -24,9 +39,9 @@ export function useXmtp(walletAddress: string | null) {
   const [state, setState] = useState<XmtpState>('disconnected');
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<XmtpMessage[]>([]);
-  const clientRef = useRef<any>(null);
-  const conversationRef = useRef<any>(null);
-  const streamCloserRef = useRef<any>(null);
+  const clientRef = useRef<XmtpClient | null>(null);
+  const conversationRef = useRef<XmtpConversation | null>(null);
+  const streamRef = useRef<StreamProxy | null>(null);
   const pendingSendsRef = useRef<Set<string>>(new Set());
 
   const connect = useCallback(async () => {
@@ -36,7 +51,8 @@ export function useXmtp(walletAddress: string | null) {
       return;
     }
 
-    cleanupResources(streamCloserRef, clientRef);
+    cleanupStream(streamRef);
+    cleanupClient(clientRef);
     conversationRef.current = null;
 
     setState('connecting');
@@ -44,7 +60,7 @@ export function useXmtp(walletAddress: string | null) {
     setMessages([]);
 
     try {
-      const ethereum = (window as any).ethereum;
+      const ethereum = (window as { ethereum?: { request: (args: { method: string; params: string[] }) => Promise<string> } }).ethereum;
       if (!ethereum) throw new Error('No wallet provider found');
 
       const { Client: XmtpClient } = await import('@xmtp/browser-sdk');
@@ -68,7 +84,7 @@ export function useXmtp(walletAddress: string | null) {
       };
 
       const client = await XmtpClient.create(signer, {
-        env: 'production' as any,
+        env: 'production',
         dbPath: `xmtp-${walletAddress.toLowerCase()}`,
       });
 
@@ -81,41 +97,39 @@ export function useXmtp(walletAddress: string | null) {
 
       conversationRef.current = dm;
 
-      try {
-        await dm.sync();
-        const existingMessages = await dm.messages();
-        const mapped = existingMessages
-          .filter((m: any) => m.content && typeof m.content === 'string')
-          .map((m: any) => ({
-            id: m.id || String(m.sentAtNs),
-            content: m.content,
-            senderInboxId: m.senderInboxId,
-            isSelf: m.senderInboxId === client.inboxId,
-            timestamp: Number(m.sentAtNs) / 1_000_000,
-          }));
-        setMessages(mapped);
-      } catch {
-      }
+      await dm.sync();
+      const existingMessages = await dm.messages();
+      const mapped = existingMessages
+        .filter((m) => m.content && typeof m.content === 'string')
+        .map((m) => ({
+          id: m.id || String(m.sentAtNs),
+          content: m.content as string,
+          senderInboxId: m.senderInboxId,
+          isSelf: m.senderInboxId === client.inboxId,
+          timestamp: Number(m.sentAtNs) / 1_000_000,
+        }));
+      setMessages(mapped);
 
       setState('ready');
 
       startStream(dm, client.inboxId ?? '');
 
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to connect to XMTP';
       console.error('XMTP connection error:', err);
-      setError(err.message || 'Failed to connect to XMTP');
+      setError(message);
       setState('error');
     }
   }, [walletAddress]);
 
-  const startStream = useCallback(async (dm: any, selfInboxId: string) => {
+  const startStream = useCallback(async (dm: XmtpConversation, selfInboxId: string) => {
     try {
-      const stream = await dm.stream();
-      streamCloserRef.current = stream;
+      const stream = await dm.stream() as unknown as StreamProxy;
+      streamRef.current = stream;
       for await (const msg of stream) {
         if (msg?.content && typeof msg.content === 'string') {
           const msgId = msg.id || String(msg.sentAtNs);
-          const contentKey = `${msg.content}`;
+          const contentKey = msg.content;
           const newMsg: XmtpMessage = {
             id: msgId,
             content: msg.content,
@@ -134,10 +148,9 @@ export function useXmtp(walletAddress: string | null) {
           });
         }
       }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        console.error('XMTP stream error:', err);
-      }
+    } catch (err: unknown) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      console.error('XMTP stream error:', err);
     }
   }, []);
 
@@ -153,19 +166,21 @@ export function useXmtp(walletAddress: string | null) {
         timestamp: Date.now(),
       };
       setMessages(prev => [...prev, optimistic]);
-      await conversationRef.current.sendText(text);
+      await conversationRef.current.send(text);
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to send message';
       console.error('XMTP send error:', err);
       pendingSendsRef.current.delete(text);
       setMessages(prev => prev.filter(m => !(m.id.startsWith('local-') && m.content === text)));
-      setError('Failed to send message');
+      setError(message);
       return false;
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    cleanupResources(streamCloserRef, clientRef);
+    cleanupStream(streamRef);
+    cleanupClient(clientRef);
     conversationRef.current = null;
     pendingSendsRef.current.clear();
     setMessages([]);
@@ -175,7 +190,8 @@ export function useXmtp(walletAddress: string | null) {
 
   useEffect(() => {
     return () => {
-      cleanupResources(streamCloserRef, clientRef);
+      cleanupStream(streamRef);
+      cleanupClient(clientRef);
     };
   }, []);
 
