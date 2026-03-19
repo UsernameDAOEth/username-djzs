@@ -485,7 +485,7 @@ const AxiomCard: React.FC<{ axiom: Axiom; index: number; isVisible: boolean }> =
       data-testid={`axiom-card-${axiom.id}`}
       onClick={() => setExpanded(!expanded)}
       className={`p-6 border transition-all duration-[600ms] select-none cursor-pointer outline-none focus-visible:border-green-400/40 ${
-        expanded ? 'border-green-400/30 bg-white/[0.02]' : 'border-white/[0.06] bg-white/[0.02]'
+        expanded ? 'border-green-400/30 bg-zinc-950/50' : 'border-zinc-800 bg-zinc-950/50'
       }`}
       style={{
         opacity: isVisible ? 1 : 0,
@@ -523,7 +523,7 @@ const AxiomCard: React.FC<{ axiom: Axiom; index: number; isVisible: boolean }> =
           opacity: expanded ? 1 : 0,
           marginTop: expanded ? '16px' : '0px',
           paddingTop: expanded ? '16px' : '0px',
-          borderTop: expanded ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+          borderTop: expanded ? '1px solid rgb(39, 39, 42)' : '1px solid transparent',
           transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
@@ -545,8 +545,8 @@ const TriadCard: React.FC<{ layer: TriadLayer; index: number; isVisible: boolean
       onBlur={() => setActive(false)}
       role="button"
       tabIndex={0}
-      className={`p-7 text-center border transition-all duration-[600ms] bg-white/[0.02] outline-none focus-visible:border-green-400/40 ${
-        active ? 'border-green-400/25' : 'border-white/[0.06]'
+      className={`p-7 text-center border transition-all duration-[600ms] bg-zinc-950/50 outline-none focus-visible:border-green-400/40 ${
+        active ? 'border-green-400/25' : 'border-zinc-800'
       }`}
       style={{
         opacity: isVisible ? 1 : 0,
@@ -579,7 +579,7 @@ const FlowDiagram: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
   return (
     <div
       data-testid="flow-diagram"
-      className="bg-white/[0.02] border border-white/[0.06] p-8 mb-20 text-center"
+      className="bg-zinc-950/50 border border-zinc-800 p-8 mb-20 text-center"
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
@@ -587,11 +587,11 @@ const FlowDiagram: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
       }}
     >
       <div className="flex items-center justify-center gap-4 flex-wrap mb-3">
-        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-white/[0.06]">INTENT</span>
+        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-zinc-800">INTENT</span>
         <span className="font-mono text-lg text-zinc-600">→</span>
-        <span className="font-mono text-sm tracking-[0.15em] text-green-400 px-4 py-2 border border-green-400/30 bg-green-400/[0.15]">[SIFR-0 AUDIT]</span>
+        <span className="font-mono text-sm tracking-[0.15em] text-green-400 px-4 py-2 border border-green-400/30 bg-green-400/10">[SIFR-0 AUDIT]</span>
         <span className="font-mono text-lg text-zinc-600">→</span>
-        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-white/[0.06]">MANIFESTATION</span>
+        <span className="font-mono text-sm tracking-[0.15em] text-zinc-500 px-4 py-2 border border-zinc-800">MANIFESTATION</span>
       </div>
       <div className="font-mono text-[11px] text-zinc-600 tracking-[0.12em] mb-2">// AUDIT_BEFORE_ACT</div>
       <div className="font-mono text-[13px] text-zinc-500 italic">
@@ -791,17 +791,6 @@ export const Sifr0Philosophy: React.FC = () => {
             gate before execution. Every autonomous agent action passes through the SIFR-0 constriction point — where intent is audited before
             manifestation is permitted.
           </p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
-          <div className="relative">
-            <TorusCanvas />
-            <div className="absolute bottom-4 left-0 right-0 text-center">
-              <span className="font-mono text-xs tracking-widest text-zinc-600 uppercase">
-                BREATH — SPIRIT — WATER
-              </span>
-            </div>
-          </div>
         </div>
 
         <div ref={flowRef}>
