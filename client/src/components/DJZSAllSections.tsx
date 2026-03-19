@@ -1076,31 +1076,6 @@ export const TryTheOracle: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <div 
-            className="inline-block p-6 border border-zinc-800  backdrop-blur-sm"
-            style={{ background: 'rgba(0,0,0,0.5)' }}
-          >
-            <div 
-              className="text-xs tracking-[0.2em] text-zinc-600 uppercase mb-3"
-              style={{ fontFamily: 'monospace' }}
-            >
-              // UPGRADE_PATH
-            </div>
-            <p className="text-zinc-400 mb-4 max-w-md">
-              Need immutable ProofOfLogic certificates on Irys? 
-              <br />
-              On-chain LogicTrustScore on Base?
-            </p>
-            <a 
-              href="https://djzs.ai/"
-              className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-zinc-600 text-white hover:bg-white hover:text-black transition-all duration-300"
-              style={{ fontFamily: 'monospace' }}
-            >
-              ACCESS FULL PROTOCOL →
-            </a>
-          </div>
-        </div>
 
         <div className="mt-16 text-center">
           <p 
