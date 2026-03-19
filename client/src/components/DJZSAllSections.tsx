@@ -601,9 +601,27 @@ const FlowDiagram: React.FC<{ isVisible: boolean }> = ({ isVisible }) => {
   );
 };
 
+const BRAND = {
+  orange: [243, 126, 32] as const,
+  teal: [46, 139, 139] as const,
+  gold: [255, 184, 77] as const,
+  purple: [123, 107, 141] as const,
+  bg: [15, 17, 24] as const,
+};
+
+function lerpColor(c1: readonly number[], c2: readonly number[], t: number): [number, number, number] {
+  return [
+    (c1[0] + (c2[0] - c1[0]) * t) | 0,
+    (c1[1] + (c2[1] - c1[1]) * t) | 0,
+    (c1[2] + (c2[2] - c1[2]) * t) | 0,
+  ];
+}
+
 const TorusCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
+  const hoveredRef = useRef(false);
+  const timeRef = useRef(0);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -622,57 +640,92 @@ const TorusCanvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const width = canvas.width = 400;
-    const height = canvas.height = 400;
-    const centerX = width / 2;
-    const centerY = height / 2;
+    const w = canvas.width = 512;
+    const h = canvas.height = 512;
+    const cx = w / 2;
+    const cy = h / 2;
+    const [bgR, bgG, bgB] = BRAND.bg;
 
-    let time = 0;
+    ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`;
+    ctx.fillRect(0, 0, w, h);
 
     const draw = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-      ctx.fillRect(0, 0, width, height);
+      const speed = hoveredRef.current ? 0.05 : 0.02;
+      const t = timeRef.current;
 
-      const R = 100;
-      const r = 40;
+      ctx.fillStyle = `rgba(${bgR},${bgG},${bgB}, 0.1)`;
+      ctx.fillRect(0, 0, w, h);
 
-      for (let u = 0; u < Math.PI * 2; u += 0.15) {
-        for (let v = 0; v < Math.PI * 2; v += 0.15) {
+      const R = w * 0.26;
+      const r = w * 0.105;
+
+      for (let u = 0; u < Math.PI * 2; u += 0.12) {
+        for (let v = 0; v < Math.PI * 2; v += 0.12) {
           const x = (R + r * Math.cos(v)) * Math.cos(u);
           const y = (R + r * Math.cos(v)) * Math.sin(u);
           const z = r * Math.sin(v);
 
-          const rotY = y * Math.cos(time * 0.5) - z * Math.sin(time * 0.5);
-          const rotZ = y * Math.sin(time * 0.5) + z * Math.cos(time * 0.5);
+          const rotY = y * Math.cos(t) - z * Math.sin(t);
+          const rotZ = y * Math.sin(t) + z * Math.cos(t);
 
-          const scale = 200 / (200 + rotZ);
-          const projX = centerX + x * scale;
-          const projY = centerY + rotY * scale;
+          const scale = (w * 0.55) / (w * 0.55 + rotZ);
+          const projX = cx + x * scale;
+          const projY = cy + rotY * scale;
 
           const depth = (rotZ + r) / (2 * r);
-          const alpha = 0.1 + depth * 0.6;
+          let alpha = 0.12 + depth * 0.7;
+          const pointSize = Math.max(0.5, 1.4 * scale);
+
+          let color: [number, number, number];
+          if (depth > 0.6) {
+            color = lerpColor(BRAND.orange, BRAND.gold, (depth - 0.6) / 0.4);
+          } else if (depth > 0.3) {
+            color = lerpColor(BRAND.teal, BRAND.orange, (depth - 0.3) / 0.3);
+          } else {
+            color = lerpColor(BRAND.purple, BRAND.teal, depth / 0.3);
+            alpha *= 0.7;
+          }
 
           ctx.beginPath();
-          ctx.arc(projX, projY, 1.5 * scale, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(200, 220, 255, ${alpha})`;
+          ctx.arc(projX, projY, pointSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${color[0]},${color[1]},${color[2]},${Math.min(1, alpha)})`;
           ctx.fill();
+
+          if (depth > 0.8 && Math.random() > 0.97) {
+            ctx.fillStyle = `rgba(255, 240, 220, ${0.5 + depth * 0.3})`;
+            ctx.fill();
+          }
         }
       }
 
-      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 60);
-      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-      gradient.addColorStop(0.5, 'rgba(180, 200, 255, 0.05)');
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      const g1 = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.85);
+      g1.addColorStop(0, 'rgba(243, 126, 32, 0.12)');
+      g1.addColorStop(0.3, 'rgba(255, 184, 77, 0.06)');
+      g1.addColorStop(0.6, 'rgba(46, 139, 139, 0.03)');
+      g1.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g1;
+      ctx.fillRect(0, 0, w, h);
 
-      ctx.font = '24px monospace';
-      ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(time * 2) * 0.2})`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('٠', centerX, centerY);
+      const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 1.3);
+      g2.addColorStop(0, 'rgba(255, 240, 220, 0.18)');
+      g2.addColorStop(0.3, 'rgba(243, 126, 32, 0.08)');
+      g2.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = g2;
+      ctx.fillRect(0, 0, w, h);
 
-      time += 0.02;
+      const dotAlpha = 0.5 + Math.sin(t * 3) * 0.2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 220, 180, ${dotAlpha})`;
+      ctx.fill();
+
+      const vig = ctx.createRadialGradient(cx, cy, w * 0.28, cx, cy, w * 0.72);
+      vig.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      vig.addColorStop(1, `rgba(${bgR},${bgG},${bgB}, 0.5)`);
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, w, h);
+
+      timeRef.current += speed;
       animationRef.current = requestAnimationFrame(draw);
     };
 
@@ -683,8 +736,10 @@ const TorusCanvas: React.FC = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full max-w-md mx-auto opacity-90"
-      style={{ background: 'transparent' }}
+      className="w-full max-w-md mx-auto"
+      style={{ background: 'transparent', cursor: 'pointer' }}
+      onMouseEnter={() => { hoveredRef.current = true; }}
+      onMouseLeave={() => { hoveredRef.current = false; }}
     />
   );
 };
