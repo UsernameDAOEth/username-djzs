@@ -1049,7 +1049,7 @@ export const TryTheOracle: React.FC = () => {
               On-chain LogicTrustScore on Base?
             </p>
             <a 
-              href="https://djzs.ai/api"
+              href="https://djzs.ai/"
               className="inline-block px-6 py-3 text-sm tracking-wider uppercase border border-zinc-600 text-white hover:bg-white hover:text-black transition-all duration-300"
               style={{ fontFamily: 'monospace' }}
             >
@@ -1063,7 +1063,7 @@ export const TryTheOracle: React.FC = () => {
             className="text-xs text-zinc-700"
             style={{ fontFamily: 'monospace' }}
           >
-            // SOFT_ORACLE: Zero-cost entry point. Full protocol at djzs.ai/api
+            // SOFT_ORACLE: Zero-cost entry point. Full protocol at djzs.ai
           </p>
         </div>
 
