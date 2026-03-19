@@ -10,7 +10,7 @@ export interface XmtpMessage {
 
 type XmtpState = 'disconnected' | 'connecting' | 'ready' | 'error';
 
-const DJZS_ADDRESS = '0x3e79e0374383ea64bc16c9b0568c6b13ef084afb';
+const DJZS_ADDRESS = '0x2C5010F8e65cD3D4d661f4e05661E2B696a43f0f';
 
 type SdkTypes = Awaited<typeof import('@xmtp/browser-sdk')>;
 type XmtpClient = InstanceType<SdkTypes['Client']>;
