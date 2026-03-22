@@ -317,13 +317,6 @@ function Tollbooth() {
     return () => clearInterval(interval);
   }, []);
 
-  const capabilities = [
-    'Adversarial verification of AI agent logic before execution',
-    'x402 USDC payment gating on Base',
-    'Immutable audit certificates on Irys',
-    'Confidential execution via Phala TEE',
-  ];
-
   const pillars = [
     { id: 'game', title: 'THE GAME', color: 'border-purple-500/50 text-purple-400', bgColor: 'bg-purple-500/5', description: 'Life as simulation. Player 1 mentality. Internal state creating external reality.' },
     { id: 'code', title: 'THE CODE', color: 'border-blue-400/50 text-blue-400', bgColor: 'bg-blue-400/5', description: 'Audit-before-act encoded. Deterministic verification as digital discipline. Trust earned, not assumed.' },
@@ -336,17 +329,6 @@ function Tollbooth() {
       <div className="max-w-4xl mx-auto">
         <h2 className="font-mono text-zinc-500 text-xs mb-1 tracking-widest">// THE TOLLBOOTH</h2>
         <div className="font-mono text-green-400 text-sm mb-6">DJZS PROTOCOL — The API Tollbooth for the A2A Economy</div>
-
-        <div className="border border-zinc-800 bg-zinc-950/30 p-5 mb-6">
-          <div className="font-mono text-xs text-zinc-500 mb-3">WHAT_IT_DOES:</div>
-          <ul className="space-y-2">
-            {capabilities.map((cap, i) => (
-              <li key={i} className="flex items-start gap-2 font-mono text-sm text-zinc-400">
-                <span className="text-green-400 mt-0.5">→</span>{cap}
-              </li>
-            ))}
-          </ul>
-        </div>
 
         <div data-testid="tollbooth-log-stream" className="my-8 font-mono text-sm border border-zinc-800 bg-black p-4">
           <div className="text-zinc-600 mb-2">--- BEGIN LOG STREAM ---</div>
