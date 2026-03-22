@@ -324,13 +324,6 @@ function Tollbooth() {
     'Confidential execution via Phala TEE',
   ];
 
-  const receipts = [
-    { component: 'Adversarial verification loop', status: 'FUNCTIONAL', color: 'text-green-400' },
-    { component: 'x402 USDC gating on Base', status: 'DEPLOYED', color: 'text-blue-400' },
-    { component: 'Immutable audit trail on Irys', status: 'OPERATIONAL', color: 'text-amber-400' },
-    { component: 'CVM execution via Phala', status: 'LIVE', color: 'text-green-400' },
-  ];
-
   const pillars = [
     { id: 'game', title: 'THE GAME', color: 'border-purple-500/50 text-purple-400', bgColor: 'bg-purple-500/5', description: 'Life as simulation. Player 1 mentality. Internal state creating external reality.' },
     { id: 'code', title: 'THE CODE', color: 'border-blue-400/50 text-blue-400', bgColor: 'bg-blue-400/5', description: 'Audit-before-act encoded. Deterministic verification as digital discipline. Trust earned, not assumed.' },
@@ -353,18 +346,6 @@ function Tollbooth() {
               </li>
             ))}
           </ul>
-        </div>
-
-        <div className="border border-zinc-800 bg-black p-5 mb-8">
-          <div className="font-mono text-xs text-zinc-500 mb-3">RECEIPTS (OUTCOMES, NOT ACTIVITY):</div>
-          <div className="space-y-2">
-            {receipts.map((r, i) => (
-              <div key={i} className="flex items-center justify-between font-mono text-sm" data-testid={`receipt-${i}`}>
-                <span className="text-zinc-400">{r.component}</span>
-                <span className={`${r.color} font-bold text-xs border border-current px-2 py-0.5`}>{r.status}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div data-testid="tollbooth-log-stream" className="my-8 font-mono text-sm border border-zinc-800 bg-black p-4">
