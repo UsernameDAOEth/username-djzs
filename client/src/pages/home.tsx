@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { DJZSSections, FoundersFund, MatrixRain } from '../components/DJZSAllSections';
+import Axioms from '../components/Axioms';
+import PhilosophySection from '../components/Philosophy';
+import ArchitectureOfIllusion from '../components/ArchitectureOfIllusion';
 import { useXmtp } from '../hooks/useXmtp';
 
 interface Web3BioLink {
@@ -460,82 +463,6 @@ function TheArchitect({ profile, loading }: { profile: Partial<Web3BioProfile> |
   );
 }
 
-function SimulationStack() {
-  const lifeToAgentMapping = [
-    { life: 'You are Player 1 controlling the simulation', agent: 'An agent executes from its core programming' },
-    { life: 'External reality reflects internal state', agent: 'Agent outputs reflect logic quality' },
-    { life: 'Trust yourself first before trusting others', agent: 'Agents must be verified before trusted' },
-    { life: 'Self-sovereignty — no external dependency', agent: 'Decentralization — no central authority' },
-    { life: 'Discipline creates freedom', agent: 'Deterministic verification creates trust' },
-    { life: 'We are one — all players connected', agent: 'A2A economy — all agents interconnected' },
-  ];
-
-  return (
-    <section className="py-16 px-4" data-testid="section-simulation-stack">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="font-mono text-zinc-500 text-xs mb-6 tracking-widest">// THE SIMULATION STACK</h2>
-
-        <div className="space-y-6">
-          <div className="border border-purple-500/30 bg-purple-500/5 p-5">
-            <div className="font-mono text-purple-400 text-xs mb-2 tracking-widest">LAYER 1: THE INTERNAL OPERATING SYSTEM</div>
-            <blockquote className="border-l-2 border-purple-400 pl-4 mb-4">
-              <p className="text-zinc-300 text-sm italic">"Before you build anything in the external world, you have to master the internal world."</p>
-            </blockquote>
-            <ul className="space-y-1.5 mb-4">
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Reality is a simulation and you are Player 1</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Your reality is a projection of your internal state</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Discipline isn't punishment — it's gaining admin access to your own simulation</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-purple-400">→</span>Taking back Player 1 status requires radical self-responsibility</li>
-            </ul>
-            <p className="font-mono text-purple-400 text-xs font-bold">"You're not in the simulation. You ARE the simulation."</p>
-          </div>
-
-          <div className="border border-blue-400/30 bg-blue-400/5 p-5">
-            <div className="font-mono text-blue-400 text-xs mb-2 tracking-widest">LAYER 2: THE VERIFICATION LAYER</div>
-            <blockquote className="border-l-2 border-blue-400 pl-4 mb-4">
-              <p className="text-zinc-300 text-sm italic">"The same way I audit my own thoughts and actions before I execute in life, DJZS audits AI agents before they execute in the digital economy."</p>
-            </blockquote>
-            <div className="border border-zinc-800 bg-black overflow-hidden">
-              <div className="grid grid-cols-2 border-b border-zinc-800">
-                <div className="px-3 py-2 font-mono text-xs text-zinc-500 border-r border-zinc-800">LIFE PRINCIPLE</div>
-                <div className="px-3 py-2 font-mono text-xs text-zinc-500">AI AGENT PARALLEL</div>
-              </div>
-              {lifeToAgentMapping.map((row, i) => (
-                <div key={i} className={`grid grid-cols-2 ${i < lifeToAgentMapping.length - 1 ? 'border-b border-zinc-800/50' : ''}`}>
-                  <div className="px-3 py-2 font-mono text-xs text-zinc-400 border-r border-zinc-800/50">{row.life}</div>
-                  <div className="px-3 py-2 font-mono text-xs text-blue-400">{row.agent}</div>
-                </div>
-              ))}
-            </div>
-            <p className="font-mono text-blue-400 text-xs font-bold mt-4">"Audit before you act. In life. In code. In everything."</p>
-          </div>
-
-          <div className="border border-green-400/30 bg-green-400/5 p-5">
-            <div className="font-mono text-green-400 text-xs mb-2 tracking-widest">LAYER 3: THE A2A FUTURE</div>
-            <blockquote className="border-l-2 border-green-400 pl-4 mb-4">
-              <p className="text-zinc-300 text-sm italic">"We're building a world where autonomous minds interact at scale. The question isn't IF. The question is: who builds the trust layer?"</p>
-            </blockquote>
-            <ul className="space-y-1.5 mb-4">
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>AI agents will transact without human intervention</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>This mirrors the simulation — autonomous entities in shared reality</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>Without verification, the agent economy becomes chaos</li>
-              <li className="flex items-start gap-2 text-zinc-400 text-xs font-mono"><span className="text-green-400">→</span>DJZS is the immune system for this new world</li>
-            </ul>
-            <p className="font-mono text-green-400 text-xs font-bold">"The future isn't human vs AI. It's conscious systems operating in verified trust."</p>
-          </div>
-
-          <div className="border-2 border-zinc-600 bg-zinc-900/50 p-5 text-center">
-            <div className="font-mono text-zinc-500 text-xs mb-3 tracking-widest">// PLAYER 1 RESOLUTION</div>
-            <p className="text-zinc-300 text-sm leading-relaxed max-w-xl mx-auto">
-              You are Player 1 in your simulation. Everyone else is Player 1 in theirs. "We are one" is the recognition that all simulations run on the same substrate.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function TheDispatch() {
   const articles = [
     "THE ADVERSARIAL NECESSITY: Auditing the Polycentric Agent Economy",
@@ -902,8 +829,10 @@ export default function DJZSLandingPage() {
 
         <Evolution />
         <DJZSSections />
+        <Axioms />
+        <PhilosophySection />
+        <ArchitectureOfIllusion />
         <TheArchitect profile={displayProfile} loading={loading} />
-        <SimulationStack />
         <TheDispatch />
         <Contact
           profile={displayProfile}

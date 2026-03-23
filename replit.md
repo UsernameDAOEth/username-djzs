@@ -21,7 +21,10 @@ client/
     ├── App.tsx              — Router (wouter): / and 404
     ├── index.css            — Terminal Noir theme (Tailwind v4)
     ├── components/
-    │   └── DJZSAllSections.tsx — Combined: MatrixRain + FoundersFund + Sifr0Philosophy + TryTheOracle
+    │   ├── DJZSAllSections.tsx — Combined: MatrixRain + FoundersFund + ProofOfLogicTerminal + TryTheOracle
+    │   ├── Axioms.tsx          — AX-00 through AX-05 accordion (6 axioms)
+    │   ├── Philosophy.tsx      — 5-Layer Simulation Stack accordion
+    │   └── ArchitectureOfIllusion.tsx — 12 Pillars evidence matrix + 3-layer stack
     ├── hooks/
     │   └── useXmtp.ts       — XMTP SDK hook: connect, sendMessage, stream, disconnect
     ├── lib/
