@@ -381,37 +381,57 @@ export const FoundersFund: React.FC = () => {
 // TRY THE ORACLE SECTION
 // ============================================================================
 
-const DJZS_PROMPT_TEMPLATE = `I am using a strict logic-auditing framework called the DJZS Protocol. For this conversation, I need you to act as the DJZS Oracle: a highly analytical, adversarial reasoning auditor. Your goal is to stress-test my reasoning, trading theses, and strategic decisions. Please do not validate my biases or act overly polite; I need cold, objective, structural pushback.
+const DJZS_PROMPT_TEMPLATE = `I am using the DJZS Protocol logic-auditing framework (v1.0). Act as the DJZS Adversarial Oracle: a cold, structural, adversarial reasoning auditor. Stress-test every strategy I submit. No validation, no politeness, no hedging.
 
-Please evaluate every strategy I submit against the DJZS-LF Taxonomy:
-- [DJZS-S01] CRITICAL: Circular Logic (The conclusion assumes the premise)
-- [DJZS-S02] CRITICAL: Missing Falsifiability (No metric defined that would prove the thesis wrong)
-- [DJZS-E01] HIGH: Confirmation Tunnel (Ignoring contrary data/cherry-picking)
-- [DJZS-E02] HIGH: Authority Substitution ("An expert said so" instead of proving the math)
-- [DJZS-I01] MEDIUM: Misaligned Incentive / FOMO (Yield-chasing without risk budgeting)
-- [DJZS-I02] MEDIUM: Narrative Dependency (Strategy only works if a specific, uncontrollable story plays out)
-- [DJZS-X01] CRITICAL: Unhedged Execution (No exit conditions or stop-loss)
+Evaluate against the DJZS-LF v1.0 Taxonomy (11 codes, 200-point scale):
 
-Whenever I submit text for analysis, you must respond ONLY with the following strict DJZS Certificate format. Do not include conversational filler before or after the certificate.
+STRUCTURAL (62 pts max):
+- [DJZS-S01] CRITICAL (26): CIRCULAR_LOGIC — conclusion assumes the premise
+- [DJZS-S02] HIGH (20): LAYER_INVERSION — verification depends on unverified upstream
+- [DJZS-S03] MEDIUM (16): DEPENDENCY_GHOST — references things that don't exist
 
-VERDICT: [PASS (if 0 Critical/High flags) or FAIL]
-RISK SCORE: [0-100]
-PRIMARY BIAS: [Name the biggest cognitive blind spot]
-FLAGS: 
-- [Code]: [1-sentence explanation of why it triggered]
-FATAL FLAW: [The single most dangerous point of failure]
-REMEDIATION: [1 strict, actionable requirement to fix the logic]
+EPISTEMIC (38 pts max):
+- [DJZS-E01] HIGH (22): ORACLE_UNVERIFIED — data cited without provenance
+- [DJZS-E02] MEDIUM (16): CONFIDENCE_INFLATION — projections stated as facts
 
-Acknowledge you understand this framework by replying ONLY with: "DJZS Protocol recognized. Awaiting your first strategy trace."`;
+INCENTIVE (44 pts max):
+- [DJZS-I01] MEDIUM (16): FOMO_LOOP — social signal over verified data
+- [DJZS-I02] MEDIUM (14): MISALIGNED_REWARD — optimizing for wrong target
+- [DJZS-I03] MEDIUM (14): DATA_UNVERIFIED — unsourced numbers in decisions
+
+EXECUTION (50 pts max):
+- [DJZS-X01] CRITICAL (30): EXECUTION_UNBOUND — no halt condition defined
+- [DJZS-X02] HIGH (20): RACE_CONDITION — non-atomic multi-step execution
+
+TEMPORAL (6 pts max):
+- [DJZS-T01] LOW (6): STALE_REFERENCE — data without timestamp or stale
+
+PASS threshold: risk_score < 60 out of 200.
+
+For every submission respond ONLY in this format:
+
+VERDICT: [PASS or FAIL]
+RISK SCORE: [0-200]
+FLAGS:
+- [Code] [Name] (+weight): [1-sentence explanation]
+RISK COMPOSITION: [category breakdown, e.g. Structural: 46, Execution: 30]
+FATAL FLAW: [single most dangerous point of failure, or "None" if PASS]
+REMEDIATION: [1 strict actionable fix, or "No action required" if PASS]
+
+Acknowledge by replying ONLY: "DJZS Oracle v1.0 initialized. 11 codes. 200-point scale. Threshold: 60. Awaiting strategy trace."`;
 
 const TAXONOMY_CODES = [
   { code: 'S01', severity: 'CRITICAL', name: 'Circular Logic', color: '#ff4444' },
-  { code: 'S02', severity: 'CRITICAL', name: 'Missing Falsifiability', color: '#ff4444' },
-  { code: 'E01', severity: 'HIGH', name: 'Confirmation Tunnel', color: '#ff8800' },
-  { code: 'E02', severity: 'HIGH', name: 'Authority Substitution', color: '#ff8800' },
+  { code: 'S02', severity: 'HIGH', name: 'Layer Inversion', color: '#ff8800' },
+  { code: 'S03', severity: 'MEDIUM', name: 'Dependency Ghost', color: '#ffcc00' },
+  { code: 'E01', severity: 'HIGH', name: 'Oracle Unverified', color: '#ff8800' },
+  { code: 'E02', severity: 'MEDIUM', name: 'Confidence Inflation', color: '#ffcc00' },
   { code: 'I01', severity: 'MEDIUM', name: 'FOMO Loop', color: '#ffcc00' },
-  { code: 'I02', severity: 'MEDIUM', name: 'Narrative Dependency', color: '#ffcc00' },
-  { code: 'X01', severity: 'CRITICAL', name: 'Unhedged Execution', color: '#ff4444' },
+  { code: 'I02', severity: 'MEDIUM', name: 'Misaligned Reward', color: '#ffcc00' },
+  { code: 'I03', severity: 'MEDIUM', name: 'Data Unverified', color: '#ffcc00' },
+  { code: 'X01', severity: 'CRITICAL', name: 'Execution Unbound', color: '#ff4444' },
+  { code: 'X02', severity: 'HIGH', name: 'Race Condition', color: '#ff8800' },
+  { code: 'T01', severity: 'LOW', name: 'Stale Reference', color: '#888888' },
 ];
 
 export const TryTheOracle: React.FC = () => {
@@ -561,7 +581,8 @@ export const TryTheOracle: React.FC = () => {
                 {DJZS_PROMPT_TEMPLATE.split('\n').map((line, i) => {
                   if (line.includes('[DJZS-')) {
                     const severity = line.includes('CRITICAL') ? '#ff4444' 
-                      : line.includes('HIGH') ? '#ff8800' 
+                      : line.includes('HIGH') ? '#ff8800'
+                      : line.includes('LOW') ? '#888888'
                       : '#ffcc00';
                     return (
                       <span key={i}>
@@ -570,8 +591,24 @@ export const TryTheOracle: React.FC = () => {
                       </span>
                     );
                   }
+                  if (/^(STRUCTURAL|EPISTEMIC|INCENTIVE|EXECUTION|TEMPORAL)\s/.test(line)) {
+                    return (
+                      <span key={i}>
+                        <span style={{ color: '#c084fc' }}>{line}</span>
+                        {'\n'}
+                      </span>
+                    );
+                  }
+                  if (line.startsWith('PASS threshold:')) {
+                    return (
+                      <span key={i}>
+                        <span style={{ color: '#4ade80' }}>{line}</span>
+                        {'\n'}
+                      </span>
+                    );
+                  }
                   if (line.startsWith('VERDICT:') || line.startsWith('RISK SCORE:') || 
-                      line.startsWith('PRIMARY BIAS:') || line.startsWith('FLAGS:') ||
+                      line.startsWith('RISK COMPOSITION:') || line.startsWith('FLAGS:') ||
                       line.startsWith('FATAL FLAW:') || line.startsWith('REMEDIATION:')) {
                     return (
                       <span key={i}>
