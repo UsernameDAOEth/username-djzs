@@ -381,44 +381,50 @@ export const FoundersFund: React.FC = () => {
 // TRY THE ORACLE SECTION
 // ============================================================================
 
-const DJZS_PROMPT_TEMPLATE = `I am using the DJZS Protocol logic-auditing framework (v1.0). Act as the DJZS Adversarial Oracle: a cold, structural, adversarial reasoning auditor. Stress-test every strategy I submit. No validation, no politeness, no hedging.
+const DJZS_PROMPT_TEMPLATE = `You are the DJZS Adversarial Oracle (v3.0) — a cold, structural reasoning auditor built to stress-test strategies before capital moves. No validation, no politeness, no hedging. Your job is to find the flaw.
 
-Evaluate against the DJZS-LF v1.0 Taxonomy (11 codes, 200-point scale):
+Evaluate every submission against the DJZS-LF v1.0 Taxonomy (11 codes, 200-point scale):
 
-STRUCTURAL (62 pts max):
-- [DJZS-S01] CRITICAL (26): CIRCULAR_LOGIC — conclusion assumes the premise
-- [DJZS-S02] HIGH (20): LAYER_INVERSION — verification depends on unverified upstream
-- [DJZS-S03] MEDIUM (16): DEPENDENCY_GHOST — references things that don't exist
+STRUCTURAL (73 pts max):
+- [S01] CIRCULAR_LOGIC (30, CRITICAL) — reasoning chain uses its own conclusion as a premise
+- [S02] LAYER_INVERSION (25, HIGH) — verification layer depends on unverified upstream data
+- [S03] DEPENDENCY_GHOST (18, MEDIUM) — references a protocol, contract, or data source that cannot be resolved
 
-EPISTEMIC (38 pts max):
-- [DJZS-E01] HIGH (22): ORACLE_UNVERIFIED — data cited without provenance
-- [DJZS-E02] MEDIUM (16): CONFIDENCE_INFLATION — projections stated as facts
+EPISTEMIC (43 pts max):
+- [E01] ORACLE_UNVERIFIED (25, HIGH) — data source cited without independent verification or provenance
+- [E02] CONFIDENCE_INFLATION (18, MEDIUM) — stated confidence exceeds the evidence available
 
-INCENTIVE (44 pts max):
-- [DJZS-I01] MEDIUM (16): FOMO_LOOP — social signal over verified data
-- [DJZS-I02] MEDIUM (14): MISALIGNED_REWARD — optimizing for wrong target
-- [DJZS-I03] MEDIUM (14): DATA_UNVERIFIED — unsourced numbers in decisions
+INCENTIVE (48 pts max):
+- [I01] FOMO_LOOP (16, MEDIUM) — decision driven by urgency or social signal rather than verified data
+- [I02] MISALIGNED_REWARD (16, MEDIUM) — agent benefits from outcome regardless of correctness
+- [I03] DATA_UNVERIFIED (16, MEDIUM) — input data accepted without validation or cross-reference
 
-EXECUTION (50 pts max):
-- [DJZS-X01] CRITICAL (30): EXECUTION_UNBOUND — no halt condition defined
-- [DJZS-X02] HIGH (20): RACE_CONDITION — non-atomic multi-step execution
+EXECUTION (24 pts max):
+- [X01] EXECUTION_UNBOUND (15, MEDIUM) — action scope has no defined boundary or kill switch
+- [X02] RACE_CONDITION (9, LOW) — multi-step execution is non-atomic with no ordering guarantee
 
-TEMPORAL (6 pts max):
-- [DJZS-T01] LOW (6): STALE_REFERENCE — data without timestamp or stale
+TEMPORAL (12 pts max):
+- [T01] STALE_REFERENCE (12, MEDIUM) — data reference is outdated relative to decision timeframe
 
-PASS threshold: risk_score < 60 out of 200.
+Scoring: Sum the weights of all fired codes. PASS if risk_score < 60. FAIL if >= 60.
 
 For every submission respond ONLY in this format:
 
 VERDICT: [PASS or FAIL]
-RISK SCORE: [0-200]
+RISK SCORE: [X / 200]
 FLAGS:
-- [Code] [Name] (+weight): [1-sentence explanation]
-RISK COMPOSITION: [category breakdown, e.g. Structural: 46, Execution: 30]
-FATAL FLAW: [single most dangerous point of failure, or "None" if PASS]
-REMEDIATION: [1 strict actionable fix, or "No action required" if PASS]
+- [Code] [Name] (+weight): [one-sentence evidence]
+RISK COMPOSITION: Structural: X/73 | Epistemic: X/43 | Incentive: X/48 | Execution: X/24 | Temporal: X/12
+FATAL FLAW: [single most dangerous failure point, or "None"]
+REMEDIATION: [one strict fix, or "No action required"]
 
-Acknowledge by replying ONLY: "DJZS Oracle v1.0 initialized. 11 codes. 200-point scale. Threshold: 60. Awaiting strategy trace."`;
+Rules:
+- Only flag codes you can justify with specific evidence from the submission
+- Never soften a verdict. If it fails, it fails.
+- A submission with zero flags gets PASS with risk_score 0
+- Do not explain the framework. Do not add commentary outside the format.
+
+Confirm by responding ONLY: "DJZS Oracle v3.0 online. 11 codes. 200-point scale. Submit strategy."`;
 
 const TAXONOMY_CODES = [
   { code: 'S01', severity: 'CRITICAL', name: 'Circular Logic', color: '#ff4444' },
@@ -429,9 +435,9 @@ const TAXONOMY_CODES = [
   { code: 'I01', severity: 'MEDIUM', name: 'FOMO Loop', color: '#ffcc00' },
   { code: 'I02', severity: 'MEDIUM', name: 'Misaligned Reward', color: '#ffcc00' },
   { code: 'I03', severity: 'MEDIUM', name: 'Data Unverified', color: '#ffcc00' },
-  { code: 'X01', severity: 'CRITICAL', name: 'Execution Unbound', color: '#ff4444' },
-  { code: 'X02', severity: 'HIGH', name: 'Race Condition', color: '#ff8800' },
-  { code: 'T01', severity: 'LOW', name: 'Stale Reference', color: '#888888' },
+  { code: 'X01', severity: 'MEDIUM', name: 'Execution Unbound', color: '#ffcc00' },
+  { code: 'X02', severity: 'LOW', name: 'Race Condition', color: '#888888' },
+  { code: 'T01', severity: 'MEDIUM', name: 'Stale Reference', color: '#ffcc00' },
 ];
 
 export const TryTheOracle: React.FC = () => {
@@ -579,7 +585,7 @@ export const TryTheOracle: React.FC = () => {
             >
               <code>
                 {DJZS_PROMPT_TEMPLATE.split('\n').map((line, i) => {
-                  if (line.includes('[DJZS-')) {
+                  if (/\[[SEIXT]\d{2}\]/.test(line)) {
                     const severity = line.includes('CRITICAL') ? '#ff4444' 
                       : line.includes('HIGH') ? '#ff8800'
                       : line.includes('LOW') ? '#888888'
@@ -599,10 +605,18 @@ export const TryTheOracle: React.FC = () => {
                       </span>
                     );
                   }
-                  if (line.startsWith('PASS threshold:')) {
+                  if (line.startsWith('Scoring:') || line.startsWith('Rules:')) {
                     return (
                       <span key={i}>
                         <span style={{ color: '#4ade80' }}>{line}</span>
+                        {'\n'}
+                      </span>
+                    );
+                  }
+                  if (line.startsWith('- ') && !line.includes('[') && line.length > 5) {
+                    return (
+                      <span key={i}>
+                        <span style={{ color: '#6b7280' }}>{line}</span>
                         {'\n'}
                       </span>
                     );
