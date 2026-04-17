@@ -197,7 +197,7 @@ function QRCodeModal({ isOpen, onClose, url }: { isOpen: boolean; onClose: () =>
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black p-4"
       onClick={onClose}
       data-testid="modal-qr-backdrop"
     >
