@@ -90,6 +90,7 @@ function useWeb3Bio(identity = 'djzs.eth') {
 
 const DJZS_ENS = 'username.dj-z-s.eth';
 const GITHUB_REPO = 'https://github.com/UsernameDAOEth/djzs-AI';
+const SITE_URL = 'https://djzs.ai/';
 
 const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
   displayName: 'Username: Dj-Z-S',
@@ -137,7 +138,99 @@ const Icons = {
       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
     </svg>
   ),
+  QR: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z" />
+    </svg>
+  ),
+  Download: () => (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+    </svg>
+  ),
 };
+
+function QRCodeModal({ isOpen, onClose, url }: { isOpen: boolean; onClose: () => void; url: string }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!isOpen || !canvasRef.current) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const QRCode = (await import('qrcode')).default;
+        if (cancelled || !canvasRef.current) return;
+        await QRCode.toCanvas(canvasRef.current, url, {
+          width: 320,
+          margin: 2,
+          errorCorrectionLevel: 'H',
+          color: { dark: '#000000', light: '#ffffff' },
+        });
+      } catch (err) {
+        console.error('QR generation failed', err);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isOpen, url]);
+
+  const handleDownload = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = 'djzs-qr.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, []);
+
+  if (!isOpen) return null;
+
+  const displayUrl = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+      onClick={onClose}
+      data-testid="modal-qr-backdrop"
+    >
+      <div
+        className="border border-green-400/60 bg-black p-6 max-w-sm w-full shadow-[0_0_40px_rgba(34,197,94,0.15)]"
+        onClick={(e) => e.stopPropagation()}
+        data-testid="modal-qr-card"
+      >
+        <h3 className="font-mono text-green-400 text-xs tracking-widest text-center mb-4">// SCAN TO CONNECT</h3>
+        <div className="bg-white p-4 flex items-center justify-center mb-4">
+          <canvas ref={canvasRef} data-testid="canvas-qr" />
+        </div>
+        <p className="font-mono text-zinc-500 text-xs text-center mb-5 truncate" data-testid="text-qr-url">{displayUrl}</p>
+        <div className="flex gap-2 justify-center">
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-2 px-3 py-1.5 border border-green-400/60 text-green-400 font-mono text-xs hover:bg-green-400/10 transition-colors"
+            data-testid="button-qr-download"
+          >
+            <Icons.Download /> DOWNLOAD PNG
+          </button>
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 border border-zinc-700 text-zinc-400 font-mono text-xs hover:border-zinc-500 hover:text-zinc-200 transition-colors"
+            data-testid="button-qr-close"
+          >
+            [ CLOSE ]
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const LINK_ICONS: Record<string, React.FC> = {
   twitter: Icons.Twitter,
@@ -166,13 +259,14 @@ function LoadingDots() {
   );
 }
 
-function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
+function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError, onOpenQR }: {
   profile: Partial<Web3BioProfile> | null;
   loading: boolean;
   onConnectWallet: () => void;
   isWalletConnected: boolean;
   walletAddress: string | null;
   walletError: string | null;
+  onOpenQR: () => void;
 }) {
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-zinc-800 bg-black/90 backdrop-blur-sm">
@@ -203,6 +297,16 @@ function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAd
           {walletError && (
             <span className="font-mono text-xs text-red-400 hidden sm:block" data-testid="text-wallet-error">{walletError}</span>
           )}
+          <button
+            onClick={onOpenQR}
+            data-testid="button-header-qr"
+            aria-label="Show QR code"
+            title="Scan to connect"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 font-mono text-xs border border-zinc-700 text-zinc-400 hover:border-green-400/50 hover:text-green-400 transition-all"
+          >
+            <Icons.QR />
+            <span className="hidden sm:inline">QR</span>
+          </button>
           <button
             onClick={onConnectWallet}
             data-testid="button-connect-wallet"
@@ -674,13 +778,14 @@ function XmtpChat({ walletAddress, onConnectWallet, isWalletConnected, walletErr
   );
 }
 
-function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError }: {
+function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletAddress, walletError, onOpenQR }: {
   profile: Partial<Web3BioProfile> | null;
   loading: boolean;
   onConnectWallet: () => void;
   isWalletConnected: boolean;
   walletAddress: string | null;
   walletError: string | null;
+  onOpenQR: () => void;
 }) {
   const links = profile?.links || FALLBACK_PROFILE.links || {};
   const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, bluesky: (links as any).bluesky || FALLBACK_PROFILE.links?.bluesky, whatsapp: (links as any).whatsapp || FALLBACK_PROFILE.links?.whatsapp, website: FALLBACK_PROFILE.links?.website, email: FALLBACK_PROFILE.links?.email };
@@ -742,6 +847,15 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
                     <Icons.External />
                   </a>
                 ))}
+                <button
+                  type="button"
+                  onClick={onOpenQR}
+                  className="col-span-2 flex items-center justify-center gap-2 px-2 py-2 border border-green-400/40 text-green-400 font-mono text-xs hover:border-green-400 hover:bg-green-400/5 transition-colors"
+                  data-testid="button-contact-qr"
+                >
+                  <Icons.QR />
+                  <span>// SCAN TO CONNECT</span>
+                </button>
               </div>
             )}
           </div>
@@ -789,6 +903,9 @@ export default function DJZSLandingPage() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [walletError, setWalletError] = useState<string | null>(null);
+  const [isQrOpen, setIsQrOpen] = useState(false);
+  const openQR = useCallback(() => setIsQrOpen(true), []);
+  const closeQR = useCallback(() => setIsQrOpen(false), []);
 
   const handleConnectWallet = useCallback(() => {
     if (isWalletConnected) return;
@@ -834,6 +951,7 @@ export default function DJZSLandingPage() {
         isWalletConnected={isWalletConnected}
         walletAddress={walletAddress}
         walletError={walletError}
+        onOpenQR={openQR}
       />
       <FoundersFund />
 
@@ -855,11 +973,13 @@ export default function DJZSLandingPage() {
           isWalletConnected={isWalletConnected}
           walletAddress={walletAddress}
           walletError={walletError}
+          onOpenQR={openQR}
         />
       </main>
 
       <Footer profile={displayProfile} />
       </div>
+      <QRCodeModal isOpen={isQrOpen} onClose={closeQR} url={SITE_URL} />
     </div>
   );
 }
