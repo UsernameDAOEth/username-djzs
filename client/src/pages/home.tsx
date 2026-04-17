@@ -103,6 +103,7 @@ const FALLBACK_PROFILE: Partial<Web3BioProfile> = {
     website: { url: 'https://djzs.ai/', handle: 'djzs.ai' },
     discord: { url: 'https://discord.gg/WKYQTBgW', handle: 'DJZS' },
     bluesky: { url: 'https://bsky.app/profile/djzsx.bsky.social', handle: 'djzsx.bsky.social' },
+    whatsapp: { url: 'https://wa.me/16502709997', handle: '+1 650-270-9997' },
     email: { url: 'mailto:djzs@username.box', handle: 'djzs@username.box' },
   },
 };
@@ -131,6 +132,11 @@ const Icons = {
       <path d="M5.92 3.273C8.752 5.4 11.797 9.71 12.913 12.022c1.116-2.312 4.161-6.622 6.993-8.749C21.948 1.737 25 .363 25 3.842c0 .695-.398 5.838-.632 6.673-.812 2.901-3.77 3.64-6.4 3.193 4.598.783 5.766 3.376 3.24 5.97-4.798 4.926-6.896-1.236-7.434-2.815-.099-.29-.145-.425-.146-.31-.001-.115-.047.02-.146.31-.538 1.579-2.636 7.74-7.434 2.815-2.526-2.594-1.358-5.187 3.24-5.97-2.63.447-5.588-.292-6.4-3.193C2.654 9.68 2.256 4.537 2.256 3.842c0-3.479 3.052-2.105 3.664-.569z" transform="translate(-2.256 -1.273)"/>
     </svg>
   ),
+  WhatsApp: () => (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  ),
 };
 
 const LINK_ICONS: Record<string, React.FC> = {
@@ -142,6 +148,7 @@ const LINK_ICONS: Record<string, React.FC> = {
   website: Icons.Website,
   discord: Icons.Discord,
   bluesky: Icons.Bluesky,
+  whatsapp: Icons.WhatsApp,
   email: Icons.Mail,
 };
 
@@ -676,7 +683,7 @@ function Contact({ profile, loading, onConnectWallet, isWalletConnected, walletA
   walletError: string | null;
 }) {
   const links = profile?.links || FALLBACK_PROFILE.links || {};
-  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, bluesky: (links as any).bluesky || FALLBACK_PROFILE.links?.bluesky, website: FALLBACK_PROFILE.links?.website, email: FALLBACK_PROFILE.links?.email };
+  const mergedLinks = { ...links, discord: (links as any).discord || FALLBACK_PROFILE.links?.discord, bluesky: (links as any).bluesky || FALLBACK_PROFILE.links?.bluesky, whatsapp: (links as any).whatsapp || FALLBACK_PROFILE.links?.whatsapp, website: FALLBACK_PROFILE.links?.website, email: FALLBACK_PROFILE.links?.email };
 
   const socialLinks = Object.entries(mergedLinks)
     .filter(([key]) => LINK_ICONS[key])
