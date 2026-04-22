@@ -1,0 +1,101 @@
+Here's a Replit prompt you can paste into a new Agent session. It's structured to give Replit exactly what it needs to be productive — current state, constraints, and the immediate task — without re-litigating design decisions you've already made.
+
+---
+
+# DJZS Engine — Replit Agent Prompt
+
+## What you're building
+
+A deterministic pre-trade audit engine for prediction markets (Polymarket, Kalshi) and crypto perpetuals (Hyperliquid via CoinGlass aggregation). The engine takes a structured trade thesis, runs it through typed failure-mode detectors, and returns a cryptographically-signed verdict (PASS / PASS_WITH_NOTES / ABORT / REVIEW) with a Keccak256-hashed receipt.
+
+This is **not** a forecasting tool. It does not predict outcomes. It audits whether a thesis is structurally coherent, evidenced, and execution-ready before money moves.
+
+## Starting point
+
+I have a working v1.0.0-alpha foundation in TypeScript. Ingest the zip I'll upload (`djzs-engine-v1.0.0-alpha.zip`) as the starting state. Read `ENGINE_STATUS.md` first — it documents exactly what works and what doesn't.
+
+**Current state:**
+- 56/56 tests passing
+- 4 of 24 LF detector codes implemented (X01, U03, R01, R02)
+- Polymarket + CoinGlass + Pyth adapters working
+- CLI runs end-to-end; receipt hash verification works
+- Node 20+, TypeScript 5.3, Zod, vitest, tsx
+
+**What is NOT built yet:**
+- 20 of 24 detector codes (registered in `src/codes/registry.ts` but no detector logic)
+- GDELT adapter (blocks E01/E02/E03)
+- Irys Datachain anchoring
+- API server (needs Hono on Cloudflare Workers eventually)
+- x402 payment middleware
+
+## Non-negotiable architectural rules
+
+These are load-bearing. Do not violate them without asking:
+
+1. **Determinism is sacred.** `computeVerdict()` must be pure TypeScript with no LLM calls and no network calls. Same inputs → identical compute hash. The test suite enforces this.
+2. **LLMs may flag inputs; LLMs do not decide verdicts.** Any semantic layer emits boolean flags only. All scoring happens in deterministic TS.
+3. **Parse failures never trigger payment.** Unparseable theses return REVIEW with structured error codes. Only parseable theses reach the engine.
+4. **Every external data source preserves source metadata** — `{provider, endpoint, fetched_at, response_hash, exchange_scope, freshness_window_seconds}` — attached to every receipt that used that data. This is how receipts stay defensible when aggregators change their feeds.
+5. **canonicalJSON must preserve round-trip invariance.** Undefined values in objects are omitted (not serialized as null). Tests enforce this — do not "simplify" that function.
+6. **Every new detector ships with:** implementation, minimum 3 unit tests (positive trigger, negative, edge case), an entry in `defaultDetectors()`, and works against the existing `EngineInput` / `LFTrigger` interfaces.
+
+## Immediate task
+
+[PICK ONE — replace this section with whichever you're doing]
+
+**Option A — Ship 8 more detectors (no new adapters):**
+Implement these in `src/codes/detectors/index.ts`, following the existing pattern of `X01_Detector`, `U03_Detector`, `R01_Detector`, `R02_Detector`:
+- `S01 STRUCTURAL_COPY` — detect copy-trade language in thesis text
+- `S02 PROPOSITION_OUTCOME_MISMATCH` — detect semantic drift between proposition and target_outcome
+- `T01 TEMPORAL_DRIFT` — thesis deadline vs market resolution deadline mismatch
+- `A01 ASSUMPTIONS_IMPLICIT` — non-trivial proposition with empty `key_assumptions`
+- `U01 NONSENSICAL_INPUT` — catches inputs that parsed but make no semantic sense
+- `U02 CONFIDENCE_SIZE_MISMATCH` — low confidence + large size (structurally inconsistent)
+- `U04 MNPI_DECLARED` — fires when `information_source_type` is `private` or `mixed`
+- `U05 PROVENANCE_UNCLEAR` — fires when `information_source_type` is `unspecified`
+
+Weights and severities are already defined in `src/codes/registry.ts` — use `getWeight(code, severity)`. Add the new detectors to `defaultDetectors()` export. Add tests to `tests/detectors.test.ts` following the existing format.
+
+**Option B — Build GDELT adapter + E01/E02/E03 detectors:**
+GDELT Event 2.0 API, free tier, docs at `https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/`. Create `src/adapters/gdelt.ts` that returns `EvidenceSnapshotInput` for the engine. Then implement E01 (no supporting evidence found), E02 (evidence exists but older than relevance window), E03 (sources disagree on the load-bearing claim).
+
+**Option C — Build O01 ORACLE_DIVERGENCE:**
+The perp code that compares CoinGlass-derived perp price against Pyth spot. Data sources already exist — just need the detector. Add to `src/codes/detectors/index.ts` + tests.
+
+## How to know you're done
+
+- `npm test` passes (no regressions; new tests added for new codes)
+- `npm run typecheck` passes
+- CLI `npx tsx cli/djzs.ts audit <thesis.json>` runs end-to-end and new codes fire on inputs designed to trigger them
+- Each new detector has an example in the test file demonstrating a positive trigger, a negative (no trigger), and an edge case
+- No regressions in existing behavior — the 56 existing tests still pass
+
+## How to NOT finish
+
+- Do not add codes to `defaultDetectors()` without implementing the detector class (ghost codes that never fire are worse than missing codes)
+- Do not weaken the determinism guarantees to make a detector "smarter"
+- Do not introduce new runtime dependencies without asking (current deps: `zod`, `js-sha3`; that's it)
+- Do not add the remaining codes all at once if one is hard to get right — ship fewer codes that actually work over more codes that misfire
+- Do not "clean up" or refactor the existing 4 detectors, the receipt schema, or canonicalJSON. They are tested and working.
+
+## Conventions
+
+- TypeScript strict mode
+- ES modules (`"type": "module"` in package.json, `.js` import extensions in source)
+- File per major concern (adapter, detector, schema, receipt)
+- Tests live in `tests/`, co-exist with `src/`
+- No classes for stateless operations — use plain functions
+- Detector classes are the one exception (they implement the `Detector` interface)
+
+## What to output
+
+1. New/modified source files
+2. New/modified tests
+3. Terminal output of `npm test` showing all tests pass
+4. Terminal output of at least one CLI audit that demonstrates the new codes firing
+
+Do not output architectural commentary, README rewrites, or "v2" plans. Write code. Run tests. Show output.
+
+---
+
+**A note on using this prompt:** replace the `[PICK ONE]` block with whichever option you're actually doing in that Replit session. Don't try to do all three at once — Replit Agent will do better on one focused task than three loose ones. My recommendation is Option A for the next session because it expands coverage fastest and has the fewest unknowns.
