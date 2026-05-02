@@ -4,31 +4,26 @@ const LAWS = [
   {
     tag: 'LAW 01',
     title: 'Constraint Precedes Outcome',
-    summary: 'Outcomes pass through structure, not desire.',
     body: 'Every possible outcome must pass through constraint. Nothing manifests simply because it is imagined, desired, predicted, or prompted. An outcome must be admissible under the rules of the system producing it.',
   },
   {
     tag: 'LAW 02',
     title: 'Probability Is Observer Uncertainty',
-    summary: 'Probability describes what the observer cannot see.',
     body: 'Probability describes what the observer does not know. It does not mean the system has no structure. In DJZS, probabilistic judgment is treated as incomplete visibility, not permission to act without verification.',
   },
   {
     tag: 'LAW 03',
     title: 'Structure Filters Possibility',
-    summary: 'Not every future is equally reachable.',
     body: 'Not every possible future is equally reachable. Incentives, liquidity, timing, evidence, execution limits, and feedback loops filter what can actually happen. DJZS audits those filters.',
   },
   {
     tag: 'LAW 04',
     title: 'Feedback Selects Reality',
-    summary: 'Every action edits the system it enters.',
     body: 'Systems evolve through feedback. A thesis, trade, prompt, or agent action changes the system it enters. DJZS treats every action as a feedback event that must be checked before release.',
   },
   {
     tag: 'LAW 05',
     title: 'Verification Must Precede Execution',
-    summary: 'Action without audit is blind simulation.',
     body: 'Action without audit is blind simulation. Before capital moves, agents act, or narratives harden into belief, the reasoning layer must be tested. DJZS exists to audit before execution.',
   },
 ];
@@ -71,9 +66,6 @@ function LawAccordion({ law, index, isActive, onToggle, visible }: {
           </span>
         </div>
         <div className="flex items-center gap-4 shrink-0">
-          <span className="font-mono text-[11px] text-zinc-600 hidden md:inline">
-            {law.summary}
-          </span>
           <span
             className={`font-mono text-base transition-all duration-200 inline-block ${
               isActive ? 'text-green-400' : 'text-zinc-700'
