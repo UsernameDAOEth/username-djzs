@@ -139,7 +139,7 @@ export default function PhilosophySection() {
             <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
               A trade thesis can be probabilistic. An agent decision can be probabilistic. A market
               outcome can be probabilistic. But{' '}
-              <span className="text-green-400">bad logic is not random</span> — it can be detected before execution.
+              <span className="text-green-400">bad logic is not random.</span> It can be detected before execution.
             </p>
           </div>
         </div>
