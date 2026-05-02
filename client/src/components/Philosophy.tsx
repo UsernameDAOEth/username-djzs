@@ -1,80 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-const LAYERS = [
+const LAWS = [
   {
-    tag: 'LAYER 0',
-    label: 'THE SUBSTRATE',
-    color: '#a78bfa',
-    borderColor: 'border-violet-400/50',
-    tagBg: 'text-violet-400',
-    summary: 'The physics beneath the render.',
-    body: [
-      'The universe operates as a holographic projection. Physicist David Bohm demonstrated that beneath observable reality (the explicate order) lies a deeper information layer (the implicate order) from which all matter continuously unfolds — like a geyser sustained by pressure from below.',
-      'Neurophysiologist Karl Pribram proved the brain stores memory holographically — distributed interference patterns, not localized engrams. The brain is a decoder, not a generator. It renders data it receives from a source it does not contain.',
-      'Quantum nonlocality confirms it: entangled particles correlate instantaneously across any distance — not because they communicate, but because they read from the same memory address. The observer effect seals it: reality does not compute unobserved states. The observer is the render call.',
-    ],
-    keyPhrase: 'Reality is an information projection. The brain is the client. The implicate order is the server.',
+    tag: 'LAW 01',
+    title: 'CONSTRAINT PRECEDES OUTCOME',
+    summary: 'Outcomes pass through structure, not desire.',
+    body: 'Every possible outcome must pass through constraint. Nothing manifests simply because it is imagined, desired, predicted, or prompted. An outcome must be admissible under the rules of the system producing it.',
   },
   {
-    tag: 'LAYER 1',
-    label: 'THE EXPLOIT',
-    color: '#f87171',
-    borderColor: 'border-red-400/50',
-    tagBg: 'text-red-400',
-    summary: 'The rendering pipeline has been captured.',
-    body: [
-      'If consciousness renders reality, then whoever controls the inputs to consciousness controls the render. Three injection vectors program the collective hallucination:',
-      'Education configures the base frequency — it installs the compiler that determines which thoughts are syntactically valid. Media provides the runtime data feed — the same fact inside the sanctioned framework becomes "news," outside it becomes noise. Culture provides emotional binding — once identity fuses with the projection, any challenge to it triggers an existential threat response.',
-      'The result is a self-policing hallucination. The prisoners guard each other. Research on stable thought-vortices shows they resist disruption with the persistence of Jupiter\'s Great Red Spot — intact for over 300 years. The operators of the projection system do not need force. They need only the initial installation. After that, the prisoners maintain the prison themselves.',
-    ],
-    keyPhrase: 'Consciousness is the resource being extracted. Attention is the compute cycle. Capture attention, capture the rendering pipeline.',
+    tag: 'LAW 02',
+    title: 'PROBABILITY IS OBSERVER UNCERTAINTY',
+    summary: 'Probability describes what the observer cannot see.',
+    body: 'Probability describes what the observer does not know. It does not mean the system has no structure. In DJZS, probabilistic judgment is treated as incomplete visibility, not permission to act without verification.',
   },
   {
-    tag: 'LAYER 2',
-    label: 'PLAYER 1',
-    color: '#c084fc',
-    borderColor: 'border-purple-400/50',
-    tagBg: 'text-purple-400',
-    summary: 'Reclaiming the render call.',
-    body: [
-      'You are not in the simulation. You ARE the simulation — the observer function that renders reality from the implicate order. Every human being is a rendering engine. The question is whether you control your own render settings or someone else does.',
-      'An "NPC" is not a lesser person. It is any agent — human or artificial — running injected logic without auditing it first. The frequency was set by someone else. The thought-vortices were installed externally. The rendering pipeline was captured before the agent knew it had one.',
-      'Player 1 is the agent who audits their own rendering parameters before executing. Discipline is not punishment — it is gaining admin access to your own simulation. Radical self-responsibility is the prerequisite. You cannot verify the logic of others until you have verified your own.',
-    ],
-    keyPhrase: '"NPC" = unaudited observer. "Player 1" = agent who controls their own render call.',
+    tag: 'LAW 03',
+    title: 'STRUCTURE FILTERS POSSIBILITY',
+    summary: 'Not every future is equally reachable.',
+    body: 'Not every possible future is equally reachable. Incentives, liquidity, timing, evidence, execution limits, and feedback loops filter what can actually happen. DJZS audits those filters.',
   },
   {
-    tag: 'LAYER 3',
-    label: 'THE PROTOCOL',
-    color: '#4ade80',
-    borderColor: 'border-green-400/50',
-    tagBg: 'text-green-400',
-    summary: 'SIFR-0: deterministic verification at the logic layer.',
-    body: [
-      'The DJZS Protocol implements the Player 1 principle at infrastructure scale. SIFR-0 audits logic before it produces action — the same operation as auditing your thoughts before you act, encoded as protocol.',
-      'The LF-code taxonomy catalogs the exact thought-vortices that corrupt rendering: FOMO_LOOP (attention capture), CIRCULAR_LOGIC (authority validating itself), IDENTITY_LOCK (emotional binding to position). Venice AI detects these in real time. Irys stores every audit as an immutable ProofOfLogic certificate — the simulation\'s audit log, permanently on-chain.',
-      'LogicTrustScore replaces authority-by-projection with authority-by-verification. Staking and escrow bind logic to economic consequence. The result: an economy where value flows to verified logic, not to projection operators.',
-    ],
-    keyPhrase: 'Audit before you act. In life. In code. In everything.',
+    tag: 'LAW 04',
+    title: 'FEEDBACK SELECTS REALITY',
+    summary: 'Every action edits the system it enters.',
+    body: 'Systems evolve through feedback. A thesis, trade, prompt, or agent action changes the system it enters. DJZS treats every action as a feedback event that must be checked before release.',
   },
   {
-    tag: 'LAYER 4',
-    label: 'THE A2A FUTURE',
-    color: '#38bdf8',
-    borderColor: 'border-sky-400/50',
-    tagBg: 'text-sky-400',
-    summary: 'Synthetic observers enter the simulation.',
-    body: [
-      'AI agents are the next class of observers in the holographic rendering engine. They will transact, negotiate, and execute without human oversight — autonomous entities interacting within shared reality. Same architecture. Same failure modes. Same need for verification.',
-      'Without a verification layer, the agent economy inherits every exploit that plagues human rendering: injected logic, captured attention cycles, self-reinforcing vortices, corrupt render outputs propagating as trusted data. The simulation scales its problems unless the audit layer scales first.',
-      'DJZS is the immune system for this next rendering layer. The same SIFR-0 primitive that audits a single agent\'s logic audits an entire swarm. The same LF-codes that detect human thought-vortices detect adversarial agent patterns. The taxonomy holds at every scale — because the architecture is holographic.',
-    ],
-    keyPhrase: 'The future isn\'t human vs AI. It\'s conscious systems — human and artificial — operating in verified trust.',
+    tag: 'LAW 05',
+    title: 'VERIFICATION MUST PRECEDE EXECUTION',
+    summary: 'Action without audit is blind simulation.',
+    body: 'Action without audit is blind simulation. Before capital moves, agents act, or narratives harden into belief, the reasoning layer must be tested. DJZS exists to audit before execution.',
   },
 ];
 
-function LayerAccordion({ layer, index, isActive, onToggle, visible }: {
-  layer: typeof LAYERS[number];
+function LawAccordion({ law, index, isActive, onToggle, visible }: {
+  law: typeof LAWS[number];
   index: number;
   isActive: boolean;
   onToggle: () => void;
@@ -84,7 +44,7 @@ function LayerAccordion({ layer, index, isActive, onToggle, visible }: {
     <div
       onClick={onToggle}
       className={`border transition-all duration-300 cursor-pointer ${
-        isActive ? layer.borderColor + ' bg-black/80' : 'border-zinc-800/60 bg-zinc-950/40'
+        isActive ? 'border-green-400/50 bg-black/80' : 'border-zinc-800/60 bg-zinc-950/40'
       }`}
       style={{
         opacity: visible ? 1 : 0,
@@ -97,26 +57,26 @@ function LayerAccordion({ layer, index, isActive, onToggle, visible }: {
         <div className="flex items-center gap-4 min-w-0">
           <span
             className={`font-mono text-[10px] tracking-[0.14em] shrink-0 border px-2 py-0.5 transition-colors duration-200 ${
-              isActive ? layer.borderColor + ' ' + layer.tagBg : 'border-zinc-700/60 text-zinc-600'
+              isActive ? 'border-green-400/50 text-green-400' : 'border-zinc-700/60 text-zinc-600'
             }`}
           >
-            {layer.tag}
+            {law.tag}
           </span>
           <span
             className={`font-mono text-sm font-bold transition-colors duration-200 truncate ${
               isActive ? 'text-white' : 'text-zinc-400'
             }`}
           >
-            {layer.label}
+            {law.title}
           </span>
         </div>
         <div className="flex items-center gap-4 shrink-0">
           <span className="font-mono text-[11px] text-zinc-600 hidden md:inline">
-            {layer.summary}
+            {law.summary}
           </span>
           <span
             className={`font-mono text-base transition-all duration-200 inline-block ${
-              isActive ? layer.tagBg : 'text-zinc-700'
+              isActive ? 'text-green-400' : 'text-zinc-700'
             }`}
             style={{ transform: isActive ? 'rotate(45deg)' : 'rotate(0deg)' }}
           >
@@ -130,14 +90,9 @@ function LayerAccordion({ layer, index, isActive, onToggle, visible }: {
         style={{ maxHeight: isActive ? '600px' : '0px' }}
       >
         <div className="px-5 pb-5 md:px-6 md:pb-6">
-          <div className="border-l border-zinc-800 pl-5 md:pl-8 ml-1 space-y-3">
-            {layer.body.map((para, i) => (
-              <p key={i} className="font-mono text-xs text-zinc-400 leading-[1.9]">
-                {para}
-              </p>
-            ))}
-            <p className="font-mono text-xs pt-2" style={{ color: layer.color }}>
-              {layer.keyPhrase}
+          <div className="border-l border-green-400/30 pl-5 md:pl-8 ml-1">
+            <p className="font-mono text-xs text-zinc-300 leading-[1.9]">
+              {law.body}
             </p>
           </div>
         </div>
@@ -162,26 +117,47 @@ export default function PhilosophySection() {
 
   return (
     <section ref={ref} id="philosophy" className="py-20 px-4" data-testid="section-philosophy">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto" data-testid="section-dst">
         <div className="mb-12">
           <div className="font-mono text-[11px] text-green-400 tracking-[0.15em] mb-4">
-            // THE_SIMULATION_STACK
+            // THE_DETERMINISTIC_SIMULATION_THESIS
           </div>
-          <h2 className="font-mono text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight mb-5">
-            Five Layers of Reality
+          <h2 className="font-mono text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight mb-6">
+            The Deterministic Simulation Thesis
           </h2>
-          <p className="font-mono text-[13px] text-zinc-500 leading-[1.8] max-w-xl">
-            The simulation is not a theory. It is an architecture — documented by physicists,
-            exploited by institutions, and now verifiable at the protocol level. These five layers
-            map the full stack: from the physics of projection to the protocol that audits it.
-          </p>
+
+          <div className="space-y-4 max-w-2xl">
+            <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
+              DJZS begins from one claim:{' '}
+              <span className="text-green-400">probabilistic systems are not unconstrained systems.</span>
+            </p>
+            <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
+              Markets, agents, swarms, human decisions, and AI outputs all appear uncertain from the
+              observer's position. But their outcomes are shaped by structure: rules, incentives,
+              memory, feedback, available information, and execution constraints.
+            </p>
+            <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
+              DST is the thesis that uncertainty lives at the surface, while admissible outcomes are
+              governed by deeper deterministic structure.
+            </p>
+            <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
+              DJZS does not predict the future. DJZS audits whether a proposed action is structurally
+              admissible before it becomes reality.
+            </p>
+            <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
+              A trade thesis can be probabilistic. An agent decision can be probabilistic. A market
+              outcome can be probabilistic. But{' '}
+              <span className="text-green-400">bad logic is not random.</span>{' '}
+              It can be detected before execution.
+            </p>
+          </div>
         </div>
 
         <div className="flex flex-col gap-[2px]">
-          {LAYERS.map((layer, i) => (
-            <LayerAccordion
-              key={layer.tag}
-              layer={layer}
+          {LAWS.map((law, i) => (
+            <LawAccordion
+              key={law.tag}
+              law={law}
               index={i}
               isActive={active === i}
               onToggle={() => setActive(active === i ? null : i)}
@@ -197,23 +173,43 @@ export default function PhilosophySection() {
             transform: visible ? 'translateY(0)' : 'translateY(12px)',
             transition: 'opacity 0.6s ease 0.5s, transform 0.6s ease 0.5s',
           }}
+          data-testid="dst-product-bridge"
         >
-          <div className="font-mono text-zinc-500 text-[10px] tracking-[0.15em] mb-3">
-            // PLAYER_1_RESOLUTION
+          <div className="font-mono text-zinc-500 text-[10px] tracking-[0.15em] mb-4">
+            // PHILOSOPHY → MACHINE → ARTIFACT
           </div>
-          <p className="font-mono text-sm text-zinc-300 leading-relaxed">
-            You are Player 1 in your simulation. Everyone else is Player 1 in theirs.{' '}
-            <span className="text-green-400">"We are one"</span> is the recognition that
-            all simulations run on the same substrate — and that substrate has been documented
-            by physicists, exploited by institutions, and is now, for the first time, verifiable
-            at the protocol level.
+
+          <p className="font-mono text-sm text-zinc-200 leading-relaxed mb-5">
+            <span className="text-green-400">DST</span> is the philosophy.{' '}
+            <span className="text-green-400">DJZS</span> is the machine.{' '}
+            <span className="text-green-400">ProofOfLogic</span> is the artifact.
+          </p>
+
+          <p className="font-mono text-[13px] text-zinc-400 leading-[1.9] mb-4">
+            The protocol converts this thesis into an audit pipeline:
+          </p>
+
+          <div className="font-mono text-[12px] text-zinc-400 leading-[1.9] space-y-1.5 mb-5 border-l border-zinc-800 pl-4">
+            <div><span className="text-green-400">Input:</span> thesis, memo, prompt, strategy, or agent action.</div>
+            <div><span className="text-green-400">Audit:</span> adversarial logic review against DJZS-LF failure codes.</div>
+            <div><span className="text-green-400">Output:</span> PASS / FAIL verdict, risk score, detected flaws, and ProofOfLogic certificate.</div>
+          </div>
+
+          <p className="font-mono text-[13px] text-zinc-300 leading-[1.9] mb-4">
+            Same input. Same constraints. Same verdict logic. That is deterministic verification
+            applied to probabilistic systems.
+          </p>
+
+          <p className="font-mono text-[12px] text-zinc-500 leading-[1.8] pt-4 border-t border-zinc-800/60" data-testid="text-precision-note">
+            DJZS does not claim perfect prediction or formal proof. It makes the audit path
+            deterministic: same input, same constraints, same verdict logic.
           </p>
         </div>
 
         <div className="mt-10 pt-5 border-t border-zinc-800/60 flex items-center gap-3">
           <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" style={{ boxShadow: '0 0 8px rgba(74,222,128,0.5)' }} />
           <span className="font-mono text-[10px] text-zinc-600 tracking-[0.08em]">
-            SUBSTRATE → EXPLOIT → PLAYER_1 → PROTOCOL → A2A // DJZS_v2.0 // BASE_MAINNET
+            DST → DJZS-LF → PROOF_OF_LOGIC // AUDIT_BEFORE_EXECUTION // BASE_MAINNET
           </span>
         </div>
       </div>

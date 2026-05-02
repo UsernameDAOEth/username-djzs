@@ -23,7 +23,7 @@ client/
     ├── components/
     │   ├── DJZSAllSections.tsx — Combined: MatrixRain + FoundersFund + ProofOfLogicTerminal + TryTheOracle
     │   ├── Axioms.tsx          — AX-00 through AX-05 accordion (6 axioms)
-    │   ├── Philosophy.tsx      — 5-Layer Simulation Stack accordion
+    │   ├── Philosophy.tsx      — Deterministic Simulation Thesis (DST): 5 laws + product bridge
     │   └── ArchitectureOfIllusion.tsx — 12 Pillars evidence matrix + 3-layer stack
     ├── hooks/
     │   └── useXmtp.ts       — XMTP SDK hook: connect, sendMessage, stream, disconnect
@@ -65,7 +65,7 @@ drizzle.config.ts            — Drizzle Kit config
 2. **FoundersFund** — Expandable funding bar with PayPal (DecentralizedDaemon), Cash App ($DJZS), ETH/Base (username.dj-z-s.eth) payment options; collapsible detail view with copy-address for crypto
 3. **Hero** — Terminal boot sequence, identity resolution, outcome status cards
 4. **Tollbooth** — Protocol capabilities, receipts, log stream, teaching pillars
-5. **Philosophy** — Protocol Axioms accordion: Ground State Baseline, Toroidal Fold, Resonance Audit, Scale Invariance; IntersectionObserver fade-in animation
+5. **Philosophy** — The Deterministic Simulation Thesis (DST): lede + 5 LAW accordion (Constraint Precedes Outcome, Probability Is Observer Uncertainty, Structure Filters Possibility, Feedback Selects Reality, Verification Must Precede Execution) + product bridge (DST → DJZS → ProofOfLogic) with precision disclaimer
 6. **Evolution** — Timeline from consciousness study to protocol deployment
 7. **Sifr0Philosophy** — SIFR-0 zero-point philosophy with animated 3D torus, cross-tradition mapping (Yoruba/Egyptian/Sanskrit/Greek/Arabic), INTENT → SIFR-0 AUDIT → MANIFESTATION flow
 8. **TryTheOracle** — Copy-paste DJZS oracle prompt with syntax highlighting, expandable code block, DJZS-LF taxonomy badges, 3-step instructions (Copy → Paste → Audit), upgrade path CTA
