@@ -3,31 +3,31 @@ import React, { useEffect, useRef, useState } from 'react';
 const LAWS = [
   {
     tag: 'LAW 01',
-    title: 'CONSTRAINT PRECEDES OUTCOME',
+    title: 'Constraint Precedes Outcome',
     summary: 'Outcomes pass through structure, not desire.',
     body: 'Every possible outcome must pass through constraint. Nothing manifests simply because it is imagined, desired, predicted, or prompted. An outcome must be admissible under the rules of the system producing it.',
   },
   {
     tag: 'LAW 02',
-    title: 'PROBABILITY IS OBSERVER UNCERTAINTY',
+    title: 'Probability Is Observer Uncertainty',
     summary: 'Probability describes what the observer cannot see.',
     body: 'Probability describes what the observer does not know. It does not mean the system has no structure. In DJZS, probabilistic judgment is treated as incomplete visibility, not permission to act without verification.',
   },
   {
     tag: 'LAW 03',
-    title: 'STRUCTURE FILTERS POSSIBILITY',
+    title: 'Structure Filters Possibility',
     summary: 'Not every future is equally reachable.',
     body: 'Not every possible future is equally reachable. Incentives, liquidity, timing, evidence, execution limits, and feedback loops filter what can actually happen. DJZS audits those filters.',
   },
   {
     tag: 'LAW 04',
-    title: 'FEEDBACK SELECTS REALITY',
+    title: 'Feedback Selects Reality',
     summary: 'Every action edits the system it enters.',
     body: 'Systems evolve through feedback. A thesis, trade, prompt, or agent action changes the system it enters. DJZS treats every action as a feedback event that must be checked before release.',
   },
   {
     tag: 'LAW 05',
-    title: 'VERIFICATION MUST PRECEDE EXECUTION',
+    title: 'Verification Must Precede Execution',
     summary: 'Action without audit is blind simulation.',
     body: 'Action without audit is blind simulation. Before capital moves, agents act, or narratives harden into belief, the reasoning layer must be tested. DJZS exists to audit before execution.',
   },
@@ -128,8 +128,10 @@ export default function PhilosophySection() {
 
           <div className="space-y-4 max-w-2xl">
             <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
-              DJZS begins from one claim:{' '}
-              <span className="text-green-400">probabilistic systems are not unconstrained systems.</span>
+              DJZS begins from one claim:
+            </p>
+            <p className="font-mono text-[13px] text-green-400 leading-[1.8]">
+              Probabilistic systems are not unconstrained systems.
             </p>
             <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
               Markets, agents, swarms, human decisions, and AI outputs all appear uncertain from the
@@ -146,9 +148,10 @@ export default function PhilosophySection() {
             </p>
             <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
               A trade thesis can be probabilistic. An agent decision can be probabilistic. A market
-              outcome can be probabilistic. But{' '}
-              <span className="text-green-400">bad logic is not random.</span>{' '}
-              It can be detected before execution.
+              outcome can be probabilistic.
+            </p>
+            <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
+              But <span className="text-green-400">bad logic is not random.</span> It can be detected before execution.
             </p>
           </div>
         </div>
