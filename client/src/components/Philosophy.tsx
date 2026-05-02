@@ -118,12 +118,10 @@ export default function PhilosophySection() {
             The Deterministic Simulation Thesis
           </h2>
 
-          <div className="space-y-4 max-w-2xl">
+          <div className="space-y-5 max-w-2xl">
             <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
-              DJZS begins from one claim:
-            </p>
-            <p className="font-mono text-[13px] text-green-400 leading-[1.8]">
-              Probabilistic systems are not unconstrained systems.
+              DJZS begins from one claim:{' '}
+              <span className="text-green-400">Probabilistic systems are not unconstrained systems.</span>
             </p>
             <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
               Markets, agents, swarms, human decisions, and AI outputs all appear uncertain from the
@@ -138,12 +136,10 @@ export default function PhilosophySection() {
               DJZS does not predict the future. DJZS audits whether a proposed action is structurally
               admissible before it becomes reality.
             </p>
-            <p className="font-mono text-[13px] text-zinc-500 leading-[1.8]">
-              A trade thesis can be probabilistic. An agent decision can be probabilistic. A market
-              outcome can be probabilistic.
-            </p>
             <p className="font-mono text-[13px] text-zinc-400 leading-[1.8]">
-              But <span className="text-green-400">bad logic is not random.</span> It can be detected before execution.
+              A trade thesis can be probabilistic. An agent decision can be probabilistic. A market
+              outcome can be probabilistic. But{' '}
+              <span className="text-green-400">bad logic is not random</span> — it can be detected before execution.
             </p>
           </div>
         </div>
