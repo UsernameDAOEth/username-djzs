@@ -1,0 +1,54 @@
+Yes — **mostly right**. This is a strong implementation brief. It correctly moves the philosophy from mystical simulation language into an operational DST doctrine: **probabilistic at observer layer, constraint-bound at system layer, deterministic at verification layer**. That is the right framing. 
+
+I would fix **three things** before sending it to Replit.
+
+## 1. Fix the `data-testid` issue
+
+This line is slightly wrong:
+
+> “Keep data-testid="section-philosophy" too, but add data-testid="section-dst" as an additional alias on the `<section>`”
+
+A React element should not have two `data-testid` attributes. Better:
+
+```text
+Keep data-testid="section-philosophy" on the <section>.
+Add data-testid="section-dst" to the inner wrapper div.
+```
+
+## 2. Add a precision disclaimer
+
+Because DJZS has previously avoided claiming “deterministic formal verification,” add this line somewhere in the lede or product bridge:
+
+```text
+DJZS does not claim perfect prediction or formal proof. It makes the audit path deterministic: same input, same constraints, same verdict logic.
+```
+
+This protects the claim. Otherwise critics can say you’re overstating what an LLM-based audit can guarantee.
+
+## 3. Tighten “verbatim” copy handling
+
+The lede is good, but “line breaks preserved” may create an awkward wall of short lines in the UI. Better instruction:
+
+```text
+Use the lede copy exactly, but render it as clean short paragraphs for readability.
+```
+
+## Updated correction block to paste into the task
+
+```text
+Important implementation correction:
+Keep data-testid="section-philosophy" on the main <section>. Add data-testid="section-dst" to the inner content wrapper, not as a second data-testid on the same element.
+
+Add this precision line to the product bridge:
+“DJZS does not claim perfect prediction or formal proof. It makes the audit path deterministic: same input, same constraints, same verdict logic.”
+
+Use the lede copy exactly, but render it as clean short paragraphs for readability.
+```
+
+## Verdict
+
+Yes, this is right.
+
+It does the important thing: **DST becomes the doctrine, DJZS becomes the machine, ProofOfLogic becomes the artifact, and SIFR-0 gets demoted to symbolic gateway.**
+
+That is the correct architecture for the philosophy update.
