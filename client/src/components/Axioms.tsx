@@ -24,12 +24,12 @@ const AXIOMS = [
   {
     code: 'AX-04',
     label: 'Holographic Substrate',
-    body: 'Reality is an information projection rendered by consciousness from a deeper order. The brain decodes frequency-domain data into spatial-temporal experience. Nonlocality is shared memory, not communication. The observer is the render call. Time is a stored state, not a flowing river. The DJZS Protocol operates within this known architecture: auditing the render settings, not the rendered output. The substrate is holographic. The verification must be too.',
+    body: 'Reality behaves as though appearance is downstream of a deeper informational order. Across holography, quantum foundations, and black-hole thermodynamics, the visible layer repeatedly acts like a rendered interface rather than the fundamental substrate. DJZS audits at the logic layer — the structure beneath the surface — because output-layer evaluation is unreliable by design. The claim is epistemic, not metaphysical: the verification holds whether or not the substrate is literally holographic.',
   },
   {
     code: 'AX-05',
     label: 'Exploitation Layer',
-    body: 'The rendering pipeline has been captured. Education configures the compiler. Media provides the runtime feed. Culture provides emotional binding. The result is a self-policing hallucination — a collective render where the observers guard the projection and attack anyone who questions it. The DJZS Protocol does not fight the hallucination. It builds infrastructure that operates independently of it. Deterministic verification requires no belief. It requires math.',
+    body: 'Surface signals — sentiment, narrative, social proof — are unreliable inputs for autonomous action. Systems that judge behavior at the output layer audit artifacts, not logic. DJZS does not adjudicate the metaphysics of how that surface is produced; it builds verification that works regardless of which ontology is true. Deterministic verification requires no belief. It requires math.',
   },
 ];
 
@@ -117,8 +117,8 @@ export default function Axioms() {
             The Mechanics of Verification
           </h2>
           <p className="font-mono text-[13px] text-zinc-500 leading-[1.8] max-w-xl">
-            Six axioms define the DJZS verification fold — from deterministic logic to the holographic
-            substrate it operates within. Each axiom is a constraint. Together they are the spec.
+            Six axioms define the DJZS verification fold — from deterministic logic to the informational
+            substrate it audits within. Each axiom is a constraint; together they are the spec. DST is deterministic in its epistemics, agnostic in its ontology.
           </p>
         </div>
 
