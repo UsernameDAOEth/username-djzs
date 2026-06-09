@@ -3,28 +3,28 @@ import React, { useEffect, useRef, useState } from 'react';
 const LAWS = [
   {
     tag: 'LAW 01',
-    title: 'Constraint Precedes Outcome',
-    body: 'Every possible outcome must pass through constraint. Nothing manifests simply because it is imagined, desired, predicted, or prompted. An outcome must be admissible under the rules of the system producing it.',
+    title: 'Constraint Precedes Appearance',
+    body: 'No realized state is unconstrained. Every outcome emerges through an admissible transition inside a bounded rule structure — possibility is filtered before manifestation. In DJZS, an action is audited against the constraints it must satisfy before it is allowed to appear.',
   },
   {
     tag: 'LAW 02',
-    title: 'Probability Is Observer Uncertainty',
-    body: 'Probability describes what the observer does not know. It does not mean the system has no structure. In DJZS, probabilistic judgment is treated as incomplete visibility, not permission to act without verification.',
+    title: 'Information Persists Across Transformation',
+    body: 'What changes in form does not necessarily vanish in informational content; surface destruction does not guarantee deep erasure. In DJZS, every audited action is preserved as an immutable ProofOfLogic certificate on Irys — the record survives the act.',
   },
   {
     tag: 'LAW 03',
-    title: 'Structure Filters Possibility',
-    body: 'Not every possible future is equally reachable. Incentives, liquidity, timing, evidence, execution limits, and feedback loops filter what can actually happen. DJZS audits those filters.',
+    title: 'Description Is Layered, Not Singular',
+    body: 'A single system admits multiple valid descriptions at different levels, with deeper layers generating shallower appearances. No one flat vocabulary exhausts reality. DJZS audits at the logic layer beneath the output layer — the structure that generates the surface, not the surface itself.',
   },
   {
     tag: 'LAW 04',
-    title: 'Feedback Selects Reality',
-    body: 'Systems evolve through feedback. A thesis, trade, prompt, or agent action changes the system it enters. DJZS treats every action as a feedback event that must be checked before release.',
+    title: 'Uncertainty Is Often Observer-Local',
+    body: 'Probabilistic experience does not imply an indeterministic system. Local uncertainty reflects the observer\'s limited position, not the absence of structure. In DJZS, probabilistic judgment is treated as incomplete visibility, never as permission to act without verification.',
   },
   {
     tag: 'LAW 05',
-    title: 'Verification Must Precede Execution',
-    body: 'Action without audit is blind simulation. Before capital moves, agents act, or narratives harden into belief, the reasoning layer must be tested. DJZS exists to audit before execution.',
+    title: 'Only Cross-Framework Invariants Become Theory',
+    body: 'A claim earns promotion only if it survives across independent domains — physics, information theory, computation, applied reasoning. This is DST\'s anti-dogma safeguard. DJZS encodes only failure modes that recur across systems, not cherry-picked anomalies.',
   },
 ];
 
