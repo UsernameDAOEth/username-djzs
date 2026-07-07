@@ -334,3 +334,35 @@
     inset: -1px;
   }
 }
+
+
+/* ---------- Accessibility (added 2026-07-07) ---------- */
+/* Focus rings for keyboard nav — was missing entirely. */
+@layer base {
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+    border-radius: 0;
+  }
+
+  /* Visually hidden until focused — for the skip-to-content link. */
+  .skip-link {
+    position: absolute;
+    left: -10000px;
+    top: 0;
+    z-index: 1000;
+    padding: 0.5rem 1rem;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border: 1px solid hsl(var(--ring));
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    left: 0;
+  }
+}
