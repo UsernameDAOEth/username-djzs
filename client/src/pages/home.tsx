@@ -271,7 +271,12 @@ function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAd
   return (
     <header className="fixed top-0 left-0 right-0 z-40 border-b border-zinc-800 bg-black/90 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <a
+          href="#top"
+          aria-label="Back to top — DJZS landing"
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          data-testid="link-brand-top"
+        >
           {loading ? (
             <div className="w-8 h-8 rounded-full bg-zinc-800 animate-pulse" />
           ) : profile?.avatar ? (
@@ -292,7 +297,7 @@ function Header({ profile, loading, onConnectWallet, isWalletConnected, walletAd
               {profile?.identity || DJZS_ENS}
             </span>
           </div>
-        </div>
+        </a>
         <div className="flex items-center gap-3">
           {walletError && (
             <span className="font-mono text-xs text-red-400 hidden sm:block" data-testid="text-wallet-error">{walletError}</span>
@@ -937,7 +942,8 @@ export default function DJZSLandingPage() {
   const displayProfile = error ? { ...FALLBACK_PROFILE, identity: DJZS_ENS } : profile;
 
   return (
-    <div className="min-h-screen bg-black text-white relative" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+    <div id="top" className="min-h-screen bg-black text-white relative" style={{ fontFamily: "'JetBrains Mono', 'Fira Code', monospace" }}>
+      <a href="#main-content" className="skip-link" data-testid="skip-link">Skip to content</a>
       <div className="fixed inset-0 z-0 pointer-events-none">
         <MatrixRain opacity={0.12} speed={0.6} density={0.98} />
       </div>
@@ -955,7 +961,7 @@ export default function DJZSLandingPage() {
       />
       <FoundersFund />
 
-      <main>
+      <main id="main-content">
         <Hero profile={displayProfile} loading={loading} />
         <Tollbooth />
 
